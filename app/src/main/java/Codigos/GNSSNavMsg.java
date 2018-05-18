@@ -28,7 +28,7 @@ public class GNSSNavMsg {
     private double IDOT;	     // Rate of inclination angle (radians/sec)
     private double codeL2;       // codes on L2 channel
     private double GPS_Week;     // GPS week (to go with Toe), (NOT Mod 1024)
-    private double L2Pdata;      // L2 P data flag
+    private double L2PdataFlag;      // L2 P data flag
     private double accuracy;     // SV user range accuracy (meters)
     private double health;       // Satellite health
     private double TGD;          // Group delay (seconds)
@@ -228,12 +228,12 @@ public class GNSSNavMsg {
         this.GPS_Week = GPS_Week;
     }
 
-    public double getL2Pdata() {
-        return L2Pdata;
+    public double getL2PdataFlag() {
+        return L2PdataFlag;
     }
 
-    public void setL2Pdata(double l2Pdata) {
-        L2Pdata = l2Pdata;
+    public void setL2PdataFlag(double l2Pdata) {
+        L2PdataFlag = l2Pdata;
     }
 
     public double getAccuracy() {
