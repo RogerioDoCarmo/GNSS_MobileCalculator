@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import static Codigos.ReaderRINEX.readLogger_RawAssets;
 import static Codigos.ReaderRINEX.readRINEX_RawAssets;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,6 +22,15 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(getApplicationContext(),
                     "Erro ao abrir o arquivo de efemérides!",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        try {
+            readLogger_RawAssets(MainActivity.this);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(getApplicationContext(),
+                    "Erro ao abrir o arquivo de log!",
                     Toast.LENGTH_SHORT).show();
         }
 
