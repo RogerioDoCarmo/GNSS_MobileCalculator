@@ -1,6 +1,7 @@
 package Codigos;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 import java.io.BufferedReader;
@@ -10,10 +11,10 @@ import java.util.ArrayList;
 
 public class ReaderRINEX {
 
-    public ArrayList<GNSSNavMsg> listaNavMsgs;
+    public static ArrayList<GNSSNavMsg> listaNavMsgs = new ArrayList<>();
 
     public ReaderRINEX(){ //TODO Por enquanto pegar da pasta raw assets msm!
-
+        this.listaNavMsgs = new ArrayList<>();
     }
 
     public static String readRINEX_RawAssets(Context context) throws IOException {
@@ -23,10 +24,39 @@ public class ReaderRINEX {
 
         // do reading, usually loop until end of file reading
         StringBuilder sb = new StringBuilder();
+
+        //PULANDO O CABEÇALHO
         String mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
 
         for (int i = 1; i < numEfemerides; i++){
+            GNSSNavMsg efemeride = new GNSSNavMsg();
+            String PRN;
+            try{
+                PRN = mLine.substring(0,2);
+            }catch (Exception er){
+                PRN = mLine.substring(1,2);
+            }
 
+            Log.i("PRNN", PRN); // FIXME
+            //efemeride.setPRN(Integer.valueOf(PRN));
+            listaNavMsgs.add(efemeride);
+
+            mLine = reader.readLine();
+            mLine = reader.readLine();
+            mLine = reader.readLine();
+            mLine = reader.readLine();
+            mLine = reader.readLine();
+            mLine = reader.readLine();
+            mLine = reader.readLine();
+            mLine = reader.readLine();
         }
 
         reader.close();
