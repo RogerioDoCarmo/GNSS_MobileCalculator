@@ -14,6 +14,7 @@ public class ReaderRINEX {
     public static ArrayList<GNSSNavMsg> listaNavMsgs = new ArrayList<>();
     public static ArrayList<GNSSMeasurement> listaMedicoes = new ArrayList<>();
 
+
     public ReaderRINEX(){ //TODO Por enquanto pegar da pasta raw assets msm!
         this.listaNavMsgs = new ArrayList<>();
     }
@@ -300,6 +301,22 @@ public class ReaderRINEX {
 
         //PULANDO O CABEÇALHO
         String mLine = reader.readLine();
+    //TODO Tratar o caso de ter ou não o campo AgcDb
+        do{
+            while ((mLine = reader.readLine()).equalsIgnoreCase("#")){
+                mLine = reader.readLine();
+            }
+
+            if (mLine.startsWith("NMEA") || mLine.startsWith("Fix")) continue;
+
+            /*Lendo uma linha raw*/
+            Log.i("raw",mLine);
+
+            //TODO PAREI AQUI 
+
+
+            if (mLine == null) break;
+        } while (true); // FIXME ARRUMAR ESSE LAÇO!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         GNSSMeasurement novaMedicao = new GNSSMeasurement();
         listaMedicoes.add(novaMedicao);
