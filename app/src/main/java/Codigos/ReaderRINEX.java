@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class ReaderRINEX {
 
     public static ArrayList<GNSSNavMsg> listaNavMsgs = new ArrayList<>();
+    public static ArrayList<GNSSMeasurement> listaMedicoes = new ArrayList<>();
 
     public ReaderRINEX(){ //TODO Por enquanto pegar da pasta raw assets msm!
         this.listaNavMsgs = new ArrayList<>();
@@ -34,12 +35,12 @@ public class ReaderRINEX {
         mLine = reader.readLine();
         mLine = reader.readLine();
         mLine = reader.readLine();
-        mLine = reader.readLine();
 
         String sub = "";
 
         for (int i = 1; i < numEfemerides; i++){
             GNSSNavMsg efemeride = new GNSSNavMsg();
+            mLine = reader.readLine();
             String PRN;
             try{
                 PRN = mLine.substring(0,2);
@@ -47,20 +48,25 @@ public class ReaderRINEX {
                 PRN = mLine.substring(1,2);
             }
 
-            Log.i("PRNN", PRN); // FIXME
+            Log.i("PRN", PRN); // FIXME
             efemeride.setPRN(PRN);
 
-            double Toc = calcTOC_tr_(Integer.valueOf(mLine.substring(9,11).replaceAll("\\s","")), // dia
-                                     Integer.valueOf(mLine.substring(12,14).replaceAll("\\s","")), // hora
-                                     Integer.valueOf(mLine.substring(15,17).replaceAll("\\s","")), // minuto
-                                     Double.valueOf(mLine.substring(18,22).replaceAll("\\s",""))); // segundo FIXME
+            try {
+                double Toc = calcTOC_tr_(Integer.valueOf(mLine.substring(9, 11).replaceAll("\\s", "")), // dia
+                        Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", "")), // hora
+                        Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", "")), // minuto
+                        Double.valueOf(mLine.substring(18, 22).replace('D', 'e').trim())); // segundo FIXME
 
-            Log.i("TOCC","Dia: " + mLine.substring(9,11).replaceAll("\\s","") +
-                                " Hora: " + mLine.substring(12,14).replaceAll("\\s","") +
-                                " Minutos: " + mLine.substring(15,17).replaceAll("\\s","") +
-                                " Segundos: " + mLine.substring(18,22).replaceAll("\\s","")  );
+                Log.i("TOC", "Dia: " + mLine.substring(9, 11).replaceAll("\\s", "") +
+                        " Hora: " + mLine.substring(12, 14).replaceAll("\\s", "") +
+                        " Minutos: " + mLine.substring(15, 17).replaceAll("\\s", "") +
+                        " Segundos: " + mLine.substring(18, 22).replaceAll("\\s", ""));
 
-            efemeride.setToc(Toc);
+                efemeride.setToc(Toc);
+            }catch (Exception err){
+                efemeride.setToc(0);
+                Log.e("TOC-ERR","Erro: " + err.getMessage());
+            }
 
             Log.i("af0","af0: " + mLine.substring(22,41).replace('D','e').replaceAll("\\s",""));
             Log.i("af1","af1: " + mLine.substring(41,60).replace('D','e').replaceAll("\\s",""));
@@ -154,15 +160,103 @@ public class ReaderRINEX {
             Log.i("Cis",sub);
 //--------------------------------------------------------------------------------------------------
 
-
-            mLine = reader.readLine();
-            mLine = reader.readLine();
-            mLine = reader.readLine();
-            mLine = reader.readLine();
             mLine = reader.readLine();
 
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            efemeride.setI0(Double.parseDouble(sub.trim()));
+
+            Log.i("I0",sub);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            efemeride.setCrc(Double.parseDouble(sub.trim()));
+
+            Log.i("Crc",sub);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setOmega(Double.parseDouble(sub.trim()));
+
+            Log.i("Omega",sub);
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            efemeride.setOMEGA_DOT(Double.parseDouble(sub.trim()));
+
+            Log.i("Omega_Dot",sub);
+//--------------------------------------------------------------------------------------------------
+
+            mLine = reader.readLine();
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            efemeride.setIDOT(Double.parseDouble(sub.trim()));
+
+            Log.i("IDOT",sub);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            double L2Code = Double.parseDouble(sub.trim());
+            efemeride.setCodeL2(L2Code);
+
+            Log.i("CodeL2",sub);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            double week = Double.parseDouble(sub.trim());
+            efemeride.setGPS_Week((int) week);
+
+            Log.i("GPS_WEEK",sub);
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            double L2Flag = Double.parseDouble(sub.trim());
+            efemeride.setL2PdataFlag((int) L2Flag);
+
+            Log.i("L2_Flag",sub);
+
+//--------------------------------------------------------------------------------------------------
+
+            mLine = reader.readLine();
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            double svAccur = Double.parseDouble(sub.trim());
+            efemeride.setAccuracy((int) svAccur);
+
+            Log.i("Sv_Accur",sub);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            double svHealth = Double.parseDouble(sub.trim());
+            efemeride.setHealth((int) svHealth);
+
+            Log.i("Sv_Health",sub);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setTGD(Double.parseDouble(sub.trim()));
+
+            Log.i("Tgd",sub);
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            double iodc = Double.parseDouble(sub.trim());
+            efemeride.setIODC((int) iodc);
+
+            Log.i("IODC",sub);
+//--------------------------------------------------------------------------------------------------
+            mLine = reader.readLine();
+
+            int len = mLine.length();
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            efemeride.setTtx(Double.parseDouble(sub.trim()));
+
+            Log.i("Transmission Time (TTX)",sub);
+
+            if (len > 22) {
+                sub = mLine.substring(22, 41).replace('D', 'e');
+                efemeride.setFit_interval(Double.parseDouble(sub.trim()));
+
+            } else {
+                efemeride.setFit_interval(0);
+            }
+
+            Log.i("Fit Interval",sub);
+
+//--------------------------------------------------------------------------------------------------
             listaNavMsgs.add(efemeride);
-
+            Log.i("FIM-MENSAGEM","===========================================");
         }
 
         reader.close();
@@ -196,6 +290,22 @@ public class ReaderRINEX {
         reader.close();
 
         return numLines / 8;
+    }
+
+    public static String readLogger_RawAssets(Context context) throws  IOException{
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour3470))); // FIXME DEIXAR DINAMICO
+
+        // do reading, usually loop until end of file reading
+        StringBuilder sb = new StringBuilder();
+
+        //PULANDO O CABEÇALHO
+        String mLine = reader.readLine();
+
+        GNSSMeasurement novaMedicao = new GNSSMeasurement();
+        listaMedicoes.add(novaMedicao);
+
+        reader.close();
+        return sb.toString();
     }
 
 }
