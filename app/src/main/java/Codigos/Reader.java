@@ -365,14 +365,12 @@ public class Reader {
                     Log.e("Err","HardwareClockDiscontinuityCount: " + ex.getMessage());
                 }
 
-
-
-
-
-
                 novaMedicao.setSvid(Integer.parseInt(linhaRaw[11]));
                 novaMedicao.setTimeOffsetNanos(Double.parseDouble(linhaRaw[12]));
+
                 novaMedicao.setState(Integer.parseInt(linhaRaw[13]));
+                Log.i("State","Resultado: " + Integer.parseInt(linhaRaw[13]));
+
                 novaMedicao.setReceivedSvTimeNanos(Long.parseLong(linhaRaw[14]));
                 novaMedicao.setReceivedSvTimeUncertaintyNanos(Double.parseDouble(linhaRaw[15]));
                 novaMedicao.setCn0DbHz(Double.parseDouble(linhaRaw[16]));
@@ -390,7 +388,6 @@ public class Reader {
                 } catch (NumberFormatException err){
                     Log.e("err","CarrierPhase errors...");
                 }
-
 
                 novaMedicao.setMultipathIndicator(Integer.parseInt(linhaRaw[26]));
 
@@ -415,9 +412,41 @@ public class Reader {
     public static void calcPseudoranges(){
         for (int i = 0; i < listaMedicoes.size(); i++){
 
-            //TODO PAREI AQUI!
+            double pseudorangeMeters = 0d;
+            double pseudorangeUncertaintyMeters = 0d;
 
-//            listaMedicoes.get(i).setPseudorangeMeters();
+            // GPS Week number:
+            Long weekNumber =  Math.round(Math.floor(-(double)listaMedicoes.get(i).getFullBiasNanos() * 1e-9/GNSSConstants.WEEKSEC));
+            //TODO VERIFICAR E ATRIBUIT 0 CASO DE ERRO
+//            listaMedicoes.get(i).getBiasNanos();
+//            listaMedicoes.get(i).getTimeOffsetNanos();
+
+            //compute time of measurement relative to start of week
+            Long WEEKNANOS = Math.round (GNSSConstants.WEEKSEC * 1e9);
+            Long weekNumberNanos = weekNumber * Math.round(GNSSConstants.WEEKSEC*1e9);
+
+            //Compute tRxNanos using gnssRaw.FullBiasNanos(1), so that
+            //tRxNanos includes rx clock drift since the first epoch:
+            Long tRxNanos = listaMedicoes.get(i).getTimeNanos() - listaMedicoes.get(i).getFullBiasNanos() - weekNumberNanos;
+
+            //TODO !!AQUI ENTRA A LOGICA DO CAMPO STATE...
+            //tRxNanos now since beginning of the week, unless we had a week rollover
+
+            //subtract the fractional offsets TimeOffsetNanos and BiasNanos:
+            double tRxSeconds = (double)(Math.round(tRxNanos) - listaMedicoes.get(i).getTimeOffsetNanos() - listaMedicoes.get(i).getBiasNanos()*1e-9);
+            double tTxSeconds = (double)listaMedicoes.get(i).getReceivedSvTimeNanos() * 1e-9;
+
+            double prSeconds = tRxSeconds - tTxSeconds;
+
+            // we are ready to compute pseudorange in meters:
+            pseudorangeMeters = prSeconds * GNSSConstants.LIGHTSPEED;
+            pseudorangeUncertaintyMeters = (double) listaMedicoes.get(i).getReceivedSvTimeUncertaintyNanos() * 1e-9 * GNSSConstants.LIGHTSPEED;
+
+            listaMedicoes.get(i).setPseudorangeMeters(pseudorangeMeters);
+            listaMedicoes.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
+
+            Log.i("PSEUDORANGE", listaMedicoes.get(i).getPseudorangeMeters() + " m");
+            Log.i("PSEUDORANGE", "Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
         }
     }
 
