@@ -9,13 +9,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class ReaderRINEX {
+public class Reader {
 
     public static ArrayList<GNSSNavMsg> listaNavMsgs = new ArrayList<>();
     public static ArrayList<GNSSMeasurement> listaMedicoes = new ArrayList<>();
 
 
-    public ReaderRINEX(){ //TODO Por enquanto pegar da pasta raw assets msm!
+    public Reader(){ //TODO Por enquanto pegar da pasta raw assets msm!
         this.listaNavMsgs = new ArrayList<>();
     }
 
@@ -294,35 +294,131 @@ public class ReaderRINEX {
     }
 
     public static String readLogger_RawAssets(Context context) throws  IOException{
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour3470))); // FIXME DEIXAR DINAMICO
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.sensorlog))); // FIXME DEIXAR DINAMICO
 
         // do reading, usually loop until end of file reading
         StringBuilder sb = new StringBuilder();
 
         //PULANDO O CABEÇALHO
         String mLine = reader.readLine();
+        while ((mLine = reader.readLine()).startsWith("#")){
+            mLine = reader.readLine();
+        }
+
     //TODO Tratar o caso de ter ou não o campo AgcDb
-        do{
-            while ((mLine = reader.readLine()).equalsIgnoreCase("#")){
-                mLine = reader.readLine();
+
+        while(mLine != null){
+            mLine = reader.readLine();
+
+            if (mLine == null || mLine.isEmpty()) continue;
+
+            if (mLine.startsWith("Raw")){
+                /*Lendo uma linha raw*/
+                Log.i("raw",mLine);
+
+                String[] linhaRaw = mLine.split(",");
+
+                if (!linhaRaw[28].equalsIgnoreCase(String.valueOf(GNSSConstants.CONSTELLATION_GPS))){
+                    Log.w("Constellation", "Non-GPS Measurement: Type " + linhaRaw[28]);
+                    continue; // TODO Por enquanto só são tratadas medições GPS
+                }
+
+                GNSSMeasurement novaMedicao = new GNSSMeasurement();
+
+                //TODO USAR UMA TABELA HASH NO LUGAR DE UM ARRAY SIMPLES!
+
+                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[1]));
+                novaMedicao.setTimeNanos(Long.parseLong(linhaRaw[2]));
+
+                try{
+                    novaMedicao.setLeapSecond(Integer.parseInt(linhaRaw[3]));
+                }catch (NumberFormatException ex){
+                    Log.e("Err","LeapSecond: " + ex.getMessage());
+                }
+
+                try{
+                    novaMedicao.setTimeUncertaintyNanos(Double.parseDouble(linhaRaw[4]));
+                }catch (NumberFormatException ex){
+                    Log.e("Err","TimeUncertaintyNanos: " + ex.getMessage());
+                }
+
+                novaMedicao.setFullBiasNanos(Long.parseLong(linhaRaw[5]));
+
+                novaMedicao.setBiasNanos(Double.parseDouble(linhaRaw[6]));
+                novaMedicao.setBiasUncertaintyNanos(Double.parseDouble(linhaRaw[7]));
+
+                try{
+                    novaMedicao.setDriftNanosPerSecond(Double.parseDouble(linhaRaw[8]));
+                }catch (NumberFormatException ex){
+                    Log.e("Err","DriftNanosPerSecond: " + ex.getMessage());
+                }
+
+                try{
+                    novaMedicao.setDriftUncertaintyNanosPerSecond(Double.parseDouble(linhaRaw[9]));
+                }catch (NumberFormatException ex){
+                    Log.e("Err","DriftUncertaintyNanosPerSecond: " + ex.getMessage());
+                }
+
+                try{
+                    novaMedicao.setHardwareClockDiscontinuityCount(Integer.parseInt(linhaRaw[10]));
+                }catch (NumberFormatException ex){
+                    Log.e("Err","HardwareClockDiscontinuityCount: " + ex.getMessage());
+                }
+
+
+
+
+
+
+                novaMedicao.setSvid(Integer.parseInt(linhaRaw[11]));
+                novaMedicao.setTimeOffsetNanos(Double.parseDouble(linhaRaw[12]));
+                novaMedicao.setState(Integer.parseInt(linhaRaw[13]));
+                novaMedicao.setReceivedSvTimeNanos(Long.parseLong(linhaRaw[14]));
+                novaMedicao.setReceivedSvTimeUncertaintyNanos(Double.parseDouble(linhaRaw[15]));
+                novaMedicao.setCn0DbHz(Double.parseDouble(linhaRaw[16]));
+                novaMedicao.setPseudorangeRateMetersPerSecond(Double.parseDouble(linhaRaw[17]));
+                novaMedicao.setPseudorangeRateUncertaintyMetersPerSecond(Double.parseDouble(linhaRaw[18]));
+                novaMedicao.setAccumulatedDeltaRangeState(Integer.parseInt(linhaRaw[19]));
+                novaMedicao.setAccumulatedDeltaRangeMeters(Double.parseDouble(linhaRaw[20]));
+                novaMedicao.setAccumulatedDeltaRangeUncertaintyMeters(Double.parseDouble(linhaRaw[21]));
+
+                try{
+                    novaMedicao.setCarrierFrequencyHz(Double.parseDouble(linhaRaw[22]));
+                    novaMedicao.setCarrierCycles(Integer.parseInt(linhaRaw[23]));
+                    novaMedicao.setCarrierPhase(Integer.parseInt(linhaRaw[24]));
+                    novaMedicao.setCarrierPhaseUncertainty(Double.parseDouble(linhaRaw[25]));
+                } catch (NumberFormatException err){
+                    Log.e("err","CarrierPhase errors...");
+                }
+
+
+                novaMedicao.setMultipathIndicator(Integer.parseInt(linhaRaw[26]));
+
+                try{
+                    novaMedicao.setSnrInDb(Double.parseDouble(linhaRaw[27]));
+                } catch (NumberFormatException err){
+                    Log.e("err","SNR: " + err.getMessage());
+                }
+
+                novaMedicao.setConstellationType(Integer.parseInt(linhaRaw[28]));
+//                novaMedicao.setAgcDb(Double.parseDouble(linhaRaw[29]));
+//                novaMedicao.setCarrierFrequencyHz(Double.parseDouble(linhaRaw[30]));
+
+                listaMedicoes.add(novaMedicao);
             }
-
-            if (mLine.startsWith("NMEA") || mLine.startsWith("Fix")) continue;
-
-            /*Lendo uma linha raw*/
-            Log.i("raw",mLine);
-
-            //TODO PAREI AQUI 
-
-
-            if (mLine == null) break;
-        } while (true); // FIXME ARRUMAR ESSE LAÇO!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        GNSSMeasurement novaMedicao = new GNSSMeasurement();
-        listaMedicoes.add(novaMedicao);
+        }
 
         reader.close();
         return sb.toString();
+    }
+
+    public static void calcPseudoranges(){
+        for (int i = 0; i < listaMedicoes.size(); i++){
+
+            //TODO PAREI AQUI!
+
+//            listaMedicoes.get(i).setPseudorangeMeters();
+        }
     }
 
 }
