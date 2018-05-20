@@ -318,40 +318,91 @@ public class Reader {
 
                 String[] linhaRaw = mLine.split(",");
 
+                if (!linhaRaw[28].equalsIgnoreCase(String.valueOf(GNSSConstants.CONSTELLATION_GPS))){
+                    Log.w("Constellation", "Non-GPS Measurement: Type " + linhaRaw[28]);
+                    continue; // TODO Por enquanto só são tratadas medições GPS
+                }
+
                 GNSSMeasurement novaMedicao = new GNSSMeasurement();
 
+                //TODO USAR UMA TABELA HASH NO LUGAR DE UM ARRAY SIMPLES!
+
                 novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[1]));
+                novaMedicao.setTimeNanos(Long.parseLong(linhaRaw[2]));
 
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[2]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[3]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[4]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[5]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[6]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[7]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[8]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[9]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[10]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[11]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[12]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[13]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[14]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[15]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[16]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[17]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[18]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[19]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[20]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[21]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[22]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[23]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[24]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[25]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[26]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[27]));
-//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[28]));
+                try{
+                    novaMedicao.setLeapSecond(Integer.parseInt(linhaRaw[3]));
+                }catch (NumberFormatException ex){
+                    Log.e("Err","LeapSecond: " + ex.getMessage());
+                }
+
+                try{
+                    novaMedicao.setTimeUncertaintyNanos(Double.parseDouble(linhaRaw[4]));
+                }catch (NumberFormatException ex){
+                    Log.e("Err","TimeUncertaintyNanos: " + ex.getMessage());
+                }
+
+                novaMedicao.setFullBiasNanos(Long.parseLong(linhaRaw[5]));
+
+                novaMedicao.setBiasNanos(Double.parseDouble(linhaRaw[6]));
+                novaMedicao.setBiasUncertaintyNanos(Double.parseDouble(linhaRaw[7]));
+
+                try{
+                    novaMedicao.setDriftNanosPerSecond(Double.parseDouble(linhaRaw[8]));
+                }catch (NumberFormatException ex){
+                    Log.e("Err","DriftNanosPerSecond: " + ex.getMessage());
+                }
+
+                try{
+                    novaMedicao.setDriftUncertaintyNanosPerSecond(Double.parseDouble(linhaRaw[9]));
+                }catch (NumberFormatException ex){
+                    Log.e("Err","DriftUncertaintyNanosPerSecond: " + ex.getMessage());
+                }
+
+                try{
+                    novaMedicao.setHardwareClockDiscontinuityCount(Integer.parseInt(linhaRaw[10]));
+                }catch (NumberFormatException ex){
+                    Log.e("Err","HardwareClockDiscontinuityCount: " + ex.getMessage());
+                }
 
 
 
+
+
+
+                novaMedicao.setSvid(Integer.parseInt(linhaRaw[11]));
+                novaMedicao.setTimeOffsetNanos(Double.parseDouble(linhaRaw[12]));
+                novaMedicao.setState(Integer.parseInt(linhaRaw[13]));
+                novaMedicao.setReceivedSvTimeNanos(Long.parseLong(linhaRaw[14]));
+                novaMedicao.setReceivedSvTimeUncertaintyNanos(Double.parseDouble(linhaRaw[15]));
+                novaMedicao.setCn0DbHz(Double.parseDouble(linhaRaw[16]));
+                novaMedicao.setPseudorangeRateMetersPerSecond(Double.parseDouble(linhaRaw[17]));
+                novaMedicao.setPseudorangeRateUncertaintyMetersPerSecond(Double.parseDouble(linhaRaw[18]));
+                novaMedicao.setAccumulatedDeltaRangeState(Integer.parseInt(linhaRaw[19]));
+                novaMedicao.setAccumulatedDeltaRangeMeters(Double.parseDouble(linhaRaw[20]));
+                novaMedicao.setAccumulatedDeltaRangeUncertaintyMeters(Double.parseDouble(linhaRaw[21]));
+
+                try{
+                    novaMedicao.setCarrierFrequencyHz(Double.parseDouble(linhaRaw[22]));
+                    novaMedicao.setCarrierCycles(Integer.parseInt(linhaRaw[23]));
+                    novaMedicao.setCarrierPhase(Integer.parseInt(linhaRaw[24]));
+                    novaMedicao.setCarrierPhaseUncertainty(Double.parseDouble(linhaRaw[25]));
+                } catch (NumberFormatException err){
+                    Log.e("err","CarrierPhase errors...");
+                }
+
+
+                novaMedicao.setMultipathIndicator(Integer.parseInt(linhaRaw[26]));
+
+                try{
+                    novaMedicao.setSnrInDb(Double.parseDouble(linhaRaw[27]));
+                } catch (NumberFormatException err){
+                    Log.e("err","SNR: " + err.getMessage());
+                }
+
+                novaMedicao.setConstellationType(Integer.parseInt(linhaRaw[28]));
+//                novaMedicao.setAgcDb(Double.parseDouble(linhaRaw[29]));
+//                novaMedicao.setCarrierFrequencyHz(Double.parseDouble(linhaRaw[30]));
 
                 listaMedicoes.add(novaMedicao);
             }
@@ -359,6 +410,15 @@ public class Reader {
 
         reader.close();
         return sb.toString();
+    }
+
+    public static void calcPseudoranges(){
+        for (int i = 0; i < listaMedicoes.size(); i++){
+
+            //TODO PAREI AQUI!
+
+//            listaMedicoes.get(i).setPseudorangeMeters();
+        }
     }
 
 }

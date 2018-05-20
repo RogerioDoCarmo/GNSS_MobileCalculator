@@ -2,8 +2,20 @@ package Codigos;
 
 public class GNSSMeasurement {
 
+    /*Pseudo-distâncias calculadas*/ // FIXME VER SE NÃO SERÁ EM OUTRO LUGAR
+    private double PseudorangeMeters;
+    private double PseudoRangeUncertaintyMeters;
+
     /*TODO Campos nao-utilizados*/
     private int ElapsedRealtimeMillis;
+    private  double TimeOffsetNanos;
+    private int AccumulatedDeltaRangeState;
+    private double CarrierFrequencyHz;
+    private int CarrierCycles;
+    private double CarrierPhase;
+    private double CarrierPhaseUncertainty;
+    private double SnrInDb;
+    private double AgcDb;
 
     private double Cn0DbHz;
     private int ConstellationType;
@@ -12,17 +24,17 @@ public class GNSSMeasurement {
     private int MultipathIndicator;
     private double PseudorangeRateMetersPerSecond;
     private double PseudorangeRateUncertaintyMetersPerSecond;
-    private int ReceivedSvTimeNanos;
+    private Long ReceivedSvTimeNanos;
     private double ReceivedSvTimeUncertaintyNanos;
     private double AccumulatedDeltaRangeMeters;
     private double AccumulatedDeltaRangeUncertaintyMeters;
 
     /*TODO TALVEZ SEPARAR OS CAMPOS ABAIXO NA CLASSE GNSSCLOCK*/
 
-    private int TimeNanos;
+    private Long TimeNanos;
     private double TimeUncertaintyNanos;
     private int LeapSecond;
-    private int FullBiasNanos;
+    private Long FullBiasNanos;
     private double BiasUncertaintyNanos;
     private double DriftNanosPerSecond;
     private double DriftUncertaintyNanosPerSecond;
@@ -90,11 +102,11 @@ public class GNSSMeasurement {
         PseudorangeRateUncertaintyMetersPerSecond = pseudorangeRateUncertaintyMetersPerSecond;
     }
 
-    public double getReceivedSvTimeNanos() {
+    public Long getReceivedSvTimeNanos() {
         return ReceivedSvTimeNanos;
     }
 
-    public void setReceivedSvTimeNanos(int receivedSvTimeNanos) {
+    public void setReceivedSvTimeNanos(long receivedSvTimeNanos) {
         ReceivedSvTimeNanos = receivedSvTimeNanos;
     }
 
@@ -124,11 +136,11 @@ public class GNSSMeasurement {
 
     /*TODO TALVEZ SEPARAR OS CAMPOS ABAIXO NA CLASSE GNSSCLOCK*/
 
-    public double getTimeNanos() {
+    public Long getTimeNanos() {
         return TimeNanos;
     }
 
-    public void setTimeNanos(int timeNanos) {
+    public void setTimeNanos(Long timeNanos) {
         TimeNanos = timeNanos;
     }
 
@@ -148,11 +160,11 @@ public class GNSSMeasurement {
         LeapSecond = leapSecond;
     }
 
-    public double getFullBiasNanos() {
+    public Long getFullBiasNanos() {
         return FullBiasNanos;
     }
 
-    public void setFullBiasNanos(int fullBiasNanos) {
+    public void setFullBiasNanos(Long fullBiasNanos) {
         FullBiasNanos = fullBiasNanos;
     }
 
@@ -206,4 +218,83 @@ public class GNSSMeasurement {
         ElapsedRealtimeMillis = elapsedRealtimeMillis;
     }
 
+    public double getTimeOffsetNanos() {
+        return TimeOffsetNanos;
+    }
+
+    public void setTimeOffsetNanos(double timeOffsetNanos) {
+        TimeOffsetNanos = timeOffsetNanos;
+    }
+
+    public int getAccumulatedDeltaRangeState() {
+        return AccumulatedDeltaRangeState;
+    }
+
+    public void setAccumulatedDeltaRangeState(int accumulatedDeltaRangeState) {
+        AccumulatedDeltaRangeState = accumulatedDeltaRangeState;
+    }
+
+    public double getCarrierFrequencyHz() {
+        return CarrierFrequencyHz;
+    }
+
+    public void setCarrierFrequencyHz(double carrierFrequencyHz) {
+        CarrierFrequencyHz = carrierFrequencyHz;
+    }
+
+    public int getCarrierCycles() {
+        return CarrierCycles;
+    }
+
+    public void setCarrierCycles(int carrierCycles) {
+        CarrierCycles = carrierCycles;
+    }
+
+    public double getCarrierPhase() {
+        return CarrierPhase;
+    }
+
+    public void setCarrierPhase(double carrierPhase) {
+        CarrierPhase = carrierPhase;
+    }
+
+    public double getCarrierPhaseUncertainty() {
+        return CarrierPhaseUncertainty;
+    }
+
+    public void setCarrierPhaseUncertainty(double carrierPhaseUncertainty) {
+        CarrierPhaseUncertainty = carrierPhaseUncertainty;
+    }
+
+    public double getSnrInDb() {
+        return SnrInDb;
+    }
+
+    public void setSnrInDb(double snrInDb) {
+        SnrInDb = snrInDb;
+    }
+
+    public double getAgcDb() {
+        return AgcDb;
+    }
+
+    public void setAgcDb(double agcDb) {
+        AgcDb = agcDb;
+    }
+
+    public double getPseudorangeMeters() {
+        return PseudorangeMeters;
+    }
+
+    public void setPseudorangeMeters(double pseudorangeMeters) {
+        PseudorangeMeters = pseudorangeMeters;
+    }
+
+    public double getPseudoRangeUncertaintyMeters() {
+        return PseudoRangeUncertaintyMeters;
+    }
+
+    public void setPseudoRangeUncertaintyMeters(double pseudoRangeUncertaintyMeters) {
+        PseudoRangeUncertaintyMeters = pseudoRangeUncertaintyMeters;
+    }
 }

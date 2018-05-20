@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import static Codigos.Reader.calcPseudoranges;
 import static Codigos.Reader.readLogger_RawAssets;
 import static Codigos.Reader.readRINEX_RawAssets;
 
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
                     "Erro ao abrir o arquivo de log!",
                     Toast.LENGTH_SHORT).show();
         }
+
+        calcPseudoranges();
 
     }
 }
