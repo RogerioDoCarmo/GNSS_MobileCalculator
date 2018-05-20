@@ -326,7 +326,6 @@ public class Reader {
 //                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[3]));
 //                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[4]));
 //                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[5]));
-//
 //                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[6]));
 //                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[7]));
 //                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[8]));

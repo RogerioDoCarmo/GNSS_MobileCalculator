@@ -2,6 +2,9 @@ package Codigos;
 
 public class GNSSMeasurement {
 
+    /*TODO Campos nao-utilizados*/
+    private int ElapsedRealtimeMillis;
+
     private double Cn0DbHz;
     private int ConstellationType;
     private int State;
@@ -119,6 +122,8 @@ public class GNSSMeasurement {
         AccumulatedDeltaRangeUncertaintyMeters = accumulatedDeltaRangeUncertaintyMeters;
     }
 
+    /*TODO TALVEZ SEPARAR OS CAMPOS ABAIXO NA CLASSE GNSSCLOCK*/
+
     public double getTimeNanos() {
         return TimeNanos;
     }
@@ -191,6 +196,14 @@ public class GNSSMeasurement {
         BiasNanos = biasNanos;
     }
 
-    /*TODO TALVEZ SEPARAR OS CAMPOS ABAIXO NA CLASSE GNSSCLOCK*/
+    /*TODO Campos nao-utilizados*/
+
+    public int getElapsedRealtimeMillis() {
+        return ElapsedRealtimeMillis;
+    }
+
+    public void setElapsedRealtimeMillis(int elapsedRealtimeMillis) {
+        ElapsedRealtimeMillis = elapsedRealtimeMillis;
+    }
 
 }
