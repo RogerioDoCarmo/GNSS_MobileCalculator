@@ -9,13 +9,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class ReaderRINEX {
+public class Reader {
 
     public static ArrayList<GNSSNavMsg> listaNavMsgs = new ArrayList<>();
     public static ArrayList<GNSSMeasurement> listaMedicoes = new ArrayList<>();
 
 
-    public ReaderRINEX(){ //TODO Por enquanto pegar da pasta raw assets msm!
+    public Reader(){ //TODO Por enquanto pegar da pasta raw assets msm!
         this.listaNavMsgs = new ArrayList<>();
     }
 
@@ -294,32 +294,69 @@ public class ReaderRINEX {
     }
 
     public static String readLogger_RawAssets(Context context) throws  IOException{
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour3470))); // FIXME DEIXAR DINAMICO
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.sensorlog))); // FIXME DEIXAR DINAMICO
 
         // do reading, usually loop until end of file reading
         StringBuilder sb = new StringBuilder();
 
         //PULANDO O CABEÇALHO
         String mLine = reader.readLine();
+        while ((mLine = reader.readLine()).startsWith("#")){
+            mLine = reader.readLine();
+        }
+
     //TODO Tratar o caso de ter ou não o campo AgcDb
-        do{
-            while ((mLine = reader.readLine()).equalsIgnoreCase("#")){
-                mLine = reader.readLine();
+
+        while(mLine != null){
+            mLine = reader.readLine();
+
+            if (mLine == null || mLine.isEmpty()) continue;
+
+            if (mLine.startsWith("Raw")){
+                /*Lendo uma linha raw*/
+                Log.i("raw",mLine);
+
+                String[] linhaRaw = mLine.split(",");
+
+                GNSSMeasurement novaMedicao = new GNSSMeasurement();
+
+                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[1]));
+
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[2]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[3]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[4]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[5]));
+//
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[6]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[7]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[8]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[9]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[10]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[11]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[12]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[13]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[14]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[15]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[16]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[17]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[18]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[19]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[20]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[21]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[22]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[23]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[24]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[25]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[26]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[27]));
+//                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[28]));
+
+
+
+
+                listaMedicoes.add(novaMedicao);
             }
-
-            if (mLine.startsWith("NMEA") || mLine.startsWith("Fix")) continue;
-
-            /*Lendo uma linha raw*/
-            Log.i("raw",mLine);
-
-            //TODO PAREI AQUI 
-
-
-            if (mLine == null) break;
-        } while (true); // FIXME ARRUMAR ESSE LAÇO!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        GNSSMeasurement novaMedicao = new GNSSMeasurement();
-        listaMedicoes.add(novaMedicao);
+        }
 
         reader.close();
         return sb.toString();
