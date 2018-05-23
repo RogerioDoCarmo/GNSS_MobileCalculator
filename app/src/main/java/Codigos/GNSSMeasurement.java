@@ -2,6 +2,10 @@ package Codigos;
 
 public class GNSSMeasurement {
 
+    /*Campos adicionados manualmente:*/
+    private Long tTx; // Tempo de transmissão em segundos da semana GPS
+    private Long tRx; // Tempo de recepção em segundos da semana GPS
+
     /*Pseudo-distâncias calculadas*/ // FIXME VER SE NÃO SERÁ EM OUTRO LUGAR
     private double PseudorangeMeters;
     private double PseudoRangeUncertaintyMeters;
@@ -39,7 +43,7 @@ public class GNSSMeasurement {
     private double DriftNanosPerSecond;
     private double DriftUncertaintyNanosPerSecond;
     private double HardwareClockDiscontinuityCount;
-    private double BiasNanos;
+    private double BiasNanos; // FIXME VER SE É LONG
 
     public GNSSMeasurement(){
 
@@ -296,5 +300,21 @@ public class GNSSMeasurement {
 
     public void setPseudoRangeUncertaintyMeters(double pseudoRangeUncertaintyMeters) {
         PseudoRangeUncertaintyMeters = pseudoRangeUncertaintyMeters;
+    }
+
+    public Long gettTx() {
+        return tTx;
+    }
+
+    public void settTx(Long tTx) {
+        this.tTx = tTx;
+    }
+
+    public Long gettRx() {
+        return tRx;
+    }
+
+    public void settRx(Long tRx) {
+        this.tRx = tRx;
     }
 }

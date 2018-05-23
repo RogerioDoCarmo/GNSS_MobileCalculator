@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import static Codigos.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
+import static Codigos.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
+import static Codigos.GNSSConstants.WEEKSEC;
+
 public class Reader {
 
     public static ArrayList<GNSSNavMsg> listaNavMsgs = new ArrayList<>();
@@ -294,6 +298,7 @@ public class Reader {
     }
 
     public static String readLogger_RawAssets(Context context) throws  IOException{
+        int qntMedicoesDescartadas = 0;
         BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.sensorlog))); // FIXME DEIXAR DINAMICO
 
         // do reading, usually loop until end of file reading
@@ -319,7 +324,8 @@ public class Reader {
                 String[] linhaRaw = mLine.split(",");
 
                 if (!linhaRaw[28].equalsIgnoreCase(String.valueOf(GNSSConstants.CONSTELLATION_GPS))){
-                    Log.w("Constellation", "Non-GPS Measurement: Type " + linhaRaw[28]);
+                    Log.e("Constellation", "Non-GPS Measurement: Type " + linhaRaw[28]);
+                    qntMedicoesDescartadas++;
                     continue; // TODO Por enquanto só são tratadas medições GPS
                 }
 
@@ -368,12 +374,36 @@ public class Reader {
                 novaMedicao.setSvid(Integer.parseInt(linhaRaw[11]));
                 novaMedicao.setTimeOffsetNanos(Double.parseDouble(linhaRaw[12]));
 
+                //FIXME REVER ESSA QUESTÃO DO STATE!
                 novaMedicao.setState(Integer.parseInt(linhaRaw[13]));
-                Log.i("State","Resultado: " + Integer.parseInt(linhaRaw[13]));
+//                Log.i("State","Resultado verificado: " + Integer.parseInt(linhaRaw[13]));
+
+                int verificacaoStatus = (int)(Integer.parseInt(linhaRaw[13]) & (1L << TOW_DECODED_MEASUREMENT_STATE_BIT));
+
+
+                if (verificacaoStatus == 0){
+                    Log.e("StateEr","TOW not decoded!: " + verificacaoStatus);
+                    qntMedicoesDescartadas++;
+                    continue;
+                }else{
+                    Log.i("StateOk","TOW certo: " + verificacaoStatus);
+                }
+
+//                Log.i("State", "Verificação: " + (Integer.parseInt(linhaRaw[13]) & (1L << TOW_DECODED_MEASUREMENT_STATE_BIT)));
 
                 novaMedicao.setReceivedSvTimeNanos(Long.parseLong(linhaRaw[14]));
                 novaMedicao.setReceivedSvTimeUncertaintyNanos(Double.parseDouble(linhaRaw[15]));
+
                 novaMedicao.setCn0DbHz(Double.parseDouble(linhaRaw[16]));
+
+                if (novaMedicao.getCn0DbHz() <= C_TO_N0_THRESHOLD_DB_HZ ){
+                    Log.e("Cn0DbHzEr","Valor: " + String.valueOf(novaMedicao.getCn0DbHz()));
+                    qntMedicoesDescartadas++;
+                    continue;
+                }else{
+                    Log.i("Cn0DbHzOk","Valor: " + String.valueOf(novaMedicao.getCn0DbHz()));
+                }
+
                 novaMedicao.setPseudorangeRateMetersPerSecond(Double.parseDouble(linhaRaw[17]));
                 novaMedicao.setPseudorangeRateUncertaintyMetersPerSecond(Double.parseDouble(linhaRaw[18]));
                 novaMedicao.setAccumulatedDeltaRangeState(Integer.parseInt(linhaRaw[19]));
@@ -405,11 +435,14 @@ public class Reader {
             }
         }
 
+        Log.i("QntDescartadas","Quantidade de medidas descartadas: " + qntMedicoesDescartadas);
+        Log.i("QntPreservadas","Quantidade de medidas preservadas: " + listaMedicoes.size());
+
         reader.close();
         return sb.toString();
     }
 
-    public static void calcPseudoranges(){
+    public static void calcPseudoranges_OLD(){
         for (int i = 0; i < listaMedicoes.size(); i++){
 
             double pseudorangeMeters = 0d;
@@ -445,9 +478,40 @@ public class Reader {
             listaMedicoes.get(i).setPseudorangeMeters(pseudorangeMeters);
             listaMedicoes.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
 
-            Log.i("PSEUDORANGE", listaMedicoes.get(i).getPseudorangeMeters() + " m");
-            Log.i("PSEUDORANGE", "Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
+            Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
+            Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
         }
     }
+
+    public static void calcPseudoranges(){
+        for (int i = 0; i < listaMedicoes.size(); i++){
+
+            double pseudorangeMeters = 0d;
+            double pseudorangeUncertaintyMeters = 0d;
+
+            // Generate the measured time in full GNSS time
+            Long tRx_GNSS = listaMedicoes.get(i).getTimeNanos() - (listaMedicoes.get(0).getFullBiasNanos() + Math.round(listaMedicoes.get(0).getBiasNanos())); // FIXME VER SE É LONG
+           // Change the valid range from full GNSS to TOW
+            Long tRx = tRx_GNSS % Math.round(WEEKSEC*1e9);
+            // Generate the satellite time
+            Long tTx = listaMedicoes.get(i).getReceivedSvTimeNanos() + Math.round(listaMedicoes.get(i).getTimeOffsetNanos());
+            // Generate the pseudorange
+            Long prMilliSeconds = (tRx - tTx);
+            pseudorangeMeters = prMilliSeconds * GNSSConstants.LIGHTSPEED * 1e-9;
+            pseudorangeUncertaintyMeters = (double) listaMedicoes.get(i).getReceivedSvTimeUncertaintyNanos() * 1e-9 * GNSSConstants.LIGHTSPEED;
+
+            listaMedicoes.get(i).setPseudorangeMeters(pseudorangeMeters);
+            listaMedicoes.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
+
+            listaMedicoes.get(i).settTx(tTx);
+            listaMedicoes.get(i).settRx(tRx);
+
+            Log.i("tTx/tRx","Svid: " +  listaMedicoes.get(i).getSvid() + " tTx: " + tTx + " tRx: " + tRx + " Intervalo: " + prMilliSeconds);
+
+            Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
+            Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
+        }
+    }
+
 
 }
