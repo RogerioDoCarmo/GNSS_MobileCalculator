@@ -1,6 +1,7 @@
 package Codigos;
 
 import android.content.Context;
+import android.location.cts.nano.Ephemeris;
 import android.util.Log;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import static Codigos.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
 import static Codigos.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
 import static Codigos.GNSSConstants.WEEKSEC;
+import pseudorange.*;
 
 public class Reader {
 
@@ -513,5 +515,11 @@ public class Reader {
         }
     }
 
+    public static void calcularWLSpvt(){
+//        GpsNavigationMessageStore;
+//        Ephemeris.GpsEphemerisProto;
+//        Ephemeris.GpsNavMessageProto;
+        
+    }
 
 }
