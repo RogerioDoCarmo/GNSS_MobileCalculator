@@ -38,4 +38,7 @@ dependencies {
     compile files('libs/asn1-base.jar')
     compile files('libs/suplClient.jar')
     compile files('libs/protobuf-nano.jar')
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
+
 }
