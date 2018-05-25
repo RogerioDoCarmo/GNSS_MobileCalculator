@@ -521,7 +521,7 @@ public class Reader {
         double We = 7.2921151467E-5;
         double c = 299792458;
 
-        for (int i = 0; i < 10; i++ ){
+        for (int i = 0; i < 10; i++ ){// FIXME
             Log.i("Coord","Inicio do calculo das coordenadas");
             //------------------------------------------
             //Dados de entrada
@@ -580,7 +580,8 @@ public class Reader {
             // EQUAÇÃO DE EULER
             double Ek = Mk;
 
-            for (int k = 0; k < 5; i++){
+            for (int k = 0; k < 5; k++){
+                Log.i("Ek","Iteração do cálculo de Euler");
                 Ek = Mk + e*Math.sin(Ek);
             }
 
@@ -594,6 +595,8 @@ public class Reader {
 
         }
 
+
+        Log.i("CoordFIM","Fim do cálculo das coordenadas!");
 
     }
 
