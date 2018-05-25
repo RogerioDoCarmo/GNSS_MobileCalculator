@@ -4,10 +4,19 @@ import android.content.Context;
 import android.util.Log;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
+
+import org.apache.commons.math3.linear.LUDecomposition;
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static Codigos.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
 import static Codigos.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
@@ -17,6 +26,7 @@ public class Reader {
 
     public static ArrayList<GNSSNavMsg> listaEfemerides = new ArrayList<>();
     public static ArrayList<GNSSMeasurement> listaMedicoes = new ArrayList<>();
+    public static ArrayList<CoordenadaGPS> listaCoord = new ArrayList<>();
 
 
     public Reader(){ //TODO Por enquanto pegar da pasta raw assets msm!
@@ -516,13 +526,14 @@ public class Reader {
     static int l = 10; // FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     public static void calcCoordendas(){
-        int L = 10;
+        //int L = 10;
         double GM = 3.986004418E14;
         double We = 7.2921151467E-5;
         double c = 299792458;
 
-        for (int i = 0; i < 10; i++ ){// FIXME
-            Log.i("Coord","Inicio do calculo das coordenadas");
+        Log.i("Coord","Inicio do calculo das coordenadas dos satélites.");
+
+        for (int i = 0; i < l; i++ ){// FIXME
             //------------------------------------------
             //Dados de entrada
             //------------------------------------------
@@ -567,7 +578,7 @@ public class Reader {
             tgps = tr-dtr-tpropag+dts; // melhoria no tempo de transmissao
 
             //------------------------------------------
-            //Coordenadas do satÃ©lite
+            //Coordenadas do satelite
             //------------------------------------------
 
             double Deltk = tgps - toe;
@@ -580,21 +591,48 @@ public class Reader {
             // EQUAÇÃO DE EULER
             double Ek = Mk;
 
+            Log.i("Ek","Cálculo iterativo da equação de Euler");
             for (int k = 0; k < 5; k++){
-                Log.i("Ek","Iteração do cálculo de Euler");
                 Ek = Mk + e*Math.sin(Ek);
             }
 
             double cosVk = (Math.cos((Ek)-e)/(1-(e*(Math.cos(Ek)))));
             double sinVk = ((Math.sqrt(1-(e*e))*Math.sin(Ek))/(1-(e*Math.cos(Ek))));
+            double Vk = Math.atan2(sinVk,cosVk);
 
-            Log.i("atan2", String.valueOf(Math.atan2(4,-3)));
+            double Fik = Vk + w;
+            double Deluk = (Cuc*Math.cos(2*Fik)) + (Cus*Math.sin(2*Fik));
+            double uk = Fik + Deluk;
 
-//            double Vk = atan2(sinVk,cosVk);
+            double Delrk = (Crc*Math.cos(2*Fik)) + (Crs*Math.sin(2*Fik));
+            double rk = (a*(1-(e*Math.cos(Ek)))) + Delrk;
 
+            double Delik = (Cic*Math.cos(2*Fik)) + (Cis*Math.sin(2*Fik));
+            double ik = io + (idot*Deltk) + Delik;
+
+            // Coordenadas do satélite no plano
+            double xk = rk*Math.cos(uk);
+            double yk = rk*Math.sin(uk);
+
+            // Coordenadas do satélite em 3D (WGS 84)
+            double Omegak = Omega0 + Omegadot*Deltk - We*tgps;
+
+            // Coordenadas originais do satelites
+            double Xk = ((xk*Math.cos(Omegak))-(yk*Math.sin(Omegak)*Math.cos(ik)));
+            double Yk = ((xk*Math.sin(Omegak))+(yk*Math.cos(Omegak)*Math.cos(ik)));
+            double Zk = (yk*Math.sin(ik));
+
+            // Coordenadas do satelites corrigidas do erro de rotacao da Terra
+            double alpha = We*tpropag;
+            double X = Xk + alpha*Yk;
+            double Y = -alpha*Xk + Yk;
+            double Z = Zk;
+
+            //coord = [coord; efemerides(i,1) X Y Z dts];
+            int PRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
+            CoordenadaGPS novaCoord = new CoordenadaGPS(PRN,X,Y,Z,dts);
 
         }
-
 
         Log.i("CoordFIM","Fim do cálculo das coordenadas!");
 
@@ -605,9 +643,19 @@ public class Reader {
 //        GpsNavigationMessageStore;
 //        Ephemeris.GpsEphemerisProto;
 //        Ephemeris.GpsNavMessageProto;
-        double dx = 0.0, dy = 0.0, dyz = 0.0;
+//        double dx = 0.0, dy = 0.0, dyz = 0.0;
 
         int MAX_ITERACOES = 100;
+        double c = 299792458;
+        double[] L0 = new double[l];
+        double[] Lb = new double[l];
+        double[] L = new double[l]; // DeltaL
+        double[][] A = new double[l][4];
+
+        //Carregando o vetor Lb
+        for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)
+            Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();
+        }
 
 
         /*TODO Usar medição NMEA como coordenada inicial*/
@@ -615,18 +663,105 @@ public class Reader {
         double Ye = -4587255.83661;
         double Ze = -2290619.16148;
         double[] X0 = new double[]{Xe, Ye, Ze,0};
+        double[][] N = new double[4][4];
+        double[] U = new double[4];
+        double[] X = new double[4];
+        double[] Xa = new double[4];
 
         // Solucao pelo metodo parametrico
         // Solucao iterativa
         for (int k = 0; k < MAX_ITERACOES; k++){
             // Vetor L0
-            for (int i = 0; i < l; i++){
+            for (int i = 0; i < l; i++){ // PARA CADA SATÉLITE
                 // dx = coord(i,2)-X0(1);
-                dx = - X0[1];
+                double dx = listaCoord.get(i).getX() - X0[0];
+                double dy = listaCoord.get(i).getY() - X0[1];
+                double dz = listaCoord.get(i).getZ() - X0[2];
+
+                // L0(i,1) = sqrt(dx^2+dy^2+dz^2) + c*(0 - coord(i,5))
+                L0[i] = Math.sqrt((dx*dx) + (dy*dy) + (dz*dz)) + c * (0 - listaCoord.get(i).getDts());
             }
+
+            //Vetor DeltaL:
+            //L = L0-Lb;
+            for (int i = 0; i < Lb.length; i++){
+                L[i] = L0[i] - Lb[i];
+            }
+
+            //MATRIZ A
+            for (int i = 0; i < l; i++){
+                double dx = listaCoord.get(i).getX() - X0[0];
+                double dy = listaCoord.get(i).getY() - X0[1];
+                double dz = listaCoord.get(i).getZ() - X0[0];
+
+                double distGeo = Math.sqrt((dx*dx) + (dy*dy) + (dz*dz));
+
+                A[i][0] = -(listaCoord.get(i).getX() - X0[0])/distGeo;
+                A[i][1] = -(listaCoord.get(i).getY() - X0[1])/distGeo;
+                A[i][2] = -(listaCoord.get(i).getZ() - X0[2])/distGeo;
+                A[i][3] = 1;
+            }
+
+            // Método Paramétrico
+            Log.i("par","Iniciando o método paramétrico");
+
+            RealMatrix RealA =  MatrixUtils.createRealMatrix(A);
+            RealVector RealL  =  MatrixUtils.createRealVector(L);
+
+
+            //  N = A'*A;
+            RealMatrix RealN = RealA.transpose().multiply(RealA);
+            //U = A'*L;
+            RealVector RealU = RealA.transpose().operate(RealL);
+
+            //X = -inv(N)*U;
+            RealMatrix RealNInverse = new LUDecomposition(RealN).getSolver().getInverse();
+            RealVector RealX = RealNInverse.scalarMultiply(-1.0).operate(RealU);
+
+            X = RealX.toArray();
+
+            X[3] = X[3]/c;
+
+            //Xa = X0+X; // FIXME FAZER UMA FUNÇÃO PARA ISSO
+            for (int i = 0; i < X0.length; i++){
+                Xa[i] = X0[i] + X[i];
+            }
+
+            //Verificação da Tolerancia
+            /*
+             if abs(max(X)) < 1e-6
+                Xa
+                abs(max(X))
+                k
+                break;
+             else X0 = Xa;
+             end
+             */
+            double erro = Math.abs(maxValue(Xa));
+            if ( erro < 1e-6){
+                Log.i("Fim",Xa.toString());
+                Log.i("Fim","Coordenada Xr: " + Xa[0]);
+                Log.i("Fim","Coordenada Yr: " + Xa[1]);
+                Log.i("Fim","Coordenada Zr: " + Xa[2]);
+                Log.i("Fim","Erro do relógio do receptor: " + Xa[3]);
+                Log.i("Fim","Erro: " + erro);
+                Log.i("Fim", "N° de iterações: " + k);
+                break;
+            }else{ // Próxima iteração
+                X0 = Xa; // ou copiar com um for
+            }
+
         }
-
-
+        // Vetor dos resíduos
+        // Fator de variância a posteriori
+        // MVC das coordenadas ajustadas
     }
+
+    public static double maxValue(double array[]){
+        List<Double> list = new ArrayList<Double>();
+        for (int i = 0; i < array.length; i++) {
+            list.add(array[i]);
+        }
+        return Collections.max(list);
 
 }
