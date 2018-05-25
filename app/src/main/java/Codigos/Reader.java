@@ -1,7 +1,6 @@
 package Codigos;
 
 import android.content.Context;
-import android.location.cts.nano.Ephemeris;
 import android.util.Log;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
@@ -13,16 +12,15 @@ import java.util.ArrayList;
 import static Codigos.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
 import static Codigos.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
 import static Codigos.GNSSConstants.WEEKSEC;
-import pseudorange.*;
 
 public class Reader {
 
-    public static ArrayList<GNSSNavMsg> listaNavMsgs = new ArrayList<>();
+    public static ArrayList<GNSSNavMsg> listaEfemerides = new ArrayList<>();
     public static ArrayList<GNSSMeasurement> listaMedicoes = new ArrayList<>();
 
 
     public Reader(){ //TODO Por enquanto pegar da pasta raw assets msm!
-        this.listaNavMsgs = new ArrayList<>();
+        this.listaEfemerides = new ArrayList<>();
     }
 
     public static String readRINEX_RawAssets(Context context) throws IOException {
@@ -262,7 +260,7 @@ public class Reader {
             Log.i("Fit Interval",sub);
 
 //--------------------------------------------------------------------------------------------------
-            listaNavMsgs.add(efemeride);
+            listaEfemerides.add(efemeride);
             Log.i("FIM-MENSAGEM","===========================================");
         }
 
@@ -515,11 +513,117 @@ public class Reader {
         }
     }
 
+    static int l = 10; // FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    public static void calcCoordendas(){
+        int L = 10;
+        double GM = 3.986004418E14;
+        double We = 7.2921151467E-5;
+        double c = 299792458;
+
+        for (int i = 0; i < 10; i++ ){
+            Log.i("Coord","Inicio do calculo das coordenadas");
+            //------------------------------------------
+            //Dados de entrada
+            //------------------------------------------
+            //Tempo de recepcao do sinal ->  Hora da observacao
+            double tr = (3*24+0)*3600 + 0*60 + 0.00; // FIXME CORRIGIR O TEMPO
+
+            double a0 = listaEfemerides.get(i).getAf0();
+            double a1 = listaEfemerides.get(i).getAf1();
+            double a2 = listaEfemerides.get(i).getAf2();
+
+            double Crs = listaEfemerides.get(i).getCrs();
+            double Deln = listaEfemerides.get(i).getDelta_n();
+            double Mo = listaEfemerides.get(i).getM0();
+
+            double Cuc = listaEfemerides.get(i).getCuc();
+            double e = listaEfemerides.get(i).getE();
+            double Cus = listaEfemerides.get(i).getCus();
+            double a = listaEfemerides.get(i).getAsqrt() * listaEfemerides.get(i).getAsqrt();
+
+            double toe = listaEfemerides.get(i).getToe();
+            double Cic = listaEfemerides.get(i).getCic();
+            double Omega0 = listaEfemerides.get(i).getOmega(); // FIXME REVER
+            double Cis = listaEfemerides.get(i).getCis();
+
+            double io = listaEfemerides.get(i).getI0();
+            double Crc = listaEfemerides.get(i).getCrc();
+            double w = listaEfemerides.get(i).getGPS_Week();
+            double Omegadot = listaEfemerides.get(i).getOMEGA_DOT();
+
+            double idot = listaEfemerides.get(i).getIDOT();
+
+            // ------------------------------------------
+            //Tempo de transmisao do sinal
+            // ------------------------------------------
+            double dtr = 0; // ERRO DO RELÓGIO
+            double tgps = tr - listaMedicoes.get(i).getPseudorangeMeters()/c;
+
+            double dts = a0 + a1*(tgps-toe) + a2*((tgps-toe)*(tgps-toe)); // ERRO DO SATÉLITE
+
+            double tpropag = listaMedicoes.get(i).getPseudorangeMeters()/c - dtr +dts;
+
+            tgps = tr-dtr-tpropag+dts; // melhoria no tempo de transmissao
+
+            //------------------------------------------
+            //Coordenadas do satÃ©lite
+            //------------------------------------------
+
+            double Deltk = tgps - toe;
+
+            double no = Math.sqrt((GM/(a*a*a)));
+            double n = no + Deln;
+
+            double Mk = Mo + n*Deltk;
+
+            // EQUAÇÃO DE EULER
+            double Ek = Mk;
+
+            for (int k = 0; k < 5; i++){
+                Ek = Mk + e*Math.sin(Ek);
+            }
+
+            double cosVk = (Math.cos((Ek)-e)/(1-(e*(Math.cos(Ek)))));
+            double sinVk = ((Math.sqrt(1-(e*e))*Math.sin(Ek))/(1-(e*Math.cos(Ek))));
+
+            Log.i("atan2", String.valueOf(Math.atan2(4,-3)));
+
+//            double Vk = atan2(sinVk,cosVk);
+
+
+        }
+
+
+    }
+
     public static void calcularWLSpvt(){
+        l = 10;
 //        GpsNavigationMessageStore;
 //        Ephemeris.GpsEphemerisProto;
 //        Ephemeris.GpsNavMessageProto;
-        
+        double dx = 0.0, dy = 0.0, dyz = 0.0;
+
+        int MAX_ITERACOES = 100;
+
+
+        /*TODO Usar medição NMEA como coordenada inicial*/
+        double Xe = 3789545.41209;
+        double Ye = -4587255.83661;
+        double Ze = -2290619.16148;
+        double[] X0 = new double[]{Xe, Ye, Ze,0};
+
+        // Solucao pelo metodo parametrico
+        // Solucao iterativa
+        for (int k = 0; k < MAX_ITERACOES; k++){
+            // Vetor L0
+            for (int i = 0; i < l; i++){
+                // dx = coord(i,2)-X0(1);
+                dx = - X0[1];
+            }
+        }
+
+
     }
 
 }
