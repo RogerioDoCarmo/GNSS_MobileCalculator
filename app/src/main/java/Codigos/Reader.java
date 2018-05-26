@@ -27,6 +27,7 @@ public class Reader {
     public static ArrayList<GNSSNavMsg> listaEfemerides = new ArrayList<>();
     public static ArrayList<GNSSMeasurement> listaMedicoes = new ArrayList<>();
     public static ArrayList<CoordenadaGPS> listaCoord = new ArrayList<>();
+    private static int l;
 
 
     public Reader(){ //TODO Por enquanto pegar da pasta raw assets msm!
@@ -384,7 +385,7 @@ public class Reader {
                 novaMedicao.setSvid(Integer.parseInt(linhaRaw[11]));
                 novaMedicao.setTimeOffsetNanos(Double.parseDouble(linhaRaw[12]));
 
-                //FIXME REVER ESSA QUESTÃO DO STATE!
+
                 novaMedicao.setState(Integer.parseInt(linhaRaw[13]));
 //                Log.i("State","Resultado verificado: " + Integer.parseInt(linhaRaw[13]));
 
@@ -523,7 +524,16 @@ public class Reader {
         }
     }
 
-    static int l = 10; // FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    /**
+     * Ajusta as medições GNSS (pseudodistancias) e as efemérides transmitidas (dados de navegação) para pertencer a mesma época.
+     * <p>
+     *     Tudo dentro de uma mesmo UTC é considerado a mesma época.
+     * </p>
+     *
+     */
+    public  static void ajustarEpocas(){
+
+    }
 
     public static void calcCoordendas(){
         //int L = 10;
@@ -638,8 +648,7 @@ public class Reader {
 
     }
 
-    public static void calcularWLSpvt(){
-        l = 10;
+    public static void calcularMMQ(){
 //        GpsNavigationMessageStore;
 //        Ephemeris.GpsEphemerisProto;
 //        Ephemeris.GpsNavMessageProto;
@@ -657,11 +666,22 @@ public class Reader {
             Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();
         }
 
+//        Aproximações iniciais
+//        double Xe = 3789545.41209;
+//        double Ye = -4587255.83661;
+//        double Ze = -2290619.16148;
 
-        /*TODO Usar medição NMEA como coordenada inicial*/
-        double Xe = 3789545.41209;
-        double Ye = -4587255.83661;
-        double Ze = -2290619.16148;
+        // Site para conversão:
+        double Xe = 3702008.05442714;
+        double Ye = 3702008.05442714;
+        double Ze = 2382032.61478866;
+        //Medição NMEA usada para coordenada inicial
+        /*
+        NMEA,$GPGGA,175553.00,2207.263271,S,05124.533248,W,1,12,0.8,438.0,M,0.0,M,,*5A,1513187753149
+        (ULTIMA GPGGA DO ARQUIVO)
+        SITE UTILIZADO PARA A CONVERSAO: http://www.apsalin.com/convert-geodetic-to-cartesian.aspx
+        */
+
         double[] X0 = new double[]{Xe, Ye, Ze,0};
         double[][] N = new double[4][4];
         double[] U = new double[4];
@@ -757,11 +777,11 @@ public class Reader {
         // MVC das coordenadas ajustadas
     }
 
-    public static double maxValue(double array[]){
+    public static double maxValue(double array[]) {
         List<Double> list = new ArrayList<Double>();
         for (int i = 0; i < array.length; i++) {
             list.add(array[i]);
         }
         return Collections.max(list);
-
+    }
 }
