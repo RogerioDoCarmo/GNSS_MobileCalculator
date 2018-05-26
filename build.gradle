@@ -25,3 +25,19 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+task findDuplicates {
+    doLast {
+        String findMe = 'javax/annotation/CheckForNull.class'
+        configurations.compile.files.each { file ->
+            if (file.name.endsWith('.jar')) {
+                def classMatches = zipTree(file).matching {
+                    include findMe
+                }.files
+                if (!classMatches.empty) {
+                    println "Found $findMe in $file ${classMatches.size()} time(s)"
+                }
+            }
+        }
+    }
+}

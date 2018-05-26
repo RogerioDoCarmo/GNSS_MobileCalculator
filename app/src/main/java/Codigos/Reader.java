@@ -768,7 +768,10 @@ public class Reader {
                 Log.i("Fim", "N° de iterações: " + k);
                 break;
             }else{ // Próxima iteração
-                X0 = Xa; // ou copiar com um for
+                //X0 = Xa; // ou copiar com um for
+                for (int i = 0; i < X0.length; i++){
+                    X0[i] = Xa[i];
+                }
             }
 
         }
