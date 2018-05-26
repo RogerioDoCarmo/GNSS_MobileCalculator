@@ -14,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import static Codigos.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
 import static Codigos.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
 import static Codigos.GNSSConstants.WEEKSEC;
 
-public class Reader {
+public class ProcessamentoPPS {
 
     public static ArrayList<GNSSNavMsg> listaEfemerides = new ArrayList<>();
     public static ArrayList<GNSSMeasurement> listaMedicoes = new ArrayList<>();
@@ -30,10 +29,18 @@ public class Reader {
     private static int l;
 
 
-    public Reader(){ //TODO Por enquanto pegar da pasta raw assets msm!
+    public ProcessamentoPPS(){ //TODO Por enquanto pegar da pasta raw assets msm!
         this.listaEfemerides = new ArrayList<>();
+        this.listaMedicoes = new ArrayList<>();
+        this.listaCoord = new ArrayList<>();
     }
 
+    /**
+     *
+     * @param context A activity em execução atual
+     * @return
+     * @throws IOException
+     */
     public static String readRINEX_RawAssets(Context context) throws IOException {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
         BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour3470)));
@@ -279,10 +286,25 @@ public class Reader {
         return sb.toString();
     }
 
+    /**
+     * Converte uma data (UTC) em segundos da semana GPS correspondente.
+     * <p>Implementação conforme (MONICO 2008)</p>
+     * @param D Dia da semana, 0 = Domingo...
+     * @param HOR Horário do dia (UTC)
+     * @param MIN Minutos do dia (UTC)
+     * @param SEG Segundos do dia (UTC)
+     * @return Segundos da semana GPS correspondente
+     */
     public static double calcTOC_tr_(int D, int HOR, int MIN, double SEG) { // TODO Adotar a abordagem de Julian Day do arquivo ReadRinexNav.m linha 83!
         return (  (D * 24 + HOR) * 3600 + MIN * 60 + SEG );
     }
 
+    /**
+     * Lê um arquivo <b>RINEX de Navegação</b> e retorna a quantidade de efemérides no arquivo.
+     * @param context Activity em execução
+     * @return O número de efemérides brutas no arquivo RINEX de observação
+     * @throws IOException
+     */
     public static int contEfemerides(Context context) throws IOException{
         int numLines = 0;
         BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour3470)));
@@ -308,6 +330,12 @@ public class Reader {
         return numLines / 8;
     }
 
+    /**
+     * Lê o arquivo gerado pelo GNSS Logger app para extrair as medições brutas (linhas Raw).
+     * @param context A activity em execução
+     * @return
+     * @throws IOException
+     */
     public static String readLogger_RawAssets(Context context) throws  IOException{
         int qntMedicoesDescartadas = 0;
         BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.sensorlog))); // FIXME DEIXAR DINAMICO
@@ -453,47 +481,11 @@ public class Reader {
         return sb.toString();
     }
 
-    public static void calcPseudoranges_OLD(){
-        for (int i = 0; i < listaMedicoes.size(); i++){
-
-            double pseudorangeMeters = 0d;
-            double pseudorangeUncertaintyMeters = 0d;
-
-            // GPS Week number:
-            Long weekNumber =  Math.round(Math.floor(-(double)listaMedicoes.get(i).getFullBiasNanos() * 1e-9/GNSSConstants.WEEKSEC));
-            //TODO VERIFICAR E ATRIBUIT 0 CASO DE ERRO
-//            listaMedicoes.get(i).getBiasNanos();
-//            listaMedicoes.get(i).getTimeOffsetNanos();
-
-            //compute time of measurement relative to start of week
-            Long WEEKNANOS = Math.round (GNSSConstants.WEEKSEC * 1e9);
-            Long weekNumberNanos = weekNumber * Math.round(GNSSConstants.WEEKSEC*1e9);
-
-            //Compute tRxNanos using gnssRaw.FullBiasNanos(1), so that
-            //tRxNanos includes rx clock drift since the first epoch:
-            Long tRxNanos = listaMedicoes.get(i).getTimeNanos() - listaMedicoes.get(i).getFullBiasNanos() - weekNumberNanos;
-
-            //TODO !!AQUI ENTRA A LOGICA DO CAMPO STATE...
-            //tRxNanos now since beginning of the week, unless we had a week rollover
-
-            //subtract the fractional offsets TimeOffsetNanos and BiasNanos:
-            double tRxSeconds = (double)(Math.round(tRxNanos) - listaMedicoes.get(i).getTimeOffsetNanos() - listaMedicoes.get(i).getBiasNanos()*1e-9);
-            double tTxSeconds = (double)listaMedicoes.get(i).getReceivedSvTimeNanos() * 1e-9;
-
-            double prSeconds = tRxSeconds - tTxSeconds;
-
-            // we are ready to compute pseudorange in meters:
-            pseudorangeMeters = prSeconds * GNSSConstants.LIGHTSPEED;
-            pseudorangeUncertaintyMeters = (double) listaMedicoes.get(i).getReceivedSvTimeUncertaintyNanos() * 1e-9 * GNSSConstants.LIGHTSPEED;
-
-            listaMedicoes.get(i).setPseudorangeMeters(pseudorangeMeters);
-            listaMedicoes.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
-
-            Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
-            Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
-        }
-    }
-
+    /**
+     * Calcula as pseudodistâncias em metros para cada <b>medição GPS</b> capturada.
+     * <p>Essas pseudodistãncias preencherão o velor Lb no ajustamento paramétrico.</p>
+     * @see ProcessamentoPPS#calcularMMQ()
+     */
     public static void calcPseudoranges(){
         for (int i = 0; i < listaMedicoes.size(); i++){
 
@@ -526,15 +518,21 @@ public class Reader {
 
     /**
      * Ajusta as medições GNSS (pseudodistancias) e as efemérides transmitidas (dados de navegação) para pertencer a mesma época.
+     * <p> Elimina as medições e efemérides de outra época e mantem apenas as da época em análise.</p>
      * <p>
      *     Tudo dentro de uma mesmo UTC é considerado a mesma época.
      * </p>
-     *
+     *@return A data para a época considerada no ajustamento.
      */
-    public  static void ajustarEpocas(){
-
+    public static GNSSDate ajustarEpocas(){
+        GNSSDate epocaAnalise = new GNSSDate();
+        return epocaAnalise;
     }
 
+    /**
+     * Calcula as <b>coordenadas X,Y,Z (WGS-84)</b> para cada satélite.
+     * <p>Calcula o <b>erro do relógio</b> para cada satélite em segundos.
+     */
     public static void calcCoordendas(){
         //int L = 10;
         double GM = 3.986004418E14;
@@ -543,12 +541,16 @@ public class Reader {
 
         Log.i("Coord","Inicio do calculo das coordenadas dos satélites.");
 
+        GNSSDate dataObservacao = ajustarEpocas();
+
         for (int i = 0; i < l; i++ ){// FIXME
             //------------------------------------------
             //Dados de entrada
             //------------------------------------------
             //Tempo de recepcao do sinal ->  Hora da observacao
-            double tr = (3*24+0)*3600 + 0*60 + 0.00; // FIXME CORRIGIR O TEMPO
+//            double tr = (3*24+0)*3600 + 0*60 + 0.00; // FIXME CORRIGIR O TEMPO
+//            double tr = calcTOC_tr_(GNSSConstants.DAY_QUA,)
+            double tr = 0;
 
             double a0 = listaEfemerides.get(i).getAf0();
             double a1 = listaEfemerides.get(i).getAf1();
@@ -648,6 +650,10 @@ public class Reader {
 
     }
 
+    /**
+     * Aplica o ajustamento pelo método dos mínimos quadrados (MMQ). <p>
+     * Utiliza a abordagem encontrada em (MONICO, 2008) p. 292-300.
+     */
     public static void calcularMMQ(){
 //        GpsNavigationMessageStore;
 //        Ephemeris.GpsEphemerisProto;
@@ -666,6 +672,7 @@ public class Reader {
             Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();
         }
 
+        Log.i("Lb","Criação do vetor Lb");
 //        Aproximações iniciais
 //        double Xe = 3789545.41209;
 //        double Ye = -4587255.83661;
@@ -723,22 +730,22 @@ public class Reader {
             }
 
             // Método Paramétrico
-            Log.i("par","Iniciando o método paramétrico");
+            Log.i("par","Iteração do método paramétrico");
 
-            RealMatrix RealA =  MatrixUtils.createRealMatrix(A);
-            RealVector RealL  =  MatrixUtils.createRealVector(L);
+            RealMatrix rA =  MatrixUtils.createRealMatrix(A);
+            RealVector rL  =  MatrixUtils.createRealVector(L);
 
 
             //  N = A'*A;
-            RealMatrix RealN = RealA.transpose().multiply(RealA);
+            RealMatrix rN = rA.transpose().multiply(rA);
             //U = A'*L;
-            RealVector RealU = RealA.transpose().operate(RealL);
+            RealVector rU = rA.transpose().operate(rL);
 
             //X = -inv(N)*U;
-            RealMatrix RealNInverse = new LUDecomposition(RealN).getSolver().getInverse();
-            RealVector RealX = RealNInverse.scalarMultiply(-1.0).operate(RealU);
+            RealMatrix rInvN = new LUDecomposition(rN).getSolver().getInverse();
+            RealVector rX = rInvN.scalarMultiply(-1.0).operate(rU);
 
-            X = RealX.toArray();
+            X = rX.toArray();
 
             X[3] = X[3]/c;
 
@@ -775,15 +782,22 @@ public class Reader {
             }
 
         }
+        //TODO Verificação dos operadores de precisão:
         // Vetor dos resíduos
         // Fator de variância a posteriori
         // MVC das coordenadas ajustadas
     }
 
-    public static double maxValue(double array[]) {
-        List<Double> list = new ArrayList<Double>();
-        for (int i = 0; i < array.length; i++) {
-            list.add(array[i]);
+    /**
+     * Retorna o maior valor de um array do tipo double.<p>
+     * Utiliza uma estrutura do tipo List<Double> para o processamento.
+     * @param array Um array primitivo do tipo double.
+     * @return O maior valor do Array.
+     */
+    private static double maxValue(double array[]) {
+        List<Double> list = new ArrayList<>();
+        for (double anArray : array) {
+            list.add(anArray);
         }
         return Collections.max(list);
     }

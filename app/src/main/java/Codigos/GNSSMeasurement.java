@@ -3,8 +3,8 @@ package Codigos;
 public class GNSSMeasurement {
 
     /*Campos adicionados manualmente:*/
-    private Long tTx; // Tempo de transmissão em segundos da semana GPS
-    private Long tRx; // Tempo de recepção em segundos da semana GPS
+    private Long tTx;
+    private Long tRx;
 
     /*Pseudo-distâncias calculadas*/ // FIXME VER SE NÃO SERÁ EM OUTRO LUGAR
     private double PseudorangeMeters;
@@ -302,18 +302,34 @@ public class GNSSMeasurement {
         PseudoRangeUncertaintyMeters = pseudoRangeUncertaintyMeters;
     }
 
+    /**
+     * Retorna o instante de transmissão do sinal em segundos da semana GPS.
+     * @return Tempo de <b>transmissão</b> em segundos da semana GPS
+     */
     public Long gettTx() {
         return tTx;
     }
 
+    /**
+     *{@link GNSSMeasurement#gettTx}
+     * @param tTx O instante de transmissão do sinal em segundos da semana GPS.
+     */
     public void settTx(Long tTx) {
         this.tTx = tTx;
     }
 
+    /**
+     * Retorna o instate de recepção do sinal em segundos da semana GPS.
+     * @return Tempo de <b>recepção</b> em segundos da semana GPS.
+     */
     public Long gettRx() {
         return tRx;
     }
 
+    /**
+     * {@link GNSSMeasurement#gettRx}
+     * @param tRx O instante de recepção do sinal em segundos da semana GPS.
+     */
     public void settRx(Long tRx) {
         this.tRx = tRx;
     }
