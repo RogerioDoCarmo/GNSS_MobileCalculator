@@ -7,12 +7,12 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
-import static Codigos.Reader.ajustarEpocas;
-import static Codigos.Reader.calcCoordendas;
-import static Codigos.Reader.calcPseudoranges;
-import static Codigos.Reader.calcularMMQ;
-import static Codigos.Reader.readLogger_RawAssets;
-import static Codigos.Reader.readRINEX_RawAssets;
+import static Codigos.ProcessamentoPPS.ajustarEpocas;
+import static Codigos.ProcessamentoPPS.calcCoordendas;
+import static Codigos.ProcessamentoPPS.calcPseudoranges;
+import static Codigos.ProcessamentoPPS.calcularMMQ;
+import static Codigos.ProcessamentoPPS.readLogger_RawAssets;
+import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
 
 public class MainActivity extends AppCompatActivity {
 
