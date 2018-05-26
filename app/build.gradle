@@ -17,12 +17,31 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/notice'
+        exclude 'META-INF/license'
+
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+//        exclude 'assets/org/apache/commons/math3'
+//        exclude 'assets/org/apache/commons/math3/exception/util/LocalizedFormats_fr.properties'
+//        exclude 'assets/org/apache/commons/math3/random/new-joe-kuo-6.1000'
+    }
 }
 
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'joda-time:joda-time:2.9.4'
+    //compile fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+//    implementation 'com.android.support:appcompat-v7:25.2.0'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     testImplementation 'junit:junit:4.12'
@@ -30,16 +49,16 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.google.android.gms:play-services-location:11.0.2'
     implementation 'com.google.android.gms:play-services-maps:11.0.2'
-    compile files('libs/achartengine-1.2.0.jar')
-    compile files('libs/guava-22.0-android.jar')
-    compile files('libs/commons-math3-3.6.1.jar')
-    compile 'com.google.android.gms:play-services-location:11.0.2'
-    compile files('libs/commons-codec-1.10.jar')
-    compile files('libs/asn1-supl2.jar')
-    compile files('libs/asn1-base.jar')
-    compile files('libs/suplClient.jar')
-    compile files('libs/protobuf-nano.jar')
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
-    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
-
+//    compile 'joda-time:joda-time:2.9.4'
+//    compile files('libs/achartengine-1.2.0.jar')
+//    compile files('libs/guava-22.0-android.jar')
+//    compile 'com.google.android.gms:play-services-location:11.0.2'
+//    compile files('libs/commons-codec-1.10.jar')
+//    compile files('libs/asn1-supl2.jar')
+//    compile files('libs/asn1-base.jar')
+//    compile files('libs/suplClient.jar')
+//    compile files('libs/protobuf-nano.jar')
+//    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
+//    https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    implementation ('org.apache.commons:commons-math3:3.6.1')
 }
