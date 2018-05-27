@@ -6,9 +6,6 @@ public class GNSSMeasurement {
     private Long tTx;
     private Long tRx;
     private GNSSDate data;
-    /**
-     * Since 1980
-     */
     private int gpsWeek;
 
     /*Pseudo-distâncias calculadas*/ // FIXME VER SE NÃO SERÁ EM OUTRO LUGAR
@@ -345,5 +342,16 @@ public class GNSSMeasurement {
 
     public void setData(GNSSDate data) {
         this.data = data;
+    }
+
+    /**
+     * Since 1980
+     */
+    public int getGpsWeek() {
+        return gpsWeek;
+    }
+
+    public void setGpsWeek(int gpsWeek) {
+        this.gpsWeek = gpsWeek;
     }
 }

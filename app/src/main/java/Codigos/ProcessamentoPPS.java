@@ -26,6 +26,7 @@ public class ProcessamentoPPS {
     public static ArrayList<GNSSNavMsg> listaEfemerides = new ArrayList<>();
     public static ArrayList<GNSSMeasurement> listaMedicoes = new ArrayList<>();
     public static ArrayList<CoordenadaGPS> listaCoord = new ArrayList<>();
+    public static ArrayList<Integer> listaPRNs = new ArrayList<>();
     private static int l;
 
 
@@ -33,6 +34,7 @@ public class ProcessamentoPPS {
         this.listaEfemerides = new ArrayList<>();
         this.listaMedicoes = new ArrayList<>();
         this.listaCoord = new ArrayList<>();
+        this.listaPRNs = new ArrayList<>();
     }
 
     /**
@@ -43,7 +45,7 @@ public class ProcessamentoPPS {
      */
     public static String readRINEX_RawAssets(Context context) throws IOException {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour3470)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1410)));
         int numEfemerides = contEfemerides(context);
 
         // do reading, usually loop until end of file reading
@@ -343,7 +345,7 @@ public class ProcessamentoPPS {
      */
     public static int contEfemerides(Context context) throws IOException{
         int numLines = 0;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour3470)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1410)));
 
         // do reading, usually loop until end of file reading
         StringBuilder sb = new StringBuilder();
@@ -374,7 +376,7 @@ public class ProcessamentoPPS {
      */
     public static String readLogger_RawAssets(Context context) throws  IOException{
         int qntMedicoesDescartadas = 0;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.sensorlog))); // FIXME DEIXAR DINAMICO
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.logtainanep1))); // FIXME DEIXAR DINAMICO
 
         // do reading, usually loop until end of file reading
         StringBuilder sb = new StringBuilder();
@@ -562,6 +564,7 @@ public class ProcessamentoPPS {
             GpsTime gpt = GpsTime.fromWeekTow(gpsWeek,gpsSecsWek.intValue());
             gpt.getUtcDateTime();
 
+            listaMedicoes.get(i).setGpsWeek(gpsWeek);
 //            int hour = Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", ""));
 //            int minute = Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", ""));
 //            double seconds = Double.valueOf(mLine.substring(18, 22).replaceAll("\\s", ""));
@@ -578,6 +581,9 @@ public class ProcessamentoPPS {
             Log.i("hour_OBS",String.valueOf(hour));
             Log.i("minute_OBS",String.valueOf(minute));
             Log.i("seconds_OBS",String.valueOf(seconds));
+
+            Log.i("hora-minuto", "Svid: " + listaMedicoes.get(i).getSvid() +
+                    " Hora: " + String.valueOf(hour) + " Minuto: " + String.valueOf(minute));
 
             GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
             listaMedicoes.get(i).setData(data);
@@ -610,11 +616,35 @@ public class ProcessamentoPPS {
 
         //epocaAnalise.compareTo()
 
+        int size = listaMedicoes.size() - 6;
+
         /**
          * Descartar efemérides e observações fora da época
          */
-        for (int i = 0; i < listaEfemerides.size(); i++){
+        for (int i = 0; i < size;i++){
+            listaMedicoes.remove(0);
+        }
 
+        for (int i = 0; i < listaMedicoes.size(); i++){
+            listaPRNs.add(listaMedicoes.get(i).getSvid());
+        }
+
+        for (int i = 0; i < listaEfemerides.size(); i++){
+            Integer PRNatual = Integer.valueOf(listaEfemerides.get(i).getPRN().trim());
+            if (!listaPRNs.contains(PRNatual)){
+                listaEfemerides.remove(i);
+            }
+        }
+
+        /**
+         * Criando o ArrayList de Coordenadas
+         */
+        for (int i = 0; i < listaEfemerides.size();i++){
+            if ( !(listaEfemerides.get(i).getData().getHour() == 19 &&
+                listaEfemerides.get(i).getData().getMin()  == 30) ){
+                    listaEfemerides.remove(i);
+                    //TODO POR OS PRNS EM ORDEM E PREENCHER O ARRAYLIST DE COORDENADAS
+            }
         }
         GNSSDate epocaAnalise = new GNSSDate(year,month,day,hour,min,sec);
         return epocaAnalise;
@@ -734,6 +764,7 @@ public class ProcessamentoPPS {
             //coord = [coord; efemerides(i,1) X Y Z dts];
             int PRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
             CoordenadaGPS novaCoord = new CoordenadaGPS(PRN,X,Y,Z,dts);
+            listaCoord.add(novaCoord);
 
         }
 
@@ -771,12 +802,18 @@ public class ProcessamentoPPS {
 
         // Site para conversão:
         double Xe = 3702008.05442714;
-        double Ye = 3702008.05442714;
+        double Ye = 4611836.75133463;
         double Ze = 2382032.61478866;
+//        double Xe = 3702008.05442714;
+//        double Ye = 3702008.05442714;
+//        double Ze = 2382032.61478866;
         //Medição NMEA usada para coordenada inicial
         /*
         NMEA,$GPGGA,175553.00,2207.263271,S,05124.533248,W,1,12,0.8,438.0,M,0.0,M,,*5A,1513187753149
-        (ULTIMA GPGGA DO ARQUIVO)
+        (ORIGINAL)
+        NMEA UTILIZADA NO TESTE DO TAINAN:
+        NMEA,$GPGGA,191430.00,2207.358552,S,05124.456111,W,1,00,0.8,438.2,M,-1.9,M,,*72
+,1526930070258
         SITE UTILIZADO PARA A CONVERSAO: http://www.apsalin.com/convert-geodetic-to-cartesian.aspx
         */
 
