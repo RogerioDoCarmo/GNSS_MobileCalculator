@@ -1,9 +1,11 @@
 package Codigos;
 
 public class GNSSNavMsg {
-    /* gpsEph structure based on ReadRinexNav.m file from Google
-        clock variable names af0, af1, af2 follow IS GPS 200
+    /**
+     * GNSSNavMsg structure based on ReadRinexNav.m file from Google
+     * clock variable names af0, af1, af2 follow IS GPS 200
     */
+    private GNSSDate data;
     private String PRN;          // SV PRN number TODO Verificar se fica como int msm!
     private double Toc;          // Time of clock (seconds)
     private double af0;          // SV clock bias (seconds)
@@ -282,5 +284,13 @@ public class GNSSNavMsg {
 
     public void setFit_interval(double fit_interval) {
         Fit_interval = fit_interval;
+    }
+
+    public void setGNSSDate(GNSSDate data) {
+        this.data = data;
+    }
+
+    public GNSSDate getData() {
+        return data;
     }
 }

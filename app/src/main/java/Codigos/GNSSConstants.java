@@ -4,18 +4,18 @@ import java.util.concurrent.TimeUnit;
 
 public class GNSSConstants {
     /**
-     * Days of the week.
+     * Days of the week as integer numbers.
      */
     public static final int DAY_DOM = 0;
-    public static final int DAY_SEG = 0;
-    public static final int DAY_TER = 0;
-    public static final int DAY_QUA = 0;
-    public static final int DAY_QUI = 0;
-    public static final int DAY_SEX = 0;
-    public static final int DAY_SAB = 0;
-
+    public static final int DAY_SEG = 1;
+    public static final int DAY_TER = 2;
+    public static final int DAY_QUA = 3;
+    public static final int DAY_QUI = 4;
+    public static final int DAY_SEX = 5;
+    public static final int DAY_SAB = 6;
 
     public static final int CONSTELLATION_GPS = 1;
+    public static final int CONSTELLATION_GLONASS = 3;
     public static final Long WEEKSEC = 604800L; /*Number of seconds in a week*/
     public static final double  LIGHTSPEED = 2.99792458e8;
     /*Constantes do GNSSLogger*/

@@ -5,6 +5,11 @@ public class GNSSMeasurement {
     /*Campos adicionados manualmente:*/
     private Long tTx;
     private Long tRx;
+    private GNSSDate data;
+    /**
+     * Since 1980
+     */
+    private int gpsWeek;
 
     /*Pseudo-distâncias calculadas*/ // FIXME VER SE NÃO SERÁ EM OUTRO LUGAR
     private double PseudorangeMeters;
@@ -332,5 +337,13 @@ public class GNSSMeasurement {
      */
     public void settRx(Long tRx) {
         this.tRx = tRx;
+    }
+
+    public GNSSDate getData() {
+        return data;
+    }
+
+    public void setData(GNSSDate data) {
+        this.data = data;
     }
 }
