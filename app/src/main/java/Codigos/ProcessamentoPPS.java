@@ -74,8 +74,12 @@ public class ProcessamentoPPS {
             Log.i("PRN", PRN); // FIXME
             efemeride.setPRN(PRN);
 
-            try {
-                double Toc = calcTOC_tr_(Integer.valueOf(mLine.substring(9, 11).replaceAll("\\s", "")), // dia
+            try { // FIXME REVER
+//                double Toc = calcTOC_tr_(Integer.valueOf(mLine.substring(9, 11).replaceAll("\\s", "")), // dia
+//                        Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", "")), // hora
+//                        Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", "")), // minuto
+//                        Double.valueOf(mLine.substring(18, 22).replace('D', 'e').trim())); // segundo FIXME
+                double Toc = calcTOC_tr_(GNSSConstants.DAY_QUA, // dia // fixme ESTA MANUAL ESSA ENTRADA!
                         Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", "")), // hora
                         Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", "")), // minuto
                         Double.valueOf(mLine.substring(18, 22).replace('D', 'e').trim())); // segundo FIXME
@@ -85,10 +89,31 @@ public class ProcessamentoPPS {
                         " Minutos: " + mLine.substring(15, 17).replaceAll("\\s", "") +
                         " Segundos: " + mLine.substring(18, 22).replaceAll("\\s", ""));
 
+
+                int year = Integer.valueOf(mLine.substring(3, 6).replaceAll("\\s", ""));
+                int month = Integer.valueOf(mLine.substring(6, 8).replaceAll("\\s", ""));
+                int day = Integer.valueOf(mLine.substring(9, 11).replaceAll("\\s", ""));
+                int hour = Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", ""));
+                int minute = Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", ""));
+                double seconds = Double.valueOf(mLine.substring(18, 22).replaceAll("\\s", ""));
+
+                Log.i("year_RINEX",String.valueOf(year));
+                Log.i("month_RINEX",String.valueOf(month));
+                Log.i("day_RINEX",String.valueOf(day));
+                Log.i("hour_RINEX",String.valueOf(hour));
+                Log.i("minute_RINEX",String.valueOf(minute));
+                Log.i("seconds_RINEX",String.valueOf(seconds));
+
                 efemeride.setToc(Toc);
+//                efemeride
+
+             GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
+             efemeride.setGNSSDate(data); // TODO VERIFICAR ERRO
+
             }catch (Exception err){
                 efemeride.setToc(0);
                 Log.e("TOC-ERR","Erro: " + err.getMessage());
+//                efemeride.setGNSSDate(null);
             }
 
             Log.i("af0","af0: " + mLine.substring(22,41).replace('D','e').replaceAll("\\s",""));
@@ -288,15 +313,26 @@ public class ProcessamentoPPS {
 
     /**
      * Converte uma data (UTC) em segundos da semana GPS correspondente.
-     * <p>Implementação conforme (MONICO 2008)</p>
-     * @param D Dia da semana, 0 = Domingo...
+     * <p>Implementação conforme (MONICO, 2008)</p>
+     * @param DAY_WEEK Dia da semana, 0 = Domingo...
      * @param HOR Horário do dia (UTC)
      * @param MIN Minutos do dia (UTC)
      * @param SEG Segundos do dia (UTC)
      * @return Segundos da semana GPS correspondente
      */
-    public static double calcTOC_tr_(int D, int HOR, int MIN, double SEG) { // TODO Adotar a abordagem de Julian Day do arquivo ReadRinexNav.m linha 83!
-        return (  (D * 24 + HOR) * 3600 + MIN * 60 + SEG );
+    public static double calcTOC_tr_(int DAY_WEEK, int HOR, int MIN, double SEG) { // TODO Adotar a abordagem de Julian Day do arquivo ReadRinexNav.m linha 83!
+        return (  (DAY_WEEK * 24 + HOR) * 3600 + MIN * 60 + SEG );
+    }
+
+    /**
+     * Converte uma data (UTC) em segundos da semana GPS correspondente.
+     * <p>Implementação conforme (MONICO, 2008)</p>
+     * @param dataGNSS Data no formato UTC.
+     * @return Segundos da semana GPS correspondente
+     * @see GNSSDate
+     */
+    public static double calcTOC_tr_(GNSSDate dataGNSS) { // TODO Adotar a abordagem de Julian Day do arquivo ReadRinexNav.m linha 83!
+        return (  (dataGNSS.getDay() * 24 + dataGNSS.getHour()) * 3600 + dataGNSS.getMin() * 60 + dataGNSS.getSec() );
     }
 
     /**
@@ -509,6 +545,43 @@ public class ProcessamentoPPS {
             listaMedicoes.get(i).settTx(tTx);
             listaMedicoes.get(i).settRx(tRx);
 
+//            int year = Integer.valueOf(2017);
+//            int month = Integer.valueOf(12);
+//            int day = Integer.valueOf(13);
+
+
+            //GPS Week number and Seconds within the week:
+            int weekNumberr =  (int)Math.floor(-(double)(listaMedicoes.get(i).getFullBiasNanos()*1e-9/GNSSConstants.WEEKSEC));
+            /**
+             * Aply gpsWeek % 1024 to get the week number in [0,1024]
+             */
+            int gpsWeek = weekNumberr;// % 1024;
+            Long gpsSecsWek = Math.round(tRx * 1e-9); // FIXME REVER
+            Log.i("gpsWeek","Semana: " + gpsWeek + " Segundos da semana: " + gpsSecsWek.intValue());
+
+            GpsTime gpt = GpsTime.fromWeekTow(gpsWeek,gpsSecsWek.intValue());
+            gpt.getUtcDateTime();
+
+//            int hour = Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", ""));
+//            int minute = Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", ""));
+//            double seconds = Double.valueOf(mLine.substring(18, 22).replaceAll("\\s", ""));
+            int year = gpt.getUtcDateTime().getYear() % 2000;
+            int month = gpt.getUtcDateTime().getMonthOfYear();
+            int day = gpt.getUtcDateTime().getDayOfMonth();
+            int hour = gpt.getUtcDateTime().getHourOfDay();
+            int minute = gpt.getUtcDateTime().getMinuteOfHour();
+            double seconds = gpt.getUtcDateTime().getSecondOfMinute();
+
+            Log.i("year_OBS",String.valueOf(year));
+            Log.i("month_OBS",String.valueOf(month));
+            Log.i("day_OBS",String.valueOf(day));
+            Log.i("hour_OBS",String.valueOf(hour));
+            Log.i("minute_OBS",String.valueOf(minute));
+            Log.i("seconds_OBS",String.valueOf(seconds));
+
+            GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
+            listaMedicoes.get(i).setData(data);
+
             Log.i("tTx/tRx","Svid: " +  listaMedicoes.get(i).getSvid() + " tTx: " + tTx + " tRx: " + tRx + " Intervalo: " + prMilliSeconds);
 
             Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
@@ -525,7 +598,25 @@ public class ProcessamentoPPS {
      *@return A data para a época considerada no ajustamento.
      */
     public static GNSSDate ajustarEpocas(){
-        GNSSDate epocaAnalise = new GNSSDate();
+        int year = 2017;
+        int month = 12;
+        int hour = 23;//fixme
+        int min = 0;
+        double sec = 0.0;
+        int day = GNSSConstants.DAY_QUA;
+
+        //TODO
+
+
+        //epocaAnalise.compareTo()
+
+        /**
+         * Descartar efemérides e observações fora da época
+         */
+        for (int i = 0; i < listaEfemerides.size(); i++){
+
+        }
+        GNSSDate epocaAnalise = new GNSSDate(year,month,day,hour,min,sec);
         return epocaAnalise;
     }
 
@@ -550,7 +641,7 @@ public class ProcessamentoPPS {
             //Tempo de recepcao do sinal ->  Hora da observacao
 //            double tr = (3*24+0)*3600 + 0*60 + 0.00; // FIXME CORRIGIR O TEMPO
 //            double tr = calcTOC_tr_(GNSSConstants.DAY_QUA,)
-            double tr = 0;
+            double tr = calcTOC_tr_(dataObservacao);
 
             double a0 = listaEfemerides.get(i).getAf0();
             double a1 = listaEfemerides.get(i).getAf1();
