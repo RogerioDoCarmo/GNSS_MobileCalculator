@@ -108,6 +108,11 @@ public class GNSSMeasurement {
         PseudorangeRateUncertaintyMetersPerSecond = pseudorangeRateUncertaintyMetersPerSecond;
     }
 
+    /**
+     * Obtem o tempo GNSS no momento da transmissão do sinal.
+     * <p> Para satélites GPS é equivalente ao <b>TOW</b> (Segundos da semana GPS atual) em <b>nanosegundos</b>.
+     * @return
+     */
     public Long getReceivedSvTimeNanos() {
         return ReceivedSvTimeNanos;
     }

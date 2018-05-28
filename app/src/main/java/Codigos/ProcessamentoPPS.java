@@ -559,6 +559,8 @@ public class ProcessamentoPPS {
              */
             int gpsWeek = weekNumberr;// % 1024;
             Long gpsSecsWek = Math.round(tRx * 1e-9); // FIXME REVER
+            //TESTE FIXME
+            gpsSecsWek = Math.round((listaMedicoes.get(i).getReceivedSvTimeNanos() + prMilliSeconds) * 1e-9);
             Log.i("gpsWeek","Semana: " + gpsWeek + " Segundos da semana: " + gpsSecsWek.intValue());
 
             GpsTime gpt = GpsTime.fromWeekTow(gpsWeek,gpsSecsWek.intValue());
