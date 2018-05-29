@@ -1,6 +1,8 @@
 package Codigos;
 
-public class GNSSNavMsg {
+import android.support.annotation.NonNull;
+
+public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
     /**
      * GNSSNavMsg structure based on ReadRinexNav.m file from Google
      * clock variable names af0, af1, af2 follow IS GPS 200
@@ -39,7 +41,7 @@ public class GNSSNavMsg {
     private double Fit_interval; //fit interval (hours), zero if not known
 
     public String getPRN() {
-        return PRN;
+        return PRN.trim();
     }
 
     public void setPRN(String PRN) {
@@ -292,5 +294,19 @@ public class GNSSNavMsg {
 
     public GNSSDate getData() {
         return data;
+    }
+
+
+    /**
+     * Comparable methot to sort all the Navigation Messages by the satelite id (PRN)
+     * TODO: Implement Comparator methods
+     * @param another Another instance of the GNSSNavMsg class.
+     * @return A negative number if this object PRN is lesser than another.
+     * <p>0 if the PRNs are equal.
+     * <p>A positive number if this object PRN is greater than another.
+     */
+    @Override
+    public int compareTo(@NonNull GNSSNavMsg another) {
+        return (Integer.valueOf(this.getPRN().trim()) - Integer.valueOf(another.getPRN().trim()));
     }
 }

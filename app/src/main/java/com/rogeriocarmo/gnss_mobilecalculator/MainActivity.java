@@ -51,15 +51,15 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
 
-        try{
-            ajustarEpocas();
-        } catch (Exception e){
-            Log.e("ERR_ajEpch","Erro ao ajustar a época para processamento");
-            String msg = e.getMessage();
-            Toast.makeText(getApplicationContext(),
-                    "Erro ao ajustar as épocas: " + msg,
-                    Toast.LENGTH_LONG).show();
-        }
+//        try{
+//            ajustarEpocas();
+//        } catch (Exception e){
+//            Log.e("ERR_ajEpch","Erro ao ajustar a época para processamento");
+//            String msg = e.getMessage();
+//            Toast.makeText(getApplicationContext(),
+//                    "Erro ao ajustar as épocas: " + msg,
+//                    Toast.LENGTH_LONG).show();
+//        }
 
         try{
             calcCoordendas();

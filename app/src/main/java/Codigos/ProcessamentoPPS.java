@@ -606,12 +606,17 @@ public class ProcessamentoPPS {
      *@return A data para a época considerada no ajustamento.
      */
     public static GNSSDate ajustarEpocas(){
-        int year = 2017;
-        int month = 12;
-        int hour = 23;//fixme
-        int min = 0;
-        double sec = 0.0;
-        int day = GNSSConstants.DAY_QUA;
+        /**
+         * DEFINIÇÃO MANUAL DA ÉPOCA PARA ANÁLISE:
+         */
+        int YEAR = 18;
+        int MONTH = 12;
+        int DAY_MONTH = 21;
+        int DAY_WEEK = GNSSConstants.DAY_QUA;
+        int HOUR_DAY = 19;//fixme
+        int MIN_HOUR = 30;
+        double SEC = 0.0;
+
 
         //TODO
 
@@ -621,34 +626,97 @@ public class ProcessamentoPPS {
         int size = listaMedicoes.size() - 6;
 
         /**
-         * Descartar efemérides e observações fora da época
+         * A seleção da época é feita de modo manual:
+         * Descarta as observações fora da época
          */
         for (int i = 0; i < size;i++){
             listaMedicoes.remove(0);
         }
 
+        /**
+         * O ArrayList de Medições contem apenas medições da época em análise.
+         * Preenche uma Lista com os PRNs dos satélites presentes nas medições que serão utilizadas
+         */
         for (int i = 0; i < listaMedicoes.size(); i++){
             listaPRNs.add(listaMedicoes.get(i).getSvid());
         }
 
-        for (int i = 0; i < listaEfemerides.size(); i++){
-            Integer PRNatual = Integer.valueOf(listaEfemerides.get(i).getPRN().trim());
-            if (!listaPRNs.contains(PRNatual)){
-                listaEfemerides.remove(i);
-            }
-        }
+        Collections.sort(listaPRNs);
+
 
         /**
-         * Criando o ArrayList de Coordenadas
+         * Remove do ArrayList de Efemérides aqueles que não estão na epoca
+         * E cujo PRN não está no ArrayList de Observações
+         *  Obtem uma lista com os PRNs das observações para a época selecionada
          */
-        for (int i = 0; i < listaEfemerides.size();i++){
-            if ( !(listaEfemerides.get(i).getData().getHour() == 19 &&
-                listaEfemerides.get(i).getData().getMin()  == 30) ){
-                    listaEfemerides.remove(i);
-                    //TODO POR OS PRNS EM ORDEM E PREENCHER O ARRAYLIST DE COORDENADAS
+        for (int i = 0; i < listaEfemerides.size(); i++){
+            GNSSNavMsg efemerideAtual = listaEfemerides.get(i);
+            Integer PRNatual = Integer.valueOf(efemerideAtual.getPRN().trim());
+
+            if ( (efemerideAtual.getData().getHour() != HOUR_DAY ||
+                  efemerideAtual.getData().getMin()  != MIN_HOUR) )
+            {
+                listaEfemerides.remove(i);
+//                continue;
+            }else{
+                Log.i("Efe","PRN: "+ efemerideAtual.getPRN() + " Efemeride mantida - Hora:" + efemerideAtual.getData().getHour() + " Minutos: " +efemerideAtual.getData().getMin() );
             }
+
+//            if (!listaPRNs.contains(PRNatual)){
+//                listaEfemerides.remove(i);
+//            }
         }
-        GNSSDate epocaAnalise = new GNSSDate(year,month,day,hour,min,sec);
+
+        Collections.sort(listaMedicoes);
+        Collections.sort(listaEfemerides);
+
+        int tamanho = listaEfemerides.size();
+        Integer ultimoPRN = Integer.valueOf(listaEfemerides.get(0).getPRN().trim());
+
+        try{
+            /**
+             * Nesse ponto temos efemérides repetidas para determinado satélite
+             * Selecionando efemérides únicas para cada satélite:
+             */
+            for (int i = tamanho - 1; i > 0; i--){ // TODO
+//                if (ultimoPRN.equals(Integer.valueOf(listaEfemerides.get(i).getPRN())) ){
+//                    ultimoPRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
+//                    listaEfemerides.remove(i);
+//                    continue;
+//
+//                }
+//                ultimoPRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
+
+                if (listaEfemerides.get(i).getPRN().equals(listaEfemerides.get(i - 1).getPRN())){
+                    listaEfemerides.remove(i - 1);
+                }
+
+            }
+
+            int tam = listaEfemerides.size();
+            int i = tam - 1;
+            do{
+                Integer PRNatual = Integer.valueOf(listaEfemerides.get(i).getPRN());
+                if (!listaPRNs.contains(PRNatual))
+                    listaEfemerides.remove(i);
+                i--;
+            }while (listaPRNs.size() != listaEfemerides.size() );
+
+            Log.i("FimEfemerides","Definidas efemérides únicas para cada satélite");
+
+        }catch (IndexOutOfBoundsException err){
+            Log.e("Erro_Index","Erro listaEfemerides");
+        }
+
+
+        l = listaEfemerides.size(); // FIXME
+
+
+        /**
+         * PROCESSANDO PARA O UTC 19:30
+         */
+//        GNSSDate epocaAnalise = new GNSSDate(year,month,day,hour,min,sec);
+        GNSSDate epocaAnalise = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
         return epocaAnalise;
     }
 
@@ -912,6 +980,14 @@ public class ProcessamentoPPS {
             }
 
         }
+
+        Log.i("FimFOOR",Xa.toString());
+        Log.i("FimFOOR","Coordenada Xr: " + Xa[0]);
+        Log.i("FimFOOR","Coordenada Yr: " + Xa[1]);
+        Log.i("FimFOOR","Coordenada Zr: " + Xa[2]);
+        Log.i("FimFOOR","Erro do relógio do receptor: " + Xa[3]);
+//        Log.i("Fim","Erro: " + erro);
+//        Log.i("Fim", "N° de iterações: " + k);
         //TODO Verificação dos operadores de precisão:
         // Vetor dos resíduos
         // Fator de variância a posteriori

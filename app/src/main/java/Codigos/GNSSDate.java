@@ -30,6 +30,10 @@ public class GNSSDate implements Comparable<GNSSDate>{
         this.sec = sec;
     }
 
+    public GNSSDate() {
+
+    }
+
     public int getYear() {
         return year;
     }
