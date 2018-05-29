@@ -1,6 +1,8 @@
 package Codigos;
 
-public class GNSSMeasurement {
+import android.support.annotation.NonNull;
+
+public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
     /*Campos adicionados manualmente:*/
     private Long tTx;
@@ -358,5 +360,18 @@ public class GNSSMeasurement {
 
     public void setGpsWeek(int gpsWeek) {
         this.gpsWeek = gpsWeek;
+    }
+
+    /**
+     * Comparable methot to sort all the Measurements by the satelite id (PRN)
+     * TODO: Implement Comparator methods
+     * @param another Another instance of the GNSSMeasurement class.
+     * @return A negative number if this object PRN is lesser than another.
+     * <p>0 if the PRNs are equal.
+     * <p>A positive number if this object PRN is greater than another.
+     */
+    @Override
+    public int compareTo(@NonNull GNSSMeasurement another) {
+        return (this.getSvid() - another.getSvid());
     }
 }
