@@ -7,7 +7,6 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
-import static Codigos.ProcessamentoPPS.ajustarEpocas;
 import static Codigos.ProcessamentoPPS.calcCoordendas;
 import static Codigos.ProcessamentoPPS.calcPseudoranges;
 import static Codigos.ProcessamentoPPS.calcularMMQ;
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 //        try{
-//            ajustarEpocas();
+//            epocasAntigo();
 //        } catch (Exception e){
 //            Log.e("ERR_ajEpch","Erro ao ajustar a época para processamento");
 //            String msg = e.getMessage();
