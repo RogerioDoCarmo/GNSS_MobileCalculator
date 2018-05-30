@@ -23,11 +23,11 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
     private double Asqrt;        // Square root of semi-major axis (meters^1/2)
     private double Toe;          // Reference time of ephemeris (seconds)
     private double Cic;          // Sine harmonic correction to angle of inclination (radians)
-    private double OMEGA;        // Longitude of ascending node at weekly epoch (radians)
+    private double Omega0;        // Longitude of ascending node at weekly epoch (radians)
     private double Cis;          // Sine harmonic correction to angle of inclination (radians)
     private double i0;           // Inclination angle at reference time (radians)
     private double Crc;	         // Cosine harmonic correction to the orbit radius (meters)
-    private double omega;	     // Argument of perigee (radians)
+    private double w;	     // Argument of perigee (radians)
     private double OMEGA_DOT;    // Rate of right ascension (radians/sec)
     private double IDOT;	     // Rate of inclination angle (radians/sec)
     private double codeL2;       // codes on L2 channel
@@ -160,12 +160,12 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
         Cic = cic;
     }
 
-    public double getOMEGA() {
-        return OMEGA;
+    public double getOmega0() {
+        return Omega0;
     }
 
-    public void setOMEGA(double OMEGA) {
-        this.OMEGA = OMEGA;
+    public void setOmega0(double omega0) {
+        this.Omega0 = omega0;
     }
 
     public double getCis() {
@@ -192,12 +192,12 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
         Crc = crc;
     }
 
-    public double getOmega() {
-        return omega;
+    public double getW() {
+        return w;
     }
 
-    public void setOmega(double omega) {
-        this.omega = omega;
+    public void setW(double w) {
+        this.w = w;
     }
 
     public double getOMEGA_DOT() {
