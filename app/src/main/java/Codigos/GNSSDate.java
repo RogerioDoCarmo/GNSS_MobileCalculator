@@ -13,7 +13,7 @@ public class GNSSDate implements Comparable<GNSSDate>{
     /**
      * Creates a GNSS date using an UTC timestamp as entry.
      * <p> Used to determine an epoch for processing.
-     * @see ProcessamentoPPS#ajustarEpocas()
+     * @see ProcessamentoPPS#epocasAntigo()
      * @param year UTC year (0~99)
      * @param month UTC month (1~12)
      * @param day UTC day (1~31)
@@ -62,7 +62,7 @@ public class GNSSDate implements Comparable<GNSSDate>{
      *
      * @param another anote UTC GNSS datestamp to compare.
      * @return 0 if the two dates are equal. So we have the same epoch to process further.
-     * @see ProcessamentoPPS#ajustarEpocas()
+     * @see ProcessamentoPPS#epocasAntigo()
      */
     @Override
     public int compareTo(@NonNull GNSSDate another) {

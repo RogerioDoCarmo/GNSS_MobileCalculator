@@ -602,7 +602,7 @@ public class ProcessamentoPPS {
      * </p>
      *@return A data para a época considerada no ajustamento.
      */
-    public static GNSSDate ajustarEpocas(){
+    public static GNSSDate epocasAntigo(){
         /**
          * DEFINIÇÃO MANUAL DA ÉPOCA PARA ANÁLISE:
          */
@@ -839,7 +839,6 @@ public class ProcessamentoPPS {
         return epocaAnalise;
     }
 
-
     /**
      * Calcula as <b>coordenadas X,Y,Z (WGS-84)</b> para cada satélite.
      * <p>Calcula o <b>erro do relógio</b> para cada satélite em segundos.
@@ -985,184 +984,22 @@ public class ProcessamentoPPS {
 
             //coord = [coord; efemerides(i,1) X Y Z dts];
             int PRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
-            CoordenadaGPS novaCoord = new CoordenadaGPS(PRN,X,Y,Z,dts);
+            CoordenadaGPS novaCoord = new CoordenadaGPS(PRN,Xc,Yc,Zc,dts);
             listaCoord.add(novaCoord);
-
         }
 
         Log.i("CoordFIM","Fim do cálculo das coordenadas!");
 
     }
-
-    /**
-     * Calcula as <b>coordenadas X,Y,Z (WGS-84)</b> para cada satélite.
-     * <p>Calcula o <b>erro do relógio</b> para cada satélite em segundos.
-     */
-    public static void calcCoordendas2_ANTIGA(){
-        //int L = 10;
-        double GM = 3.986004418E14;
-        double We = 7.2921151467E-5;
-        double c = 299792458;
-
-        Log.i("Coord","Inicio do calculo das coordenadas dos satélites.");
-
-        GNSSDate dataObservacao = ajustarEpocas();
-
-        for (int i = 0; i < l; i++ ){// FIXME
-            //------------------------------------------
-            //Dados de entrada
-            //------------------------------------------
-            //Tempo de recepcao do sinal ->  Hora da observacao
-//            double tr = (3*24+0)*3600 + 0*60 + 0.00; // FIXME CORRIGIR O TEMPO
-//            double tr = calcTOC_tr_(GNSSConstants.DAY_QUA,)
-            double tr = calcTOC_tr_(dataObservacao);
-
-            double a0 = listaEfemerides.get(i).getAf0();
-            double a1 = listaEfemerides.get(i).getAf1();
-            double a2 = listaEfemerides.get(i).getAf2();
-
-            double Crs = listaEfemerides.get(i).getCrs();
-            double Deln = listaEfemerides.get(i).getDelta_n();
-            double Mo = listaEfemerides.get(i).getM0();
-
-            double Cuc = listaEfemerides.get(i).getCuc();
-            double e = listaEfemerides.get(i).getE();
-            double Cus = listaEfemerides.get(i).getCus();
-            double a = listaEfemerides.get(i).getAsqrt() * listaEfemerides.get(i).getAsqrt();
-
-            double toe = listaEfemerides.get(i).getToe();
-            double Cic = listaEfemerides.get(i).getCic();
-            double Omega0 = listaEfemerides.get(i).getOmega0(); // FIXME REVER
-            double Cis = listaEfemerides.get(i).getCis();
-
-            double io = listaEfemerides.get(i).getI0();
-            double Crc = listaEfemerides.get(i).getCrc();
-            double w = listaEfemerides.get(i).getGPS_Week();
-            double Omegadot = listaEfemerides.get(i).getOMEGA_DOT();
-
-            double idot = listaEfemerides.get(i).getIDOT();
-
-            // ------------------------------------------
-            //Tempo de transmisao do sinal
-            // ------------------------------------------
-            double dtr = 0; // ERRO DO RELÓGIO
-            double tgps = tr - listaMedicoes.get(i).getPseudorangeMeters()/c;
-
-            double dts = a0 + a1*(tgps-toe) + a2*((tgps-toe)*(tgps-toe)); // ERRO DO SATÉLITE
-
-            double tpropag = listaMedicoes.get(i).getPseudorangeMeters()/c - dtr +dts;
-
-            tgps = tr-dtr-tpropag+dts; // melhoria no tempo de transmissao
-
-            //------------------------------------------
-            //Coordenadas do satelite
-            //------------------------------------------
-
-            double Deltk = tgps - toe;
-
-            //TODO REVISAR
-            /**
-             * Considerando possível mudança de semana
-             * Autor: Bruno Vani
-             */
-            if (Deltk > 302400)
-                Deltk = Deltk - 604800;
-            else if (Deltk < -302400)
-                Deltk = Deltk + 604800;
-
-            double no = Math.sqrt((GM/(a*a*a)));
-            double n = no + Deln;
-
-            double Mk = Mo + n*Deltk;
-
-            // EQUAÇÃO DE EULER
-            double Ek = Mk;
-
-            Log.i("Ek","Cálculo iterativo da equação de Euler");
-            for (int k = 0; k < 7; k++){
-                Ek = Mk + e*Math.sin(Ek);
-            }
-
-            //Anomalia verdadeira // FIXME ALTERACAO RECEM FEITA
-//            double sinVk = ((Math.sqrt(1-(e*e))*Math.sin(Ek))/(1-(e*Math.cos(Ek))));
-//            double cosVk = (Math.cos((Ek)-e)/(1-(e*(Math.cos(Ek)))));
-
-            double sinVk = ((Math.sqrt((e * e)) * Math.sin(Ek)) / (1 - (e * Math.cos(Ek))) );
-            double cosVk = (Math.cos((Ek) - e) / (1 - e * Math.cos(Ek)));
-
-            /**
-             * Teste do quadrante
-             * autor: Bruno Vani
-             */
-            double Vk = 0d;
-            if (((sinVk >= 0) && (cosVk >= 0)) || (sinVk < 0) && (cosVk >= 0)) { // I ou III quadrante
-                Vk = Math.atan(sinVk / cosVk);
-            } else if (((sinVk >= 0) && (cosVk < 0)) || ((sinVk < 0 ) && (cosVk) < 0)) { //  II ou IV quadrante
-                Vk = Math.atan(sinVk / cosVk) + 3.1415926535898; // FIXME
-            }
-
-//            double Vk = Math.atan(sinVk,cosVk);
-//            double Vk = Math.atan2(sinVk,cosVk);
-
-            double Fik = Vk + w;
-            double Deluk = (Cuc*Math.cos(2*Fik)) + (Cus*Math.sin(2*Fik));
-            double uk = Fik + Deluk;
-
-            double Delrk = (Crc*Math.cos(2*Fik)) + (Crs*Math.sin(2*Fik));
-            double rk = (a*(1-(e*Math.cos(Ek)))) + Delrk;
-
-            double Delik = (Cic*Math.cos(2*Fik)) + (Cis*Math.sin(2*Fik));
-            double ik = io + (idot*Deltk) + Delik;
-
-            // Coordenadas do satélite no plano
-            double xk = rk*Math.cos(uk);
-            double yk = rk*Math.sin(uk);
-
-            // Coordenadas do satélite em 3D (WGS 84)
-            double Omegak = Omega0 + Omegadot*Deltk - We*tgps;
-
-            // Coordenadas originais do satelites
-            double Xk = ((xk*Math.cos(Omegak))-(yk*Math.sin(Omegak)*Math.cos(ik)));
-            double Yk = ((xk*Math.sin(Omegak))+(yk*Math.cos(Omegak)*Math.cos(ik)));
-            double Zk = (yk*Math.sin(ik));
-
-            // Coordenadas do satelites corrigidas do erro de rotacao da Terra
-            double alpha = We*tpropag;
-            double X = Xk + alpha*Yk;
-            double Y = -alpha*Xk + Yk;
-            double Z = Zk;
-
-            /**
-             * Análise do quadrante:
-             * Autor: Bruno Vani
-             */
-
-
-
-            //coord = [coord; efemerides(i,1) X Y Z dts];
-            int PRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
-            CoordenadaGPS novaCoord = new CoordenadaGPS(PRN,X,Y,Z,dts);
-            listaCoord.add(novaCoord);
-
-        }
-
-        Log.i("CoordFIM","Fim do cálculo das coordenadas!");
-
-    }
-
 
     /**
      * Aplica o ajustamento pelo método dos mínimos quadrados (MMQ). <p>
      * Utiliza a abordagem encontrada em (MONICO, 2008) p. 292-300.
      */
     public static void calcularMMQ(){
-//        GpsNavigationMessageStore;
-//        Ephemeris.GpsEphemerisProto;
-//        Ephemeris.GpsNavMessageProto;
-//        double dx = 0.0, dy = 0.0, dyz = 0.0;
-
-        int MAX_ITERACOES = 100;
-        double c = 299792458;
+        int MAX_ITERACOES = 8;
+        int contIteracoes = 0;
+        double c = 2.99792458e8;
         double[] L0 = new double[l];
         double[] Lb = new double[l];
         double[] L = new double[l]; // DeltaL
@@ -1173,37 +1010,34 @@ public class ProcessamentoPPS {
             Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();
         }
 
-        Log.i("Lb","Criação do vetor Lb");
-//        Aproximações iniciais
-//        double Xe = 3789545.41209;
-//        double Ye = -4587255.83661;
-//        double Ze = -2290619.16148;
+        Log.i("Lb","Vetor Lb criado");
 
-        // Site para conversão:
-        double Xe = 3702008.05442714;
-        double Ye = 4611836.75133463;
-        double Ze = 2382032.61478866;
-        //TODO PAREI AQUI, REVER A O PONTO INICIAL
 //        double Xe = 3702008.05442714;
-//        double Ye = 3702008.05442714;
+//        double Ye = 4611836.75133463;
 //        double Ze = 2382032.61478866;
-        //Medição NMEA usada para coordenada inicial
-        /*
-        NMEA,$GPGGA,175553.00,2207.263271,S,05124.533248,W,1,12,0.8,438.0,M,0.0,M,,*5A,1513187753149
-        (ORIGINAL)
 
-        NMEA UTILIZADA NO TESTE DO TAINAN:
-        NMEA,$GPGGA,191430.00,2207.358552,S,05124.456111,W,1,00,0.8,438.2,M,-1.9,M,,*72
-,1526930070258
-        SITE UTILIZADO PARA A CONVERSAO: http://www.apsalin.com/convert-geodetic-to-cartesian.aspx RUIM
-        BOM: https://www.ngs.noaa.gov/NCAT/
+        /*
+        * Medição NMEA utilizada como posição incial
+        * Site utilizado para conversão: http://www.apsalin.com/convert-geodetic-to-cartesian.aspx
+        * Última NMEA do arquivo do Logger foi utilizada: (TESTE EP1-21/05) com Moto X4
+        * NMEA,$GPGGA,191430.00,2207.358552,S,05124.456111,W,1,00,0.8,438.2,M,-1.9,M,,*72,1526930070258
         */
+//        double Xe = 3687119.95648062;
+//        double Ye = -4620870.66156297;
+//        double Ze = -2387573.3390488;
+
+        // USANDO O APP:
+        double Xe = 3687627.26039751;
+        double Ye = -4620683.42055526;
+        double Ze = -2387155.01580668;
 
         double[] X0 = new double[]{Xe, Ye, Ze,0};
         double[][] N = new double[4][4];
         double[] U = new double[4];
         double[] X = new double[4];
         double[] Xa = new double[4];
+
+        Log.i("Inicio","Iniciando solução iterativa!");
 
         // Solucao pelo metodo parametrico
         // Solucao iterativa
@@ -1229,7 +1063,7 @@ public class ProcessamentoPPS {
             for (int i = 0; i < l; i++){
                 double dx = listaCoord.get(i).getX() - X0[0];
                 double dy = listaCoord.get(i).getY() - X0[1];
-                double dz = listaCoord.get(i).getZ() - X0[0];
+                double dz = listaCoord.get(i).getZ() - X0[2];
 
                 double distGeo = Math.sqrt((dx*dx) + (dy*dy) + (dz*dz));
 
@@ -1252,10 +1086,10 @@ public class ProcessamentoPPS {
 
             //X = -inv(N)*U;
             RealMatrix rInvN = new LUDecomposition(rN).getSolver().getInverse();
-            RealVector rX = rInvN.scalarMultiply(-1.0).operate(rU);
+            RealVector rX = rInvN.scalarMultiply(-1.0d).operate(rU);
+//            RealVector rX = rInvN.operate(rU).mapMultiply(-1.0d);
 
             X = rX.toArray();
-
             X[3] = X[3]/c;
 
             //Xa = X0+X; // FIXME FAZER UMA FUNÇÃO PARA ISSO
@@ -1274,14 +1108,13 @@ public class ProcessamentoPPS {
              end
              */
             double erro = Math.abs(maxValue(Xa));
-            if ( erro < 1e-6){
-                Log.i("FimERRO",Xa.toString());
+            if ( erro < 0.004){
+                Log.i("FimERRO","N° de iterações: " + contIteracoes);
                 Log.i("FimERRO","Coordenada Xr: " + Xa[0]);
                 Log.i("FimERRO","Coordenada Yr: " + Xa[1]);
                 Log.i("FimERRO","Coordenada Zr: " + Xa[2]);
                 Log.i("FimERRO","Erro do relógio do receptor: " + Xa[3]);
                 Log.i("FimERRO","Erro: " + erro);
-                Log.i("FimERRO", "N° de iterações: " + k);
                 break;
             }else{ // Próxima iteração
                 //X0 = Xa; // ou copiar com um for
@@ -1290,10 +1123,10 @@ public class ProcessamentoPPS {
 //                    X0[i] = Xa[i];
 //                }
             }
-
+            contIteracoes++;
         }
 
-        Log.i("FimFOOR",Xa.toString());
+        Log.i("FimFOOR","Nº de iterações: " + contIteracoes);
         Log.i("FimFOOR","Coordenada Xr: " + Xa[0]);
         Log.i("FimFOOR","Coordenada Yr: " + Xa[1]);
         Log.i("FimFOOR","Coordenada Zr: " + Xa[2]);
@@ -1317,6 +1150,7 @@ public class ProcessamentoPPS {
         for (double anArray : array) {
             list.add(anArray);
         }
+        list.remove(list.size() -1);
         return Collections.max(list);
     }
 }
