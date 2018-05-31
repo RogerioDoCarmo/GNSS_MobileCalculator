@@ -68,6 +68,9 @@ public class ProcessamentoPPS {
         for (int i = 1; i < numEfemerides; i++){
             GNSSNavMsg efemeride = new GNSSNavMsg();
             mLine = reader.readLine();
+
+
+
             String PRN;
             try{
                 PRN = mLine.substring(0,2);
@@ -83,10 +86,10 @@ public class ProcessamentoPPS {
 //                        Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", "")), // hora
 //                        Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", "")), // minuto
 //                        Double.valueOf(mLine.substring(18, 22).replace('D', 'e').trim())); // segundo FIXME
-                double Toc = calcTOC_tr_(GNSSConstants.DAY_QUA, // dia // fixme ESTA MANUAL ESSA ENTRADA!
-                        Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", "")), // hora
-                        Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", "")), // minuto
-                        Double.valueOf(mLine.substring(18, 22).replace('D', 'e').trim())); // segundo FIXME
+//                double Toc = calcTOC_tr_(GNSSConstants.DAY_QUA, // dia // fixme ESTA MANUAL ESSA ENTRADA!
+//                        Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", "")), // hora
+//                        Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", "")), // minuto
+//                        Double.valueOf(mLine.substring(18, 22).replace('D', 'e').trim())); // segundo FIXME
 
                 Log.i("TOC", "Dia: " + mLine.substring(9, 11).replaceAll("\\s", "") +
                         " Hora: " + mLine.substring(12, 14).replaceAll("\\s", "") +
@@ -107,8 +110,10 @@ public class ProcessamentoPPS {
                 Log.i("hour_RINEX",String.valueOf(hour));
                 Log.i("minute_RINEX",String.valueOf(minute));
                 Log.i("seconds_RINEX",String.valueOf(seconds));
+                Log.i("seconds_RINEX",String.valueOf(seconds));
+                Log.i("Fim_TOC","=============================");
 
-                efemeride.setToc(Toc);
+//                efemeride.setToc(Toc);
 //                efemeride
 
              GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
@@ -1007,7 +1012,7 @@ public class ProcessamentoPPS {
 
         /*Exemplo do livro do Galera pg 292-299*/
         Xe = 3687627.3634;
-        Ye = -4620287.5137;
+        Ye = -4620821.5137;
         Ze = -2386884.4153;
 
         Lb[0] = 48100232.525;
@@ -1023,30 +1028,28 @@ public class ProcessamentoPPS {
         listaCoord.add(novaCoord1);
 
         CoordenadaGPS novaCoord2 = new CoordenadaGPS(7,21244105.748,-15360752.012,-2877135.125,
-                0.00057038458904959996); // Microsecs:
+                0.00057038458904959996); // Microsecs: 570.3845890496
         listaCoord.add(novaCoord2);
 
         CoordenadaGPS novaCoord3 = new CoordenadaGPS(10,-135122.979,-25794393.804,5954578.737,
-                3.88125012807e-5); // Microsecs
+                3.88125012807e-5); // Microsecs: 38.8125012807
         listaCoord.add(novaCoord3);
 
         CoordenadaGPS novaCoord4 = new CoordenadaGPS(13,19720605.766,-17653994.853,-1657890.383,
-                -4.76228094177e-5); // Microsecs
+                -4.76228094177e-5); // Microsecs: -47.6228094177
         listaCoord.add(novaCoord4);
 
         CoordenadaGPS novaCoord5 = new CoordenadaGPS(19,25910284.743,5823456.939,-2525126.594,
-                1.64975089736e-5); // Microsecs:
+                1.64975089736e-5); // Microsecs: 16.4975089736
         listaCoord.add(novaCoord5);
 
         CoordenadaGPS novaCoord6 = new CoordenadaGPS(26,-1932297.136,-16733519.796,-20382553.367,
-                0.00065557612181870004); // Microsecs
+                0.00065557612181870004); // Microsecs: 655.5761218187
         listaCoord.add(novaCoord6);
 
         CoordenadaGPS novaCoord7 = new CoordenadaGPS(27,22374396.828,-3351761.100,-14280051.988,
-                2.69173316672e-5); // Microsecs
+                2.691733116672e-5); // Microsecs: 26.91733116672
         listaCoord.add(novaCoord7);
-
-
 
     }
 
@@ -1077,8 +1080,6 @@ public class ProcessamentoPPS {
 //        Lb[3] = 190473995.597;
 //        Lb[4] = 188623153.103;
 //        Lb[5] = 190412833.439;
-
-
 
         Log.i("Lb","Vetor Lb criado");
 
@@ -1178,11 +1179,9 @@ public class ProcessamentoPPS {
             RealVector rU = rA.transpose().operate(rL);
 
             //X = -inv(N)*U;
-            rN = rN;
-
             RealMatrix rInvN = new LUDecomposition(rN).getSolver().getInverse();
-//            RealVector rX = rInvN.scalarMultiply(-1.0d).operate(rU);
             RealVector rX = rInvN.operate(rU);
+//            RealVector rX = rInvN.scalarMultiply(-1.0d).operate(rU);
 //            RealVector rX = rInvN.operate(rU).mapMultiply(-1.0d);
 
             X = rX.toArray();
