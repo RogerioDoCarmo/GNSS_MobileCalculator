@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -992,23 +993,92 @@ public class ProcessamentoPPS {
 
     }
 
+    static double Xe = 3942590.30657541;
+    static double Ye = -4940172.84476568;
+    static double Ze = -2553313.07836198;
+
+    static double[] Lb;
+
+    private static void setarExemplo(){
+        l = 7;
+        listaCoord = null;
+        listaCoord = new ArrayList<>();
+        Lb = new double[l];
+
+        /*Exemplo do livro do Galera pg 292-299*/
+        Xe = 3687627.3634;
+        Ye = -4620287.5137;
+        Ze = -2386884.4153;
+
+        Lb[0] = 48100232.525;
+        Lb[1] = 47574517.142;
+        Lb[2] = 50223295.501;
+        Lb[3] = 47847868.400;
+        Lb[4] = 51708803.181;
+        Lb[5] = 49370715.900;
+        Lb[6] = 49337431.587;
+
+        CoordenadaGPS novaCoord1 = new CoordenadaGPS(2,13191926.036,-9634277.149,-20330138.156,
+                                -8.93963614364e-5); // Microsecs: -89.3963614364
+        listaCoord.add(novaCoord1);
+
+        CoordenadaGPS novaCoord2 = new CoordenadaGPS(7,21244105.748,-15360752.012,-2877135.125,
+                0.00057038458904959996); // Microsecs:
+        listaCoord.add(novaCoord2);
+
+        CoordenadaGPS novaCoord3 = new CoordenadaGPS(10,-135122.979,-25794393.804,5954578.737,
+                3.88125012807e-5); // Microsecs
+        listaCoord.add(novaCoord3);
+
+        CoordenadaGPS novaCoord4 = new CoordenadaGPS(13,19720605.766,-17653994.853,-1657890.383,
+                -4.76228094177e-5); // Microsecs
+        listaCoord.add(novaCoord4);
+
+        CoordenadaGPS novaCoord5 = new CoordenadaGPS(19,25910284.743,5823456.939,-2525126.594,
+                1.64975089736e-5); // Microsecs:
+        listaCoord.add(novaCoord5);
+
+        CoordenadaGPS novaCoord6 = new CoordenadaGPS(26,-1932297.136,-16733519.796,-20382553.367,
+                0.00065557612181870004); // Microsecs
+        listaCoord.add(novaCoord6);
+
+        CoordenadaGPS novaCoord7 = new CoordenadaGPS(27,22374396.828,-3351761.100,-14280051.988,
+                2.69173316672e-5); // Microsecs
+        listaCoord.add(novaCoord7);
+
+
+
+    }
+
     /**
      * Aplica o ajustamento pelo método dos mínimos quadrados (MMQ). <p>
      * Utiliza a abordagem encontrada em (MONICO, 2008) p. 292-300.
      */
     public static void calcularMMQ(){
-        int MAX_ITERACOES = 8;
+
+        setarExemplo();
+
         int contIteracoes = 0;
         double c = 2.99792458e8;
         double[] L0 = new double[l];
-        double[] Lb = new double[l];
+//        Lb = new double[l];
         double[] L = new double[l]; // DeltaL
         double[][] A = new double[l][4];
 
         //Carregando o vetor Lb
-        for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)
-            Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();
-        }
+//        for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)
+//            Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();// * 1e-1 ;
+//        }
+
+        // Pr certas do arquivo .derived:
+//        Lb[0] = 190839015.701;
+//        Lb[1] = 187836742.332;
+//        Lb[2] = 188113982.596;
+//        Lb[3] = 190473995.597;
+//        Lb[4] = 188623153.103;
+//        Lb[5] = 190412833.439;
+
+
 
         Log.i("Lb","Vetor Lb criado");
 
@@ -1022,22 +1092,40 @@ public class ProcessamentoPPS {
         * Última NMEA do arquivo do Logger foi utilizada: (TESTE EP1-21/05) com Moto X4
         * NMEA,$GPGGA,191430.00,2207.358552,S,05124.456111,W,1,00,0.8,438.2,M,-1.9,M,,*72,1526930070258
         */
+        // USANDO A MEDICAO NMEA
 //        double Xe = 3687119.95648062;
 //        double Ye = -4620870.66156297;
 //        double Ze = -2387573.3390488;
 
         // USANDO O APP:
-        double Xe = 3687627.26039751;
-        double Ye = -4620683.42055526;
-        double Ze = -2387155.01580668;
+//        double Xe = 3687627.26039751;
+//        double Ye = -4620683.42055526;
+//        double Ze = -2387155.01580668;
+        // USANDO O EP2:
+//        double Xe = 3942590.30657541;
+//        double Ye = -4940172.84476568;
+//        double Ze = -2553313.07836198;
 
-        double[] X0 = new double[]{Xe, Ye, Ze,0};
+
+        double[] X0 = new double[]{Xe, Ye, Ze,0d};
         double[][] N = new double[4][4];
         double[] U = new double[4];
         double[] X = new double[4];
         double[] Xa = new double[4];
+        double erro = 0d;
 
         Log.i("Inicio","Iniciando solução iterativa!");
+
+        Log.i("Iteracao_Line","============================================");
+        Log.i("Iteracao_CONT","Nº da iteração: " + 0);
+        Log.i("Iteracao_X","Vetor X: " + Arrays.toString(X));
+        Log.i("Iteracao_Xa","Vetor Xa: " + Arrays.toString(Xa));
+        Log.i("Iteracao_ERRO","Erro: " + erro);
+        Log.i("Iteracao_Line","============================================");
+
+        int MAX_ITERACOES = 6;
+
+
 
         // Solucao pelo metodo parametrico
         // Solucao iterativa
@@ -1050,13 +1138,16 @@ public class ProcessamentoPPS {
                 double dz = listaCoord.get(i).getZ() - X0[2];
 
                 // L0(i,1) = sqrt(dx^2+dy^2+dz^2) + c*(0 - coord(i,5))
-                L0[i] = Math.sqrt((dx*dx) + (dy*dy) + (dz*dz)) + c * (0 - listaCoord.get(i).getDts());
+//                L0[i] = Math.sqrt( (dx*dx) + (dy*dy) + (dz*dz) ) + c * (0 - listaCoord.get(i).getDts());
+                double ro = Math.sqrt( (dx*dx) + (dy*dy) + (dz*dz) );
+                L0[i] = ro;
             }
 
-            //Vetor DeltaL:
-            //L = L0-Lb;
+            //Vetor delta_L:
+            //L = Lb-L0;
             for (int i = 0; i < Lb.length; i++){
-                L[i] = L0[i] - Lb[i];
+//                L[i] = Lb[i] - L0[i];
+                L[i] = Lb[i] - L0[i] + c * (0 - listaCoord.get(i).getDts());
             }
 
             //MATRIZ A
@@ -1065,36 +1156,41 @@ public class ProcessamentoPPS {
                 double dy = listaCoord.get(i).getY() - X0[1];
                 double dz = listaCoord.get(i).getZ() - X0[2];
 
-                double distGeo = Math.sqrt((dx*dx) + (dy*dy) + (dz*dz));
+                double distGeo = Math.sqrt(( dx*dx) + (dy*dy) + (dz*dz) );
 
-                A[i][0] = -(listaCoord.get(i).getX() - X0[0])/distGeo;
-                A[i][1] = -(listaCoord.get(i).getY() - X0[1])/distGeo;
-                A[i][2] = -(listaCoord.get(i).getZ() - X0[2])/distGeo;
-                A[i][3] = 1;
+                A[i][0] = -( dx / distGeo);
+                A[i][1] = -( dy / distGeo);
+                A[i][2] = -( dz / distGeo);
+                A[i][3] = 1.0d;
             }
 
-            // Método Paramétrico
-            Log.i("par","Iteração do método paramétrico");
-
             RealMatrix rA =  MatrixUtils.createRealMatrix(A);
+
+//            Log.i("Iteracao","Matriz A recém-calculada: \n" + Arrays.deepToString(A));
+            Log.i("Iteracao","Matriz A no RealMatrix: \n" + rA.toString());
+
             RealVector rL  =  MatrixUtils.createRealVector(L);
 
             //  N = A'*A;
             RealMatrix rN = rA.transpose().multiply(rA);
+
             //U = A'*L;
             RealVector rU = rA.transpose().operate(rL);
 
             //X = -inv(N)*U;
+            rN = rN;
+
             RealMatrix rInvN = new LUDecomposition(rN).getSolver().getInverse();
-            RealVector rX = rInvN.scalarMultiply(-1.0d).operate(rU);
+//            RealVector rX = rInvN.scalarMultiply(-1.0d).operate(rU);
+            RealVector rX = rInvN.operate(rU);
 //            RealVector rX = rInvN.operate(rU).mapMultiply(-1.0d);
 
             X = rX.toArray();
-            X[3] = X[3]/c;
+            X[3] = X[3] / c; // FIXME!!!!!!!
 
             //Xa = X0+X; // FIXME FAZER UMA FUNÇÃO PARA ISSO
-            for (int i = 0; i < X0.length; i++){
-                Xa[i] = X0[i] + X[i];
+            for (int j = 0; j < X0.length; j++){
+                Xa[j] = X0[j] + X[j];
             }
 
             //Verificação da Tolerancia
@@ -1107,32 +1203,51 @@ public class ProcessamentoPPS {
              else X0 = Xa;
              end
              */
-            double erro = Math.abs(maxValue(Xa));
-            if ( erro < 0.004){
-                Log.i("FimERRO","N° de iterações: " + contIteracoes);
+
+            erro = Math.abs(maxValue(X));
+            int numIteracao = contIteracoes + 1;
+
+            if (erro < 0.0004 ) {
+                Log.i("Iteracao","============================================");
+                Log.i("Iteracao","Nº da iteração: " + numIteracao);
+                Log.i("Iteracao","Vetor X: " + Arrays.toString(X));
+                Log.i("Iteracao","Vetor Xa: " + Arrays.toString(Xa));
+                Log.i("Iteracao","Erro: " + erro);
+                Log.i("Iteracao","============================================");
+                Log.i("Iteracao","============================================");
+
+                Log.i("FimERRO","N° de iterações: " + numIteracao);
                 Log.i("FimERRO","Coordenada Xr: " + Xa[0]);
                 Log.i("FimERRO","Coordenada Yr: " + Xa[1]);
                 Log.i("FimERRO","Coordenada Zr: " + Xa[2]);
                 Log.i("FimERRO","Erro do relógio do receptor: " + Xa[3]);
-                Log.i("FimERRO","Erro: " + erro);
+                Log.i("FimERRO","Erro das coordenadas: " + erro);
                 break;
             }else{ // Próxima iteração
-                //X0 = Xa; // ou copiar com um for
+                //X0 = Xa;
                 System.arraycopy(Xa,0,X0,0,X0.length);
-//                for (int i = 0; i < X0.length; i++){
-//                    X0[i] = Xa[i];
-//                }
             }
+
+            Log.i("Iteracao","============================================");
+            Log.i("Iteracao","Nº da iteração: " + numIteracao);
+            Log.i("Iteracao","Vetor X: " + Arrays.toString(X));
+            Log.i("Iteracao","Vetor Xa: " + Arrays.toString(Xa));
+            Log.i("Iteracao","Erro: " + erro);
+            Log.i("Iteracao","============================================");
+            Log.i("Iteracao","============================================");
+
             contIteracoes++;
         }
-
-        Log.i("FimFOOR","Nº de iterações: " + contIteracoes);
+        int numIteracao = contIteracoes + 1;
+        Log.i("FimFOOR","============================================");
+        Log.i("FimFOOR","Nº de iterações: " + numIteracao);
         Log.i("FimFOOR","Coordenada Xr: " + Xa[0]);
         Log.i("FimFOOR","Coordenada Yr: " + Xa[1]);
         Log.i("FimFOOR","Coordenada Zr: " + Xa[2]);
         Log.i("FimFOOR","Erro do relógio do receptor: " + Xa[3]);
-//        Log.i("Fim","Erro: " + erro);
-//        Log.i("Fim", "N° de iterações: " + k);
+        Log.i("FimFOOR","Erro das coordenadas: " + erro);
+        Log.i("FimFOOR","============================================");
+        Log.i("FimFOOR","============================================");
         //TODO Verificação dos operadores de precisão:
         // Vetor dos resíduos
         // Fator de variância a posteriori
@@ -1153,4 +1268,5 @@ public class ProcessamentoPPS {
         list.remove(list.size() -1);
         return Collections.max(list);
     }
+
 }

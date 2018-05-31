@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
             calcCoordendas();
         } catch (Exception e){
             Log.e("ERR_coord","Erro ao calcular as coordenadas dos satélites");
+            e.printStackTrace();
             String msg = e.getMessage();
             Toast.makeText(getApplicationContext(),
                     "Erro ao calcular as coordenadas do satélite: " + msg,
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
             calcularMMQ();
         } catch (Exception e){
             Log.e("ERR_MMQ","Erro ao processar o ajustamento");
+            e.printStackTrace();
             String msg = e.getMessage();
             Toast.makeText(getApplicationContext(),
                     "Erro ao calcular o ajustamento: " + msg,
