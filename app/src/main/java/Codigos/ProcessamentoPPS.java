@@ -528,75 +528,134 @@ public class ProcessamentoPPS {
      * @see ProcessamentoPPS#calcularMMQ()
      */
     public static void calcPseudoranges(){
+
+        int FLAG_OPCAO = 2;
+
         for (int i = 0; i < listaMedicoes.size(); i++){
 
-            double pseudorangeMeters = 0d;
-            double pseudorangeUncertaintyMeters = 0d;
+            if (FLAG_OPCAO == 1) { // IMPLEMENTAÇÃO SEGUNDO A GSA
+                double pseudorangeMeters = 0d;
+                double pseudorangeUncertaintyMeters = 0d;
 
-            // Generate the measured time in full GNSS time
-            Long tRx_GNSS = listaMedicoes.get(i).getTimeNanos() - (listaMedicoes.get(0).getFullBiasNanos() + Math.round(listaMedicoes.get(0).getBiasNanos())); // FIXME VER SE É LONG
-           // Change the valid range from full GNSS to TOW
-            Long tRx = tRx_GNSS % Math.round(WEEKSEC*1e9);
-            // Generate the satellite time
-            Long tTx = listaMedicoes.get(i).getReceivedSvTimeNanos() + Math.round(listaMedicoes.get(i).getTimeOffsetNanos());
-            // Generate the pseudorange
-            Long prMilliSeconds = (tRx - tTx);
-            pseudorangeMeters = prMilliSeconds * GNSSConstants.LIGHTSPEED * 1e-9;
-            pseudorangeUncertaintyMeters = (double) listaMedicoes.get(i).getReceivedSvTimeUncertaintyNanos() * 1e-9 * GNSSConstants.LIGHTSPEED;
+//            if (FLAG_OPCAO == 1){ // Implementação da GSA
+//
+//            }
 
-            listaMedicoes.get(i).setPseudorangeMeters(pseudorangeMeters);
-            listaMedicoes.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
+                // Generate the measured time in full GNSS time
+                Long tRx_GNSS = listaMedicoes.get(i).getTimeNanos() - (listaMedicoes.get(0).getFullBiasNanos() + Math.round(listaMedicoes.get(0).getBiasNanos())); // FIXME VER SE É LONG
+                // Change the valid range from full GNSS to TOW
+                Long tRx = tRx_GNSS % Math.round(WEEKSEC*1e9);
+                // Generate the satellite time
+                Long tTx = listaMedicoes.get(i).getReceivedSvTimeNanos() + Math.round(listaMedicoes.get(i).getTimeOffsetNanos());
+                // Generate the pseudorange
+                Long prMilliSeconds = (tRx - tTx);
+                pseudorangeMeters = prMilliSeconds * GNSSConstants.LIGHTSPEED * 1e-9;
+                pseudorangeUncertaintyMeters = (double) listaMedicoes.get(i).getReceivedSvTimeUncertaintyNanos() * 1e-9 * GNSSConstants.LIGHTSPEED;
 
-            listaMedicoes.get(i).settTx(tTx);
-            listaMedicoes.get(i).settRx(tRx);
+                listaMedicoes.get(i).setPseudorangeMeters(pseudorangeMeters);
+                listaMedicoes.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
+
+                listaMedicoes.get(i).settTx(tTx);
+                listaMedicoes.get(i).settRx(tRx);
 
 //            int year = Integer.valueOf(2017);
 //            int month = Integer.valueOf(12);
 //            int day = Integer.valueOf(13);
 
 
-            //GPS Week number and Seconds within the week:
-            int weekNumberr =  (int)Math.floor(-(double)(listaMedicoes.get(i).getFullBiasNanos()*1e-9/GNSSConstants.WEEKSEC));
-            /**
-             * Aply gpsWeek % 1024 to get the week number in [0,1024]
-             */
-            int gpsWeek = weekNumberr;// % 1024;
-            Long gpsSecsWek = Math.round(tRx * 1e-9); // FIXME REVER
-            //TESTE FIXME
-            gpsSecsWek = Math.round((listaMedicoes.get(i).getReceivedSvTimeNanos() + prMilliSeconds) * 1e-9);
-            Log.i("gpsWeek","Semana: " + gpsWeek + " Segundos da semana: " + gpsSecsWek.intValue());
+                //GPS Week number and Seconds within the week:
+                int weekNumberr =  (int)Math.floor(-(double)(listaMedicoes.get(i).getFullBiasNanos()*1e-9/GNSSConstants.WEEKSEC));
+                /**
+                 * Aply gpsWeek % 1024 to get the week number in [0,1024]
+                 */
+                int gpsWeek = weekNumberr;// % 1024;
+                Long gpsSecsWek = Math.round(tRx * 1e-9); // FIXME REVER
+                //TESTE FIXME
+//            gpsSecsWek = Math.round((listaMedicoes.get(i).getReceivedSvTimeNanos() + prMilliSeconds) * 1e-9);
+                gpsSecsWek = Math.round((listaMedicoes.get(i).getReceivedSvTimeNanos()) * 1e-9);
+                Log.i("gpsWeek","Semana: " + gpsWeek + " Segundos da semana: " + gpsSecsWek.intValue());
 
-            GpsTime gpt = GpsTime.fromWeekTow(gpsWeek,gpsSecsWek.intValue());
-            gpt.getUtcDateTime();
+                GpsTime gpt = GpsTime.fromWeekTow(gpsWeek,gpsSecsWek.intValue());
+                gpt.getUtcDateTime();
 
-            listaMedicoes.get(i).setGpsWeek(gpsWeek);
+                listaMedicoes.get(i).setGpsWeek(gpsWeek);
 //            int hour = Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", ""));
 //            int minute = Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", ""));
 //            double seconds = Double.valueOf(mLine.substring(18, 22).replaceAll("\\s", ""));
-            int year = gpt.getUtcDateTime().getYear() % 2000;
-            int month = gpt.getUtcDateTime().getMonthOfYear();
-            int day = gpt.getUtcDateTime().getDayOfMonth();
-            int hour = gpt.getUtcDateTime().getHourOfDay();
-            int minute = gpt.getUtcDateTime().getMinuteOfHour();
-            double seconds = gpt.getUtcDateTime().getSecondOfMinute();
+                int year = gpt.getUtcDateTime().getYear() % 2000;
+                int month = gpt.getUtcDateTime().getMonthOfYear();
+                int day = gpt.getUtcDateTime().getDayOfMonth();
+                int hour = gpt.getUtcDateTime().getHourOfDay();
+                int minute = gpt.getUtcDateTime().getMinuteOfHour();
+                double seconds = gpt.getUtcDateTime().getSecondOfMinute();
 
-            Log.i("year_OBS",String.valueOf(year));
-            Log.i("month_OBS",String.valueOf(month));
-            Log.i("day_OBS",String.valueOf(day));
-            Log.i("hour_OBS",String.valueOf(hour));
-            Log.i("minute_OBS",String.valueOf(minute));
-            Log.i("seconds_OBS",String.valueOf(seconds));
+                Log.i("year_OBS",String.valueOf(year));
+                Log.i("month_OBS",String.valueOf(month));
+                Log.i("day_OBS",String.valueOf(day));
+                Log.i("hour_OBS",String.valueOf(hour));
+                Log.i("minute_OBS",String.valueOf(minute));
+                Log.i("seconds_OBS",String.valueOf(seconds));
 
-            Log.i("hora-minuto", "Svid: " + listaMedicoes.get(i).getSvid() +
-                    " Hora: " + String.valueOf(hour) + " Minuto: " + String.valueOf(minute));
+                Log.i("hora-minuto", "Svid: " + listaMedicoes.get(i).getSvid() +
+                        " Hora: " + String.valueOf(hour) + " Minuto: " + String.valueOf(minute));
 
-            GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
-            listaMedicoes.get(i).setData(data);
+                GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
+                listaMedicoes.get(i).setData(data);
 
-            Log.i("tTx/tRx","Svid: " +  listaMedicoes.get(i).getSvid() + " tTx: " + tTx + " tRx: " + tRx + " Intervalo: " + prMilliSeconds);
+                Log.i("tTx/tRx","Svid: " +  listaMedicoes.get(i).getSvid() + " tTx: " + tTx + " tRx: " + tRx + " Intervalo: " + prMilliSeconds);
 
-            Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
-            Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
+                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
+                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
+            }else{ // IMPLEMENTAÇÃO SEGUNDO A PLANILHA
+                /**
+                 * GPS Week Number within this week
+                 * Aply gpsWeek % 1024 to get the week number in [0,1024]
+                 */
+                Long weekNumber =  Math.round(Math.floor(-listaMedicoes.get(i).getFullBiasNanos() * 1e-9 / GNSSConstants.WEEKSEC));
+                Long gpsSecsWek = Math.round((listaMedicoes.get(i).getReceivedSvTimeNanos()) * 1e-9);
+
+                Long tRxNanos = (listaMedicoes.get(i).getTimeNanos() + (int)listaMedicoes.get(i).getTimeOffsetNanos()) -
+                                (listaMedicoes.get(i).getFullBiasNanos() + (int)listaMedicoes.get(i).getBiasNanos()) -
+                                weekNumber * GNSSConstants.WEEKSEC *1000000000; // fixme
+
+                Double prMs = (tRxNanos - listaMedicoes.get(i).getReceivedSvTimeNanos()) * 1e-6;
+                Double prMeters = prMs * GNSSConstants.LIGHTSPEED * 1e-3;
+                Double pseudorangeUncertaintyMeters = listaMedicoes.get(i).getReceivedSvTimeUncertaintyNanos() * 1e-9 * GNSSConstants.LIGHTSPEED;
+
+                listaMedicoes.get(i).setPseudorangeMeters(prMeters);
+                listaMedicoes.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
+
+                Log.i("gpsWeek","Semana: " + weekNumber.intValue() + " Segundos da semana: " + gpsSecsWek.intValue());
+
+                GpsTime gpt = GpsTime.fromWeekTow(weekNumber.intValue(),gpsSecsWek.intValue());
+                gpt.getUtcDateTime();
+
+                listaMedicoes.get(i).setGpsWeek(weekNumber.intValue());
+
+                int year = gpt.getUtcDateTime().getYear() % 2000;
+                int month = gpt.getUtcDateTime().getMonthOfYear();
+                int day = gpt.getUtcDateTime().getDayOfMonth();
+                int hour = gpt.getUtcDateTime().getHourOfDay();
+                int minute = gpt.getUtcDateTime().getMinuteOfHour();
+                double seconds = gpt.getUtcDateTime().getSecondOfMinute();
+
+                Log.i("year_OBS",String.valueOf(year));
+                Log.i("month_OBS",String.valueOf(month));
+                Log.i("day_OBS",String.valueOf(day));
+                Log.i("hour_OBS",String.valueOf(hour));
+                Log.i("minute_OBS",String.valueOf(minute));
+                Log.i("seconds_OBS",String.valueOf(seconds));
+
+                Log.i("hora-minuto", "Svid: " + listaMedicoes.get(i).getSvid() +
+                        " Hora: " + String.valueOf(hour) + " Minuto: " + String.valueOf(minute));
+
+                GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
+                listaMedicoes.get(i).setData(data);
+
+                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
+                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
+            }
+
         }
     }
 
@@ -1059,19 +1118,19 @@ public class ProcessamentoPPS {
      */
     public static void calcularMMQ(){
 
-        setarExemplo();
+//        setarExemplo();
 
         int contIteracoes = 0;
         double c = 2.99792458e8;
         double[] L0 = new double[l];
-//        Lb = new double[l];
+        Lb = new double[l];
         double[] L = new double[l]; // DeltaL
         double[][] A = new double[l][4];
 
         //Carregando o vetor Lb
-//        for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)
-//            Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();// * 1e-1 ;
-//        }
+        for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)
+            Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();// * 1e-1 ;
+        }
 
         // Pr certas do arquivo .derived:
 //        Lb[0] = 190839015.701;
@@ -1103,9 +1162,9 @@ public class ProcessamentoPPS {
 //        double Ye = -4620683.42055526;
 //        double Ze = -2387155.01580668;
         // USANDO O EP2:
-//        double Xe = 3942590.30657541;
-//        double Ye = -4940172.84476568;
-//        double Ze = -2553313.07836198;
+        double Xe = 3942590.30657541;
+        double Ye = -4940172.84476568;
+        double Ze = -2553313.07836198;
 
 
         double[] X0 = new double[]{Xe, Ye, Ze,0d};
@@ -1124,7 +1183,7 @@ public class ProcessamentoPPS {
         Log.i("Iteracao_ERRO","Erro: " + erro);
         Log.i("Iteracao_Line","============================================");
 
-        int MAX_ITERACOES = 6;
+        int MAX_ITERACOES = 8;
 
 
 
@@ -1166,6 +1225,7 @@ public class ProcessamentoPPS {
             }
 
             RealMatrix rA =  MatrixUtils.createRealMatrix(A);
+            // new Array2DRowRealMatrix(aa, false);
 
 //            Log.i("Iteracao","Matriz A recém-calculada: \n" + Arrays.deepToString(A));
             Log.i("Iteracao","Matriz A no RealMatrix: \n" + rA.toString());
@@ -1179,7 +1239,8 @@ public class ProcessamentoPPS {
             RealVector rU = rA.transpose().operate(rL);
 
             //X = -inv(N)*U;
-            RealMatrix rInvN = new LUDecomposition(rN).getSolver().getInverse();
+//            RealMatrix rInvN = new LUDecomposition(rN).getSolver().getInverse();
+            RealMatrix rInvN = MatrixUtils.inverse(rN);
             RealVector rX = rInvN.operate(rU);
 //            RealVector rX = rInvN.scalarMultiply(-1.0d).operate(rU);
 //            RealVector rX = rInvN.operate(rU).mapMultiply(-1.0d);
