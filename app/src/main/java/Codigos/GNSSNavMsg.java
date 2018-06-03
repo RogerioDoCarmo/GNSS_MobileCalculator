@@ -8,7 +8,7 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
      * clock variable names af0, af1, af2 follow IS GPS 200
     */
     private GNSSDate data;
-    private String PRN;          // SV PRN number TODO Verificar se fica como int msm!
+    private Integer PRN;          // SV PRN number TODO Verificar se fica como int msm!
     private double Toc;          // Time of clock (seconds)
     private double af0;          // SV clock bias (seconds)
     private double af1;          // SV clock drift (sec/sec)
@@ -28,7 +28,7 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
     private double i0;           // Inclination angle at reference time (radians)
     private double Crc;	         // Cosine harmonic correction to the orbit radius (meters)
     private double w;	     // Argument of perigee (radians)
-    private double OMEGA_DOT;    // Rate of right ascension (radians/sec)
+    private double Omega_v;    // Rate of right ascension (radians/sec)
     private double IDOT;	     // Rate of inclination angle (radians/sec)
     private double codeL2;       // codes on L2 channel
     private double GPS_Week;     // GPS week (to go with Toe), (NOT Mod 1024)
@@ -40,11 +40,11 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
     private double ttx;	         // Transmission time of message (seconds)
     private double Fit_interval; //fit interval (hours), zero if not known
 
-    public String getPRN() {
-        return PRN.trim();
+    public Integer getPRN() {
+        return PRN;
     }
 
-    public void setPRN(String PRN) {
+    public void setPRN(Integer PRN) {
         this.PRN = PRN;
     }
 
@@ -160,11 +160,11 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
         Cic = cic;
     }
 
-    public double getOmega0() {
+    public double get0mega_0() {
         return Omega0;
     }
 
-    public void setOmega0(double omega0) {
+    public void setOmega_0(double omega0) {
         this.Omega0 = omega0;
     }
 
@@ -200,12 +200,12 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
         this.w = w;
     }
 
-    public double getOMEGA_DOT() {
-        return OMEGA_DOT;
+    public double getOmega_v() {
+        return Omega_v;
     }
 
-    public void setOMEGA_DOT(double OMEGA_DOT) {
-        this.OMEGA_DOT = OMEGA_DOT;
+    public void setOmega_v(double OMEGA_DOT) {
+        this.Omega_v = OMEGA_DOT;
     }
 
     public double getIDOT() {
@@ -307,6 +307,6 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
      */
     @Override
     public int compareTo(@NonNull GNSSNavMsg another) {
-        return (Integer.valueOf(this.getPRN().trim()) - Integer.valueOf(another.getPRN().trim()));
+        return (this.getPRN() - another.getPRN());
     }
 }
