@@ -7,11 +7,13 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
-import static Codigos.ProcessamentoPPS.calcCoordendas;
+import static Codigos.ProcessamentoPPS.calcCoordenadas;
+import static Codigos.ProcessamentoPPS.calcCoordendasTeste_G05;
 import static Codigos.ProcessamentoPPS.calcPseudoranges;
 import static Codigos.ProcessamentoPPS.calcularMMQ;
 import static Codigos.ProcessamentoPPS.readLogger_RawAssets;
 import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
+import static Codigos.ProcessamentoPPS.testeCoord_G05;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,6 +21,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        try { // Teste para um único satélite
+            testeCoord_G05(getApplicationContext());
+            calcCoordendasTeste_G05();
+            Log.i("TesteCoord","Fim do teste de coordenada de G05");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try {
             readRINEX_RawAssets(MainActivity.this);
@@ -61,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         try{
-            calcCoordendas();
+            calcCoordenadas();
         } catch (Exception e){
             Log.e("ERR_coord","Erro ao calcular as coordenadas dos satélites");
             e.printStackTrace();
