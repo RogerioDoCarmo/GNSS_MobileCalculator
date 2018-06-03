@@ -5,8 +5,6 @@ import android.util.Log;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
@@ -15,7 +13,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,21 +37,29 @@ public class ProcessamentoPPS {
     }
 
     /**
-     *
+     * Teste manual de cálculo de coordenada para o satélite G05
+     * <p>A data é <b>15/07/2012(UTC)</b>
+     * <p>A data da coleta é <b>2012-07-15 11h13m45s </b>
+     * <p>A data da efeméride utilizada é <b>2012-07-15 10:00:00</b>
      * @param context A activity em execução atual
      * @return
      * @throws IOException
      */
-    public static String readRINEX_RawAssets(Context context) throws IOException {
+    public static String testeCoord_G05(Context context) throws IOException {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1410cortado20)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.teste05)));
 //        int numEfemerides = contEfemerides(context);
 
         // do reading, usually loop until end of file reading
         StringBuilder sb = new StringBuilder();
 
-        //PULANDO O CABEÇALHO
+        //PULANDO O CABEÇALHO DE 13 LINHAS...
         String mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
         mLine = reader.readLine();
         mLine = reader.readLine();
         mLine = reader.readLine();
@@ -64,42 +69,19 @@ public class ProcessamentoPPS {
         mLine = reader.readLine();
 
         String sub = "";
-        int numEfemerides = 7; // FIXME FAZER UM WHILE
+        int numEfemerides = 1; // FIXME FAZER UM WHILE
 
-        for (int i = 1; i < numEfemerides; i++){
+        for (int i = 0; i < numEfemerides; i++){
             GNSSNavMsg efemeride = new GNSSNavMsg();
             mLine = reader.readLine();
 
 //first line - epoch of satellite clock (toc)
 //====================================================================
-
-//            String PRN;
-//            try{
-//                PRN = mLine.substring(0,2);
-//            }catch (Exception er){
-//                PRN = mLine.substring(1,2);
-//            }
-
-
             sub = mLine.substring(0, 2).trim();
             efemeride.setPRN(Integer.valueOf(sub));  // FIXME
             Log.i("PRN", sub);
 
             try { // FIXME REVER
-//                double Toc = calcTOC_tr_(Integer.valueOf(mLine.substring(9, 11).replaceAll("\\s", "")), // dia
-//                        Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", "")), // hora
-//                        Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", "")), // minuto
-//                        Double.valueOf(mLine.substring(18, 22).replace('D', 'e').trim())); // segundo FIXME
-//                double Toc = calcTOC_tr_(GNSSConstants.DAY_QUA, // dia // fixme ESTA MANUAL ESSA ENTRADA!
-//                        Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", "")), // hora
-//                        Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", "")), // minuto
-//                        Double.valueOf(mLine.substring(18, 22).replace('D', 'e').trim())); // segundo FIXME
-
-                Log.i("TOC", "Dia: " + mLine.substring(9, 11).replaceAll("\\s", "") +
-                        " Hora: " + mLine.substring(12, 14).replaceAll("\\s", "") +
-                        " Minutos: " + mLine.substring(15, 17).replaceAll("\\s", "") +
-                        " Segundos: " + mLine.substring(18, 22).replaceAll("\\s", ""));
-
 
                 int year = Integer.valueOf(mLine.substring(3, 6).replaceAll("\\s", ""));
                 int month = Integer.valueOf(mLine.substring(6, 8).replaceAll("\\s", ""));
@@ -108,30 +90,14 @@ public class ProcessamentoPPS {
                 int minute = Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", ""));
                 double seconds = Double.valueOf(mLine.substring(18, 22).replaceAll("\\s", ""));
 
-                Log.i("year_RINEX",String.valueOf(year));
-                Log.i("month_RINEX",String.valueOf(month));
-                Log.i("day_RINEX",String.valueOf(day));
-                Log.i("hour_RINEX",String.valueOf(hour));
-                Log.i("minute_RINEX",String.valueOf(minute));
-                Log.i("seconds_RINEX",String.valueOf(seconds));
-                Log.i("seconds_RINEX",String.valueOf(seconds));
-                Log.i("Fim_TOC","=============================");
-
-//                efemeride.setToc(Toc);
-//                efemeride
-
-             GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
-             efemeride.setGNSSDate(data); // TODO VERIFICAR ERRO
+                GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
+                efemeride.setGNSSDate(data); // TODO VERIFICAR ERRO
 
             }catch (Exception err){
                 efemeride.setToc(0);
                 Log.e("TOC-ERR","Erro: " + err.getMessage());
 //                efemeride.setGNSSDate(null);
             }
-
-            Log.i("af0","af0: " + mLine.substring(22,41).replace('D','e').replaceAll("\\s",""));
-            Log.i("af1","af1: " + mLine.substring(41,60).replace('D','e').replaceAll("\\s",""));
-            Log.i("af2","af2: " + mLine.substring(60,79).replace('D','e').replaceAll("\\s",""));
 
             double af0 = Double.valueOf(mLine.substring(22,41).replace('D','e')
                     .replaceAll("\\s",""));
@@ -151,21 +117,16 @@ public class ProcessamentoPPS {
 
             sub = mLine.substring(3, 22).replace('D', 'e');
             double iode = Double.parseDouble(sub.trim());
-            // TODO check double -> int conversion ?
             efemeride.setIODE(iode);
-            Log.i("IODE",sub);
 
             sub = mLine.substring(22, 41).replace('D', 'e');
             efemeride.setCrs(Double.parseDouble(sub.trim()));
-            Log.i("Crs",sub);
 
             sub = mLine.substring(41, 60).replace('D', 'e');
             efemeride.setDelta_n(Double.parseDouble(sub.trim()));
-            Log.i("Delta_n",sub);
 
             sub = mLine.substring(60, 79).replace('D', 'e');
             efemeride.setM0(Double.parseDouble(sub.trim()));
-            Log.i("M0",sub);
 //            third line - broadcast orbit (2)
 //            ====================================================================
 
@@ -174,19 +135,15 @@ public class ProcessamentoPPS {
             sub = mLine.substring(0, 22).replace('D', 'e');
             double Cuc = Double.parseDouble(sub.trim());
             efemeride.setCuc(Cuc);
-            Log.i("Cuc",sub);
 
             sub = mLine.substring(22, 41).replace('D', 'e');
             efemeride.setE(Double.parseDouble(sub.trim()));
-            Log.i("E",sub);
 
             sub = mLine.substring(41, 60).replace('D', 'e');
             efemeride.setCus(Double.parseDouble(sub.trim()));
-            Log.i("Cus",sub);
 
             sub = mLine.substring(60, 79).replace('D', 'e');
             efemeride.setAsqrt(Double.parseDouble(sub.trim()));
-            Log.i("Asqrt",sub);
 //fourth line
 //--------------------------------------------------------------------------------------------------
             mLine = reader.readLine();
@@ -194,19 +151,15 @@ public class ProcessamentoPPS {
             sub = mLine.substring(0, 22).replace('D', 'e');
             double toe = Double.parseDouble(sub.trim());
             efemeride.setToe(toe);
-            Log.i("Toe",sub);
 
             sub = mLine.substring(22, 41).replace('D', 'e');
             efemeride.setCic(Double.parseDouble(sub.trim()));
-            Log.i("Cic",sub);
 
             sub = mLine.substring(41, 60).replace('D', 'e');
             efemeride.setOmega_0(Double.parseDouble(sub.trim()));
-            Log.i("Omega0","Valor: " + efemeride.get0mega_0() );
 
             sub = mLine.substring(60, 79).replace('D', 'e');
             efemeride.setCis(Double.parseDouble(sub.trim()));
-            Log.i("Cis",sub);
             //fifth line
 //--------------------------------------------------------------------------------------------------
 
@@ -214,42 +167,34 @@ public class ProcessamentoPPS {
 
             sub = mLine.substring(0, 22).replace('D', 'e');
             efemeride.setI0(Double.parseDouble(sub.trim()));
-            Log.i("I0",sub);
 
             sub = mLine.substring(22, 41).replace('D', 'e');
             efemeride.setCrc(Double.parseDouble(sub.trim()));
-            Log.i("Crc",sub);
 
             sub = mLine.substring(41, 60).replace('D', 'e');
             efemeride.setW(Double.parseDouble(sub.trim()));
-            Log.i("w",sub);
 
             sub = mLine.substring(60, 79).replace('D', 'e');
             efemeride.setOmega_v(Double.parseDouble(sub.trim()));
-            Log.i("Omega_v",sub);
-            //sixth line
+//            sixth line
 //--------------------------------------------------------------------------------------------------
 
             mLine = reader.readLine();
 
             sub = mLine.substring(0, 22).replace('D', 'e');
             efemeride.setIDOT(Double.parseDouble(sub.trim()));
-            Log.i("IDOT",sub);
 
             sub = mLine.substring(22, 41).replace('D', 'e');
             double L2Code = Double.parseDouble(sub.trim());
             efemeride.setCodeL2(L2Code);
-            Log.i("CodeL2",sub);
 
             sub = mLine.substring(41, 60).replace('D', 'e');
             double week = Double.parseDouble(sub.trim());
             efemeride.setGPS_Week((int) week);
-            Log.i("GPS_WEEK",sub);
 
             sub = mLine.substring(60, 79).replace('D', 'e');
             double L2Flag = Double.parseDouble(sub.trim());
             efemeride.setL2PdataFlag((int) L2Flag);
-            Log.i("L2_Flag",sub);
 //seventh line
 //--------------------------------------------------------------------------------------------------
 
@@ -258,21 +203,17 @@ public class ProcessamentoPPS {
             sub = mLine.substring(0, 22).replace('D', 'e');
             double svAccur = Double.parseDouble(sub.trim());
             efemeride.setAccuracy((int) svAccur);
-            Log.i("Sv_Accur",sub);
 
             sub = mLine.substring(22, 41).replace('D', 'e');
             double svHealth = Double.parseDouble(sub.trim());
             efemeride.setHealth((int) svHealth);
-            Log.i("Sv_Health",sub);
 
             sub = mLine.substring(41, 60).replace('D', 'e');
             efemeride.setTGD(Double.parseDouble(sub.trim()));
-            Log.i("Tgd",sub);
 
             sub = mLine.substring(60, 79).replace('D', 'e');
             double iodc = Double.parseDouble(sub.trim());
             efemeride.setIODC((int) iodc);
-            Log.i("IODC",sub);
             //eigth line
             //--------------------------------------------------------------------------------------------------
             mLine = reader.readLine();
@@ -281,7 +222,6 @@ public class ProcessamentoPPS {
 
             sub = mLine.substring(0, 22).replace('D', 'e');
             efemeride.setTtx(Double.parseDouble(sub.trim()));
-            Log.i("Transmission Time (TTX)",sub);
 
             if (len > 22) {
                 sub = mLine.substring(22, 41).replace('D', 'e');
@@ -291,11 +231,421 @@ public class ProcessamentoPPS {
                 efemeride.setFit_interval(0);
             }
 
-            Log.i("Fit Interval",sub);
+//--------------------------------------------------------------------------------------------------
+            listaEfemerides.add(efemeride);
+        }
+
+        reader.close();
+
+        return sb.toString();
+    }
+
+    /**
+     * Teste manual de cálculo de coordenada para o satélite G05
+     * @see ProcessamentoPPS#testeCoord_G05(Context)
+     * Calcula as <b>coordenadas X,Y,Z (WGS-84)</b> para o satélite.
+     * <p>Calcula o <b>erro do relógio</b> para o satélite em segundos.
+     */
+    public static void calcCoordendasTeste_G05(){
+        /**
+         * Os valroes originais foram extraído da execução no site:
+         * <p>http://is-cigala-calibra.fct.unesp.br/pps/indexn.php</p>
+         */
+        // O valor da pseudodistancia de G05 extraído do RINEX.
+        Double pseudorange = 25259606.102;
+
+        double Xoriginal = 12749332.708;
+        double Yoriginal = 8942678.944;
+        double Zoriginal = -21541599.861;
+        double dtsOriginal =  -0.00033476511554568;
+
+        //int L = 10;
+        double GM = 3.9860044185E14; // 3.986004418E14;
+        double We = 7.2921151467E-5; // 7.2921151467E-5;
+        double c = 299792458;
+
+        GNSSDate dataObservacao = new GNSSDate(12,7,15,11,0,0);
+
+        for (int i = 0; i < 1; i++ ){// FIXME
+            //------------------------------------------
+            //Dados de entrada
+            //------------------------------------------
+            //Tempo de recepcao do sinal ->  Hora da observacao
+//            double tr = (3*24+0)*3600 + 0*60 + 0.00; // FIXME CORRIGIR O TEMPO
+//            double tr = calc_Tr(GNSSConstants.DAY_QUA,)
+            double a0 = listaEfemerides.get(i).getAf0();
+            double a1 = listaEfemerides.get(i).getAf1();
+            double a2 = listaEfemerides.get(i).getAf2();
+
+            double Crs = listaEfemerides.get(i).getCrs();
+            double delta_n = listaEfemerides.get(i).getDelta_n();
+            double m0 = listaEfemerides.get(i).getM0();
+
+            double Cuc = listaEfemerides.get(i).getCuc();
+            double e = listaEfemerides.get(i).getE();
+            double Cus = listaEfemerides.get(i).getCus();
+            double a = listaEfemerides.get(i).getAsqrt() * listaEfemerides.get(i).getAsqrt();
+
+            double toe = listaEfemerides.get(i).getToe();
+            double Cic = listaEfemerides.get(i).getCic();
+            double omega_0 = listaEfemerides.get(i).get0mega_0();
+            double Cis = listaEfemerides.get(i).getCis();
+
+            double io = listaEfemerides.get(i).getI0();
+            double Crc = listaEfemerides.get(i).getCrc();
+            double w = listaEfemerides.get(i).getW();
+            double omega_v = listaEfemerides.get(i).getOmega_v();
+            double idot = listaEfemerides.get(i).getIDOT();
+
+            // ------------------------------------------
+            //Tempo de transmisao do sinal
+            // ------------------------------------------
+            double dtr = 0d; // ERRO DO RELÓGIO
+            double tr = calc_Tr(GNSSConstants.DAY_DOM,11,0,0);
+            double tgps = tr - (pseudorange / c);
+
+            double dts = a0 + a1 * (tgps - toe) + a2 * (Math.pow(tgps - toe,2.0)); // ERRO DO SATÉLITE
+            double tpropag = pseudorange/c - dtr + dts;
+
+            tgps = tr - dtr- tpropag + dts; // melhoria no tempo de transmissao
+
+            //------------------------------------------
+            //Coordenadas do satelite
+            //------------------------------------------
+
+            double delta_tk = tgps - toe;
+
+            /**
+             * Considerando possível mudança de semana
+             * Autor: Bruno Vani
+             */
+            if (delta_tk > 302400)
+                delta_tk = delta_tk - 604800;
+            else if (delta_tk < -302400)
+                delta_tk = delta_tk + 604800;
+
+            /*(4.9)*/
+            double no = Math.sqrt(GM / (a*a*a)); // terceira lei de kepler
+
+            /*(4.10)*/
+            double n = no + delta_n; // movimento medio corrigido
+            double mk = m0 + n * delta_tk; // anomalia media
+
+            /**
+             * iteracao - anomalia excentrica
+             */
+            /*(4.11)*/
+            double ek = mk;
+            for (int k = 0; k < 7; k++){
+                ek = mk + e * Math.sin(ek);
+            }
+
+            //Anomalia verdadeira
+//            double sen_vk = ((Math.sqrt(1-(e*e))*Math.sin(ek))/(1-(e*Math.cos(ek))));
+//            double cos_vk = (Math.cos((ek)-e)/(1-(e*(Math.cos(ek)))));
+            // Anomalia verdadeira
+            /*(4.12)*/
+            double sen_vk = ( (Math.sqrt(1 - (e * e)) ) * Math.sin(ek) )  / ( 1 - (e * Math.cos(ek)) );
+            double cos_vk = (Math.cos(ek) - e) / (1 - e * Math.cos(ek) );
+
+            /**
+             * Teste do quadrante
+             * autor: Bruno Vani
+             */
+            double vk = 0d;
+            if (((sen_vk >= 0) && (cos_vk >= 0)) || (sen_vk < 0) && (cos_vk >= 0)) { // I ou III quadrante
+                vk = Math.atan(sen_vk / cos_vk);
+            } else if (((sen_vk >= 0) && (cos_vk < 0)) || ((sen_vk < 0 ) && (cos_vk) < 0)) { //  II ou IV quadrante
+                vk = Math.atan(sen_vk / cos_vk) + 3.1415926535898; // FIXME Math.pi();
+            } else{
+                Log.e("VK","Erro no ajuste do quadrante");
+            }
+//            double vk = Math.atan(sen_vk,cos_vk);
+//            double vk = Math.atan2(sen_vk,cos_vk);
+
+            //coordenadas planas do satelite
+            /*(4.13)*/
+            double fik = vk + w; // argumento da latitude
+            double delta_uk = Cuc * Math.cos(2 * fik) + Cus * Math.sin(2 * fik); // correcao do argumento da latitude
+            // latitude
+            double uk = fik + delta_uk; //argumento da latitude corrigido
+            /*(4.14)*/
+            double delta_rk = Crc * Math.cos(2 * fik) + Crs * Math.sin(2 * fik); //correcao do raio
+            double rk = a * (1 - e * Math.cos(ek)) + delta_rk; //raio corrigido
+
+            double delta_ik = Cic * Math.cos(2 * fik) + Cis * Math.sin(2 * fik); //correcao da inclinacao
+            double ik = io + idot * delta_tk + delta_ik; //inclinacao corrigida
+            /*(4.15)*/
+            // Coordenadas do satélite no plano
+            double xk = rk * Math.cos(uk); //posicao x no plano orbital
+            double yk = rk * Math.sin(uk); //posicao y no plano orbital
+
+            // Coordenadas do satélite em 3D (WGS 84)
+            double Omegak = omega_0 + omega_v * delta_tk - We * tgps;
+
+            // Coordenadas originais do satelites
+            double X = ((xk * Math.cos(Omegak)) - (yk * Math.sin(Omegak) * Math.cos(ik)));
+            double Y = ((xk * Math.sin(Omegak)) + (yk * Math.cos(Omegak) * Math.cos(ik)));
+            double Z = (yk * Math.sin(ik));
+
+            // Coordenadas do satelites corrigidas do erro de rotacao da Terra
+            double alpha = We * tpropag;
+            double Xc = X + alpha * Y;
+            double Yc = -alpha * X + Y;
+            double Zc = Z;
+//            //Coordenadas finais para o processamento
+//            double X = Xk;
+//            double Y = Yk;
+//            double Z = Zk;
+
+            //coord = [coord; efemerides(i,1) X Y Z dts];
+            int PRN = 5;
+            CoordenadaGPS novaCoord = new CoordenadaGPS(PRN,Xc,Yc,Zc,dts);
+
+            double difX = Xoriginal - Xc;
+            double difY = Yoriginal - Yc;
+            double difZ = Zoriginal - Zc;
+            double difDts = dtsOriginal - dts;
+
+            Log.i("FimTeste","Diferença na coordenada X: " + difX);
+            Log.i("FimTeste","Diferença na coordenada Y: " + difY);
+            Log.i("FimTeste","Diferença na coordenada Z: " + difZ);
+            Log.i("FimTeste","Diferença no dts: " + difDts);
+    }
+        listaEfemerides = null;
+        listaEfemerides = new ArrayList<>();
+    }
+
+
+    /**
+     *
+     * @param context A activity em execução atual
+     * @return
+     * @throws IOException
+     */
+    public static String readRINEX_RawAssets(Context context) throws IOException {
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1410cortado20)));
+//        int numEfemerides = contEfemerides(context);
+
+        // do reading, usually loop until end of file reading
+        StringBuilder sb = new StringBuilder();
+
+        //PULANDO O CABEÇALHO DE 8 LINHAS
+        String mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+        mLine = reader.readLine();
+
+        String sub = "";
+        int numEfemerides = 7; // FIXME FAZER UM WHILE
+
+        for (int i = 1; i < numEfemerides; i++){
+            GNSSNavMsg efemeride = new GNSSNavMsg();
+            mLine = reader.readLine();
+
+//first line - epoch of satellite clock (toc)
+//====================================================================
+            sub = mLine.substring(0, 2).trim();
+            efemeride.setPRN(Integer.valueOf(sub));  // FIXME
+//            Log.i("PRN", sub);
+
+            try { // FIXME REVER
+                int year = Integer.valueOf(mLine.substring(3, 6).replaceAll("\\s", ""));
+                int month = Integer.valueOf(mLine.substring(6, 8).replaceAll("\\s", ""));
+                int day = Integer.valueOf(mLine.substring(9, 11).replaceAll("\\s", ""));
+                int hour = Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", ""));
+                int minute = Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", ""));
+                double seconds = Double.valueOf(mLine.substring(18, 22).replaceAll("\\s", ""));
+
+//                Log.i("year_RINEX",String.valueOf(year));
+//                Log.i("month_RINEX",String.valueOf(month));
+//                Log.i("day_RINEX",String.valueOf(day));
+//                Log.i("hour_RINEX",String.valueOf(hour));
+//                Log.i("minute_RINEX",String.valueOf(minute));
+//                Log.i("seconds_RINEX",String.valueOf(seconds));
+//                Log.i("seconds_RINEX",String.valueOf(seconds));
+//                Log.i("Fim_TOC","=============================");
+
+             GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
+             efemeride.setGNSSDate(data);
+
+            }catch (Exception err){
+                efemeride.setToc(0);
+                Log.e("TOC-ERR","Erro: " + err.getMessage());
+//                efemeride.setGNSSDate(null);
+            }
+
+//            Log.i("af0","af0: " + mLine.substring(22,41).replace('D','e').replaceAll("\\s",""));
+//            Log.i("af1","af1: " + mLine.substring(41,60).replace('D','e').replaceAll("\\s",""));
+//            Log.i("af2","af2: " + mLine.substring(60,79).replace('D','e').replaceAll("\\s",""));
+
+            double af0 = Double.valueOf(mLine.substring(22,41).replace('D','e')
+                    .replaceAll("\\s",""));
+
+            double af1 = Double.valueOf(mLine.substring(41,60).replace('D','e')
+                    .replaceAll("\\s",""));
+
+            double af2 = Double.valueOf(mLine.substring(60,79).replace('D','e')
+                    .replaceAll("\\s",""));
+
+            efemeride.setAf0(af0);
+            efemeride.setAf1(af1);
+            efemeride.setAf2(af2);
+//// second line - broadcast orbit
+//====================================================================
+            mLine = reader.readLine();
+
+            sub = mLine.substring(3, 22).replace('D', 'e');
+            double iode = Double.parseDouble(sub.trim());
+            efemeride.setIODE(iode);
+//            Log.i("IODE",sub);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            efemeride.setCrs(Double.parseDouble(sub.trim()));
+//            Log.i("Crs",sub);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setDelta_n(Double.parseDouble(sub.trim()));
+//            Log.i("Delta_n",sub);
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            efemeride.setM0(Double.parseDouble(sub.trim()));
+//            Log.i("M0",sub);
+//            third line - broadcast orbit (2)
+//            ====================================================================
+
+            mLine = reader.readLine();
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            double Cuc = Double.parseDouble(sub.trim());
+            efemeride.setCuc(Cuc);
+//            Log.i("Cuc",sub);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            efemeride.setE(Double.parseDouble(sub.trim()));
+//            Log.i("E",sub);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setCus(Double.parseDouble(sub.trim()));
+//            Log.i("Cus",sub);
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            efemeride.setAsqrt(Double.parseDouble(sub.trim()));
+//            Log.i("Asqrt",sub);
+//fourth line
+//--------------------------------------------------------------------------------------------------
+            mLine = reader.readLine();
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            double toe = Double.parseDouble(sub.trim());
+            efemeride.setToe(toe);
+//            Log.i("Toe",sub);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            efemeride.setCic(Double.parseDouble(sub.trim()));
+//            Log.i("Cic",sub);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setOmega_0(Double.parseDouble(sub.trim()));
+//            Log.i("Omega0","Valor: " + efemeride.get0mega_0() );
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            efemeride.setCis(Double.parseDouble(sub.trim()));
+//            Log.i("Cis",sub);
+            //fifth line
+//--------------------------------------------------------------------------------------------------
+
+            mLine = reader.readLine();
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            efemeride.setI0(Double.parseDouble(sub.trim()));
+//            Log.i("I0",sub);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            efemeride.setCrc(Double.parseDouble(sub.trim()));
+//            Log.i("Crc",sub);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setW(Double.parseDouble(sub.trim()));
+//            Log.i("w",sub);
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            efemeride.setOmega_v(Double.parseDouble(sub.trim()));
+//            Log.i("Omega_v",sub);
+            //sixth line
+//--------------------------------------------------------------------------------------------------
+
+            mLine = reader.readLine();
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            efemeride.setIDOT(Double.parseDouble(sub.trim()));
+//            Log.i("IDOT",sub);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            double L2Code = Double.parseDouble(sub.trim());
+            efemeride.setCodeL2(L2Code);
+//            Log.i("CodeL2",sub);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            double week = Double.parseDouble(sub.trim());
+            efemeride.setGPS_Week((int) week);
+//            Log.i("GPS_WEEK",sub);
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            double L2Flag = Double.parseDouble(sub.trim());
+            efemeride.setL2PdataFlag((int) L2Flag);
+//            Log.i("L2_Flag",sub);
+//seventh line
+//--------------------------------------------------------------------------------------------------
+
+            mLine = reader.readLine();
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            double svAccur = Double.parseDouble(sub.trim());
+            efemeride.setAccuracy((int) svAccur);
+//            Log.i("Sv_Accur",sub);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            double svHealth = Double.parseDouble(sub.trim());
+            efemeride.setHealth((int) svHealth);
+//            Log.i("Sv_Health",sub);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setTGD(Double.parseDouble(sub.trim()));
+//            Log.i("Tgd",sub);
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            double iodc = Double.parseDouble(sub.trim());
+            efemeride.setIODC((int) iodc);
+//            Log.i("IODC",sub);
+            //eigth line
+            //--------------------------------------------------------------------------------------------------
+            mLine = reader.readLine();
+
+            int len = mLine.length();
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            efemeride.setTtx(Double.parseDouble(sub.trim()));
+//            Log.i("Transmission Time (TTX)",sub);
+
+            if (len > 22) {
+                sub = mLine.substring(22, 41).replace('D', 'e');
+                efemeride.setFit_interval(Double.parseDouble(sub.trim()));
+
+            } else {
+                efemeride.setFit_interval(0);
+            }
+
+//            Log.i("Fit Interval",sub);
 
 //--------------------------------------------------------------------------------------------------
             listaEfemerides.add(efemeride);
-            Log.i("FIM-OBERVAVAO","===========================================");
+//            Log.i("FIM-OBERVAVAO","===========================================");
         }
 
         reader.close();
@@ -311,7 +661,7 @@ public class ProcessamentoPPS {
      * @param SEG Segundos do dia (UTC)
      * @return Segundos da semana GPS correspondente
      */
-    public static double calcTOC_tr_(int DAY_WEEK, int HOR_DAY, int MIN, double SEG) { // TODO Adotar a abordagem de Julian Day do arquivo ReadRinexNav.m linha 83!
+    public static double calc_Tr(int DAY_WEEK, int HOR_DAY, int MIN, double SEG) {
         return (  (DAY_WEEK * 24 + HOR_DAY) * 3600 + MIN * 60 + SEG );
     }
 
@@ -322,8 +672,8 @@ public class ProcessamentoPPS {
      * @return Segundos da semana GPS correspondente
      * @see GNSSDate
      */
-    public static double calcTOC_tr_(GNSSDate dataGNSS) { // TODO Adotar a abordagem de Julian Day do arquivo ReadRinexNav.m linha 83!
-        return (  (GNSSConstants.DAY_SEG * 24 + dataGNSS.getHour()) * 3600 + dataGNSS.getMin() * 60 + dataGNSS.getSec() ); // FIXME
+    public static double calc_Tr(GNSSDate dataGNSS) {
+        return (  (GNSSConstants.DAY_SEG * 24 + dataGNSS.getHour()) * 3600 + dataGNSS.getMin() * 60 + dataGNSS.getSec() );
     }
 
     /**
@@ -336,9 +686,8 @@ public class ProcessamentoPPS {
         int numLines = 0;
         BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1410)));
 
-        // do reading, usually loop until end of file reading
         StringBuilder sb = new StringBuilder();
-        /*PULANDO AS LINHAS DO CABEÇALHO*/
+        /*PULANDO O CABEÇALHO DE 8 LINHAS*/
         String mLine = reader.readLine();
                mLine = reader.readLine();
                mLine = reader.readLine();
@@ -385,12 +734,12 @@ public class ProcessamentoPPS {
 
             if (mLine.startsWith("Raw")){
                 /*Lendo uma linha raw*/
-                Log.i("raw",mLine);
+//                Log.i("raw",mLine);
 
                 String[] linhaRaw = mLine.split(",");
 
                 if (!linhaRaw[28].equalsIgnoreCase(String.valueOf(GNSSConstants.CONSTELLATION_GPS))){
-                    Log.e("Constellation", "Non-GPS Measurement: Type " + linhaRaw[28]);
+//                    Log.e("Constellation", "Non-GPS Measurement: Type " + linhaRaw[28]);
                     qntMedicoesDescartadas++;
                     continue; // TODO Por enquanto só são tratadas medições GPS
                 }
@@ -405,13 +754,13 @@ public class ProcessamentoPPS {
                 try{
                     novaMedicao.setLeapSecond(Integer.parseInt(linhaRaw[3]));
                 }catch (NumberFormatException ex){
-                    Log.e("Err","LeapSecond: " + ex.getMessage());
+//                    Log.e("Err","LeapSecond: " + ex.getMessage());
                 }
 
                 try{
                     novaMedicao.setTimeUncertaintyNanos(Double.parseDouble(linhaRaw[4]));
                 }catch (NumberFormatException ex){
-                    Log.e("Err","TimeUncertaintyNanos: " + ex.getMessage());
+//                    Log.e("Err","TimeUncertaintyNanos: " + ex.getMessage());
                 }
 
                 novaMedicao.setFullBiasNanos(Long.parseLong(linhaRaw[5]));
@@ -422,19 +771,19 @@ public class ProcessamentoPPS {
                 try{
                     novaMedicao.setDriftNanosPerSecond(Double.parseDouble(linhaRaw[8]));
                 }catch (NumberFormatException ex){
-                    Log.e("Err","DriftNanosPerSecond: " + ex.getMessage());
+//                    Log.e("Err","DriftNanosPerSecond: " + ex.getMessage());
                 }
 
                 try{
                     novaMedicao.setDriftUncertaintyNanosPerSecond(Double.parseDouble(linhaRaw[9]));
                 }catch (NumberFormatException ex){
-                    Log.e("Err","DriftUncertaintyNanosPerSecond: " + ex.getMessage());
+//                    Log.e("Err","DriftUncertaintyNanosPerSecond: " + ex.getMessage());
                 }
 
                 try{
                     novaMedicao.setHardwareClockDiscontinuityCount(Integer.parseInt(linhaRaw[10]));
                 }catch (NumberFormatException ex){
-                    Log.e("Err","HardwareClockDiscontinuityCount: " + ex.getMessage());
+//                    Log.e("Err","HardwareClockDiscontinuityCount: " + ex.getMessage());
                 }
 
                 novaMedicao.setSvid(Integer.parseInt(linhaRaw[11]));
@@ -448,11 +797,11 @@ public class ProcessamentoPPS {
 
 
                 if (verificacaoStatus == 0){
-                    Log.e("StateEr","TOW not decoded!: " + verificacaoStatus);
+//                    Log.e("StateEr","TOW not decoded!: " + verificacaoStatus);
                     qntMedicoesDescartadas++;
                     continue;
                 }else{
-                    Log.i("StateOk","TOW certo: " + verificacaoStatus);
+//                    Log.i("StateOk","TOW certo: " + verificacaoStatus);
                 }
 
 //                Log.i("State", "Verificação: " + (Integer.parseInt(linhaRaw[13]) & (1L << TOW_DECODED_MEASUREMENT_STATE_BIT)));
@@ -463,11 +812,11 @@ public class ProcessamentoPPS {
                 novaMedicao.setCn0DbHz(Double.parseDouble(linhaRaw[16]));
 
                 if (novaMedicao.getCn0DbHz() <= C_TO_N0_THRESHOLD_DB_HZ ){
-                    Log.e("Cn0DbHzEr","Valor: " + String.valueOf(novaMedicao.getCn0DbHz()));
+//                    Log.e("Cn0DbHzEr","Valor: " + String.valueOf(novaMedicao.getCn0DbHz()));
                     qntMedicoesDescartadas++;
                     continue;
                 }else{
-                    Log.i("Cn0DbHzOk","Valor: " + String.valueOf(novaMedicao.getCn0DbHz()));
+//                    Log.i("Cn0DbHzOk","Valor: " + String.valueOf(novaMedicao.getCn0DbHz()));
                 }
 
                 novaMedicao.setPseudorangeRateMetersPerSecond(Double.parseDouble(linhaRaw[17]));
@@ -482,7 +831,7 @@ public class ProcessamentoPPS {
                     novaMedicao.setCarrierPhase(Integer.parseInt(linhaRaw[24]));
                     novaMedicao.setCarrierPhaseUncertainty(Double.parseDouble(linhaRaw[25]));
                 } catch (NumberFormatException err){
-                    Log.e("err","CarrierPhase errors...");
+//                    Log.e("err","CarrierPhase errors...");
                 }
 
                 novaMedicao.setMultipathIndicator(Integer.parseInt(linhaRaw[26]));
@@ -490,7 +839,7 @@ public class ProcessamentoPPS {
                 try{
                     novaMedicao.setSnrInDb(Double.parseDouble(linhaRaw[27]));
                 } catch (NumberFormatException err){
-                    Log.e("err","SNR: " + err.getMessage());
+//                    Log.e("err","SNR: " + err.getMessage());
                 }
 
                 novaMedicao.setConstellationType(Integer.parseInt(linhaRaw[28]));
@@ -611,7 +960,7 @@ public class ProcessamentoPPS {
                 listaMedicoes.get(i).setPseudorangeMeters(prMeters);
                 listaMedicoes.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
 
-                Log.i("gpsWeek","Semana: " + weekNumber.intValue() + " Segundos da semana: " + gpsSecsWek.intValue());
+//                Log.i("gpsWeek","Semana: " + weekNumber.intValue() + " Segundos da semana: " + gpsSecsWek.intValue());
 
                 GpsTime gpt = GpsTime.fromWeekTow(weekNumber.intValue(),gpsSecsWek.intValue());
                 gpt.getUtcDateTime();
@@ -625,21 +974,21 @@ public class ProcessamentoPPS {
                 int minute = gpt.getUtcDateTime().getMinuteOfHour();
                 double seconds = gpt.getUtcDateTime().getSecondOfMinute();
 
-                Log.i("year_OBS",String.valueOf(year));
-                Log.i("month_OBS",String.valueOf(month));
-                Log.i("day_OBS",String.valueOf(day));
-                Log.i("hour_OBS",String.valueOf(hour));
-                Log.i("minute_OBS",String.valueOf(minute));
-                Log.i("seconds_OBS",String.valueOf(seconds));
+//                Log.i("year_OBS",String.valueOf(year));
+//                Log.i("month_OBS",String.valueOf(month));
+//                Log.i("day_OBS",String.valueOf(day));
+//                Log.i("hour_OBS",String.valueOf(hour));
+//                Log.i("minute_OBS",String.valueOf(minute));
+//                Log.i("seconds_OBS",String.valueOf(seconds));
 
-                Log.i("hora-minuto", "Svid: " + listaMedicoes.get(i).getSvid() +
-                        " Hora: " + String.valueOf(hour) + " Minuto: " + String.valueOf(minute));
+//                Log.i("hora-minuto", "Svid: " + listaMedicoes.get(i).getSvid() +
+//                        " Hora: " + String.valueOf(hour) + " Minuto: " + String.valueOf(minute));
 
                 GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
                 listaMedicoes.get(i).setData(data);
 
-                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
-                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
+//                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
+//                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
             }
 
         }
@@ -653,148 +1002,19 @@ public class ProcessamentoPPS {
      * </p>
      *@return A data para a época considerada no ajustamento.
      */
-//    public static GNSSDate epocasAntigo(){
-//        /**
-//         * DEFINIÇÃO MANUAL DA ÉPOCA PARA ANÁLISE:
-//         */
-//        int YEAR = 18;
-//        int MONTH = 12;
-//        int DAY_MONTH = 21;
-//        int DAY_WEEK = GNSSConstants.DAY_SEG;
-//        int HOUR_DAY = 19;//fixme
-//        int MIN_HOUR = 30;
-//        double SEC = 0.0;
-//
-//
-//        //TODO
-//
-//
-//        //epocaAnalise.compareTo()
-//
-//        int size = listaMedicoes.size() - 6;
-//
-//        /**
-//         * A seleção da época é feita de modo manual:
-//         * Descarta as observações fora da época
-//         */
-//        for (int i = 0; i < size;i++){
-//            listaMedicoes.remove(0);
-//        }
-//
-//        /**
-//         * O ArrayList de Medições contem apenas medições da época em análise.
-//         * Preenche uma Lista com os PRNs dos satélites presentes nas medições que serão utilizadas
-//         */
-//        for (int i = 0; i < listaMedicoes.size(); i++){
-//            listaPRNs.add(listaMedicoes.get(i).getSvid());
-//        }
-//
-//        Collections.sort(listaPRNs);
-//
-//
-//        /**
-//         * Remove do ArrayList de Efemérides aqueles que não estão na epoca
-//         * E cujo PRN não está no ArrayList de Observações
-//         *  Obtem uma lista com os PRNs das observações para a época selecionada
-//         */
-//        for (int i = 0; i < listaEfemerides.size(); i++){
-//            GNSSNavMsg efemerideAtual = listaEfemerides.get(i);
-//            Integer PRNatual = Integer.valueOf(efemerideAtual.getPRN().trim());
-//
-//            if ( (efemerideAtual.getData().getHour() != HOUR_DAY ||
-//                  efemerideAtual.getData().getMin()  != MIN_HOUR) )
-//            {
-//                listaEfemerides.remove(i);
-////                continue;
-//            }else{
-//                Log.i("Efe","PRN: "+ efemerideAtual.getPRN() + " Efemeride mantida - Hora:" + efemerideAtual.getData().getHour() + " Minutos: " +efemerideAtual.getData().getMin() );
-//            }
-//
-////            if (!listaPRNs.contains(PRNatual)){
-////                listaEfemerides.remove(i);
-////            }
-//        }
-//
-//        Collections.sort(listaMedicoes);
-//        Collections.sort(listaEfemerides);
-//
-//        int tamanho = listaEfemerides.size();
-//        Integer ultimoPRN = Integer.valueOf(listaEfemerides.get(0).getPRN().trim());
-//
-//        try{
-//            /**
-//             * Nesse ponto temos efemérides repetidas para determinado satélite
-//             * Selecionando efemérides únicas para cada satélite:
-//             */
-//            for (int i = tamanho - 1; i > 0; i--){ // TODO
-////                if (ultimoPRN.equals(Integer.valueOf(listaEfemerides.get(i).getPRN())) ){
-////                    ultimoPRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
-////                    listaEfemerides.remove(i);
-////                    continue;
-////
-////                }
-////                ultimoPRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
-//
-//                if (listaEfemerides.get(i).getPRN().equals(listaEfemerides.get(i - 1).getPRN())){
-//                    listaEfemerides.remove(i - 1);
-//                }
-//
-//            }
-//
-//            int tam = listaEfemerides.size();
-//            int i = tam - 1;
-//            do{
-//                Integer PRNatual = Integer.valueOf(listaEfemerides.get(i).getPRN());
-//                if (!listaPRNs.contains(PRNatual))
-//                    listaEfemerides.remove(i);
-//                i--;
-//            }while (listaPRNs.size() != listaEfemerides.size() );
-//
-//            Log.i("FimEfemerides","Definidas efemérides únicas para cada satélite");
-//
-//        }catch (IndexOutOfBoundsException err){
-//            Log.e("Erro_Index","Erro listaEfemerides");
-//        }
-//
-//
-//        l = listaEfemerides.size(); // FIXME
-//
-//
-//        /**
-//         * PROCESSANDO PARA O UTC 19:30
-//         */
-////        GNSSDate epocaAnalise = new GNSSDate(year,month,day,hour,min,sec);
-//        GNSSDate epocaAnalise = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
-//        return epocaAnalise;
-//    }
-
-    /**
-     * Ajusta as medições GNSS (pseudodistancias) e as efemérides transmitidas (dados de navegação) para pertencer a mesma época.
-     * <p> Elimina as medições e efemérides de outra época e mantem apenas as da época em análise.</p>
-     * <p>
-     *     Tudo dentro de uma mesmo UTC é considerado a mesma época.
-     * </p>
-     *@return A data para a época considerada no ajustamento.
-     */
-    public static GNSSDate ajustarEpocas2(){
+    public static GNSSDate ajustarEpocas(){
         /**
          * DEFINIÇÃO MANUAL DA ÉPOCA PARA ANÁLISE:
          */
         int YEAR = 18;
         int MONTH = 12;
         int DAY_MONTH = 21;
-        int DAY_WEEK = GNSSConstants.DAY_SEG;
-        int HOUR_DAY = 19;//fixme
+        int DAY_WEEK = GNSSConstants.DAY_SEG; // FIXME
+        int HOUR_DAY = 19; // FIXME
         int MIN_HOUR = 20;
         double SEC = 0.0;
 
-//        DateTime data = new DateTime()
-
-        //TODO
-
-
-        //epocaAnalise.compareTo()
-
+        // Analisando a última época de observações apenas
         int size = listaMedicoes.size() - 6;
 
         /**
@@ -815,12 +1035,12 @@ public class ProcessamentoPPS {
 
         Collections.sort(listaPRNs);
 
-
         /**
          * Remove do ArrayList de Efemérides aqueles que não estão na epoca
          * E cujo PRN não está no ArrayList de Observações
          *  Obtem uma lista com os PRNs das observações para a época selecionada
          */
+       // FIXME
 //        for (int i = 0; i < listaEfemerides.size(); i++){
 //            GNSSNavMsg efemerideAtual = listaEfemerides.get(i);
 //            Integer PRNatual = Integer.valueOf(efemerideAtual.getPRN().trim());
@@ -894,15 +1114,15 @@ public class ProcessamentoPPS {
      * Calcula as <b>coordenadas X,Y,Z (WGS-84)</b> para cada satélite.
      * <p>Calcula o <b>erro do relógio</b> para cada satélite em segundos.
      */
-    public static void calcCoordendas(){
+    public static void calcCoordenadas(){
         //int L = 10;
         double GM = 3.9860044185E14; // 3.986004418E14;
         double We = 7.2921151467E-5; // 7.2921151467E-5;
         double c = 299792458;
 
-        GNSSDate dataObservacao = ajustarEpocas2();
+        GNSSDate dataObservacao = ajustarEpocas();
 
-        Log.i("Coord","Inicio do calculo das coordenadas dos satélites.");
+//        Log.i("Coord","Inicio do calculo das coordenadas dos satélites.");
 
         for (int i = 0; i < l; i++ ){// FIXME
             //------------------------------------------
@@ -910,7 +1130,7 @@ public class ProcessamentoPPS {
             //------------------------------------------
             //Tempo de recepcao do sinal ->  Hora da observacao
 //            double tr = (3*24+0)*3600 + 0*60 + 0.00; // FIXME CORRIGIR O TEMPO
-//            double tr = calcTOC_tr_(GNSSConstants.DAY_QUA,)
+//            double tr = calc_Tr(GNSSConstants.DAY_QUA,)
             double a0 = listaEfemerides.get(i).getAf0();
             double a1 = listaEfemerides.get(i).getAf1();
             double a2 = listaEfemerides.get(i).getAf2();
@@ -939,7 +1159,7 @@ public class ProcessamentoPPS {
             //Tempo de transmisao do sinal
             // ------------------------------------------
             double dtr = 0d; // ERRO DO RELÓGIO
-            double tr = calcTOC_tr_(dataObservacao);
+            double tr = calc_Tr(dataObservacao);
             double tgps = tr - (listaMedicoes.get(i).getPseudorangeMeters() / c);
 
             double dts = a0 + a1 * (tgps - toe) + a2 * (Math.pow(tgps - toe,2.0)); // ERRO DO SATÉLITE
@@ -1043,7 +1263,7 @@ public class ProcessamentoPPS {
             listaCoord.add(novaCoord);
         }
 
-        Log.i("CoordFIM","Fim do cálculo das coordenadas!");
+//        Log.i("CoordFIM","Fim do cálculo das coordenadas!");
 
     }
 
@@ -1053,6 +1273,9 @@ public class ProcessamentoPPS {
 
     static double[] Lb;
 
+    /**
+     * Exemplo do livro
+     */
     private static void setarExemplo(){
         l = 7;
         listaCoord = null;
@@ -1100,6 +1323,7 @@ public class ProcessamentoPPS {
                 2.691733116672e-5); // Microsecs: 26.91733116672
         listaCoord.add(novaCoord7);
 
+        Log.i("Exemplo","Exemplo configurado...");
     }
 
     /**
@@ -1108,7 +1332,9 @@ public class ProcessamentoPPS {
      */
     public static void calcularMMQ(){
 
-        setarExemplo();
+//        setarExemplo();
+
+        boolean flag = false;
 
         int contIteracoes = 0;
         double c = 2.99792458e8;
@@ -1116,13 +1342,13 @@ public class ProcessamentoPPS {
         double[] L = new double[l]; // DeltaL
         double[][] A = new double[l][4];
 
-//        Lb = new double[l];
+        Lb = new double[l];
         //Carregando o vetor Lb
-//        for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)
-//            Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();// * 1e-1 ;
-//        }
+        for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)
+            Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();// * 1e-1 ;
+        }
 
-        // Pr certas do arquivo .derived:
+        // Pseudoranges do arquivo .derived:
 //        Lb[0] = 190839015.701;
 //        Lb[1] = 187836742.332;
 //        Lb[2] = 188113982.596;
@@ -1151,10 +1377,11 @@ public class ProcessamentoPPS {
 //        double Xe = 3687627.26039751;
 //        double Ye = -4620683.42055526;
 //        double Ze = -2387155.01580668;
+
         // USANDO O EP2:
-//        double Xe = 3942590.30657541;
-//        double Ye = -4940172.84476568;
-//        double Ze = -2553313.07836198;
+        double Xe = 3942590.30657541;
+        double Ye = -4940172.84476568;
+        double Ze = -2553313.07836198;
 
 
         double[] X0 = new double[]{Xe, Ye, Ze,0d};
@@ -1164,16 +1391,7 @@ public class ProcessamentoPPS {
         double[] Xa = new double[4];
         double erro = 0d;
 
-        Log.i("Inicio","Iniciando solução iterativa!");
-
-//        Log.i("Iteracao_Line","============================================");
-//        Log.i("Iteracao_CONT","Nº da iteração: " + 0);
-//        Log.i("Iteracao_X","Vetor X: " + Arrays.toString(X));
-//        Log.i("Iteracao_Xa","Vetor Xa: " + Arrays.toString(Xa));
-//        Log.i("Iteracao_ERRO","Erro: " + erro);
-//        Log.i("Iteracao_Line","============================================");
-
-        int MAX_ITERACOES = 6;
+        int MAX_ITERACOES = 8;
 
         // Solucao iterativa pelo metodo parametrico
         for (int k = 0; k < MAX_ITERACOES; k++){
@@ -1211,11 +1429,10 @@ public class ProcessamentoPPS {
                 A[i][3] = 1.0d;
             }
 
+//            Log.i("Iteracao","Matriz A recém-calculada: \n" + Arrays.deepToString(A))
+
             RealMatrix rA =  MatrixUtils.createRealMatrix(A);
 //             RealMatrix rA = new Array2DRowRealMatrix(A, false);
-
-//            Log.i("Iteracao","Matriz A recém-calculada: \n" + Arrays.deepToString(A));
-            Log.i("Iteracao","Matriz A no RealMatrix: \n" + rA.toString());
 
             RealMatrix rP = MatrixUtils.createRealIdentityMatrix(l);
 
@@ -1233,7 +1450,7 @@ public class ProcessamentoPPS {
 //            RealVector rX = rInvN.operate(rU).mapMultiply(-1.0d);
 
             X = rX.toArray();
-            X[3] = X[3] / c; // FIXME!!!!!!!
+            X[3] = X[3] / c;
 
             //Xa = X0+X; // FIXME FAZER UMA FUNÇÃO PARA ISSO
             for (int j = 0; j < X0.length; j++){
@@ -1241,59 +1458,40 @@ public class ProcessamentoPPS {
             }
 
             //Verificação da Tolerancia
-            /*
-             if abs(max(X)) < 1e-6
-                Xa
-                abs(max(X))
-                k
-                break;
-             else X0 = Xa;
-             end
-             */
-
             erro = Math.abs(maxValue(X));
             int numIteracao = contIteracoes + 1;
 
-            if (erro < 0.0004 ) {
-                Log.i("Iteracao","============================================");
-                Log.i("Iteracao","Nº da iteração: " + numIteracao);
-                Log.i("Iteracao","Vetor X: " + Arrays.toString(X));
-                Log.i("Iteracao","Vetor Xa: " + Arrays.toString(Xa));
-                Log.i("Iteracao","Erro: " + erro);
-                Log.i("Iteracao","============================================");
-                Log.i("Iteracao","============================================");
-
+            if (erro < 0.0004 ) { // Módulo do erro em metros
+                Log.i("FimERRO","============================================");
                 Log.i("FimERRO","N° de iterações: " + numIteracao);
                 Log.i("FimERRO","Coordenada Xr: " + Xa[0]);
                 Log.i("FimERRO","Coordenada Yr: " + Xa[1]);
                 Log.i("FimERRO","Coordenada Zr: " + Xa[2]);
                 Log.i("FimERRO","Erro do relógio do receptor: " + Xa[3]);
                 Log.i("FimERRO","Erro das coordenadas: " + erro);
+                Log.i("FimERRO","============================================");
+                flag = true;
                 break;
             }else{ // Próxima iteração
                 //X0 = Xa;
                 System.arraycopy(Xa,0,X0,0,X0.length);
             }
 
-//            Log.i("Iteracao","============================================");
-//            Log.i("Iteracao","Nº da iteração: " + numIteracao);
-//            Log.i("Iteracao","Vetor X: " + Arrays.toString(X));
-//            Log.i("Iteracao","Vetor Xa: " + Arrays.toString(Xa));
-//            Log.i("Iteracao","Erro: " + erro);
-//            Log.i("Iteracao","============================================");
-//            Log.i("Iteracao","============================================");
-
             contIteracoes++;
+        } // Fim do laço do ajustamento
+
+        if (!flag){
+            int numIteracao = contIteracoes + 1;
+            Log.i("FimFOOR","============================================");
+            Log.i("FimFOOR","Nº de iterações: " + numIteracao);
+            Log.i("FimFOOR","Coordenada Xr: " + Xa[0]);
+            Log.i("FimFOOR","Coordenada Yr: " + Xa[1]);
+            Log.i("FimFOOR","Coordenada Zr: " + Xa[2]);
+            Log.i("FimFOOR","Erro do relógio do receptor: " + Xa[3]);
+            Log.i("FimFOOR","Erro das coordenadas: " + erro);
+            Log.i("FimFOOR","============================================");
         }
-        int numIteracao = contIteracoes + 1;
-        Log.i("FimFOOR","============================================");
-        Log.i("FimFOOR","Nº de iterações: " + numIteracao);
-        Log.i("FimFOOR","Coordenada Xr: " + Xa[0]);
-        Log.i("FimFOOR","Coordenada Yr: " + Xa[1]);
-        Log.i("FimFOOR","Coordenada Zr: " + Xa[2]);
-        Log.i("FimFOOR","Erro do relógio do receptor: " + Xa[3]);
-        Log.i("FimFOOR","Erro das coordenadas: " + erro);
-        Log.i("FimFOOR","============================================");
+
         //TODO Verificação dos operadores de precisão:
         // Vetor dos resíduos
         // Fator de variância a posteriori
@@ -1311,7 +1509,7 @@ public class ProcessamentoPPS {
         for (double anArray : array) {
             list.add(anArray);
         }
-        list.remove(list.size() -1);
+        list.remove(list.size() -1); // Remove o erro do relógio da verificação
         return Collections.max(list);
     }
 
