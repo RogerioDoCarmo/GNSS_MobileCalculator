@@ -42,7 +42,7 @@ public class GNSSDate implements Comparable<GNSSDate>{
         return month;
     }
 
-    public int getDay() {
+    public int getDay_Month() {
         return day;
     }
 
@@ -66,7 +66,7 @@ public class GNSSDate implements Comparable<GNSSDate>{
      */
     @Override
     public int compareTo(@NonNull GNSSDate another) {
-        if (this.getDay() == another.getDay()     &&
+        if (this.getDay_Month() == another.getDay_Month()     &&
             this.getHour() == another.getHour()   &&
             this.getMin() == another.getMin()     &&
             this.getMonth() == another.getMonth() &&

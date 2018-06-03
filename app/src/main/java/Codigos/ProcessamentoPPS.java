@@ -6,6 +6,7 @@ import android.util.Log;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
@@ -63,7 +64,7 @@ public class ProcessamentoPPS {
         mLine = reader.readLine();
 
         String sub = "";
-        int numEfemerides = 24; // FIXME
+        int numEfemerides = 7; // FIXME FAZER UM WHILE
 
         for (int i = 1; i < numEfemerides; i++){
             GNSSNavMsg efemeride = new GNSSNavMsg();
@@ -72,15 +73,17 @@ public class ProcessamentoPPS {
 //first line - epoch of satellite clock (toc)
 //====================================================================
 
-            String PRN;
-            try{
-                PRN = mLine.substring(0,2);
-            }catch (Exception er){
-                PRN = mLine.substring(1,2);
-            }
+//            String PRN;
+//            try{
+//                PRN = mLine.substring(0,2);
+//            }catch (Exception er){
+//                PRN = mLine.substring(1,2);
+//            }
 
-            efemeride.setPRN(Integer.valueOf(PRN.trim()));  // FIXME
-            Log.i("PRN", PRN);
+
+            sub = mLine.substring(0, 2).trim();
+            efemeride.setPRN(Integer.valueOf(sub));  // FIXME
+            Log.i("PRN", sub);
 
             try { // FIXME REVER
 //                double Toc = calcTOC_tr_(Integer.valueOf(mLine.substring(9, 11).replaceAll("\\s", "")), // dia
@@ -320,7 +323,7 @@ public class ProcessamentoPPS {
      * @see GNSSDate
      */
     public static double calcTOC_tr_(GNSSDate dataGNSS) { // TODO Adotar a abordagem de Julian Day do arquivo ReadRinexNav.m linha 83!
-        return (  (dataGNSS.getDay() * 24 + dataGNSS.getHour()) * 3600 + dataGNSS.getMin() * 60 + dataGNSS.getSec() );
+        return (  (GNSSConstants.DAY_SEG * 24 + dataGNSS.getHour()) * 3600 + dataGNSS.getMin() * 60 + dataGNSS.getSec() ); // FIXME
     }
 
     /**
@@ -839,43 +842,43 @@ public class ProcessamentoPPS {
         Collections.sort(listaMedicoes);
         Collections.sort(listaEfemerides);
 
-        int tamanho = listaEfemerides.size();
-        Integer ultimoPRN = listaEfemerides.get(0).getPRN();
-
-        try{
-            /**
-//             * Nesse ponto temos efemérides repetidas para determinado satélite
-//             * Selecionando efemérides únicas para cada satélite:
-//             */
-//            for (int i = tamanho - 1; i > 0; i--){ // TODO
-////                if (ultimoPRN.equals(Integer.valueOf(listaEfemerides.get(i).getPRN())) ){
-////                    ultimoPRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
-////                    listaEfemerides.remove(i);
-////                    continue;
+//        int tamanho = listaEfemerides.size();
+//        Integer ultimoPRN = listaEfemerides.get(0).getPRN();
+//
+//        try{
+//            /**
+////             * Nesse ponto temos efemérides repetidas para determinado satélite
+////             * Selecionando efemérides únicas para cada satélite:
+////             */
+////            for (int i = tamanho - 1; i > 0; i--){ // TODO
+//////                if (ultimoPRN.equals(Integer.valueOf(listaEfemerides.get(i).getPRN())) ){
+//////                    ultimoPRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
+//////                    listaEfemerides.remove(i);
+//////                    continue;
+//////
+//////                }
+//////                ultimoPRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
 ////
+////                if (listaEfemerides.get(i).getPRN().equals(listaEfemerides.get(i - 1).getPRN())){
+////                    listaEfemerides.remove(i - 1);
 ////                }
-////                ultimoPRN = Integer.valueOf(listaEfemerides.get(i).getPRN());
+////
+////            }
 //
-//                if (listaEfemerides.get(i).getPRN().equals(listaEfemerides.get(i - 1).getPRN())){
-//                    listaEfemerides.remove(i - 1);
-//                }
+//            int tam = listaEfemerides.size();
+//            int i = tam - 1;
+//            do{
+//                Integer PRNatual = listaEfemerides.get(i).getPRN();
+//                if (!listaPRNs.contains(PRNatual))
+//                    listaEfemerides.remove(i);
+//                i--;
+//            }while (listaPRNs.size() != listaEfemerides.size() );
 //
-//            }
-
-            int tam = listaEfemerides.size();
-            int i = tam - 1;
-            do{
-                Integer PRNatual = listaEfemerides.get(i).getPRN();
-                if (!listaPRNs.contains(PRNatual))
-                    listaEfemerides.remove(i);
-                i--;
-            }while (listaPRNs.size() != listaEfemerides.size() );
-
-            Log.i("FimEfemerides","Definidas efemérides únicas para cada satélite");
-
-        }catch (IndexOutOfBoundsException err){
-            Log.e("Erro_Index","Erro listaEfemerides");
-        }
+//            Log.i("FimEfemerides","Definidas efemérides únicas para cada satélite");
+//
+//        }catch (IndexOutOfBoundsException err){
+//            Log.e("Erro_Index","Erro listaEfemerides");
+//        }
 
         l = listaEfemerides.size(); // FIXME
 
@@ -1105,19 +1108,19 @@ public class ProcessamentoPPS {
      */
     public static void calcularMMQ(){
 
-//        setarExemplo();
+        setarExemplo();
 
         int contIteracoes = 0;
         double c = 2.99792458e8;
         double[] L0 = new double[l];
-        Lb = new double[l];
         double[] L = new double[l]; // DeltaL
         double[][] A = new double[l][4];
 
+//        Lb = new double[l];
         //Carregando o vetor Lb
-        for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)
-            Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();// * 1e-1 ;
-        }
+//        for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)
+//            Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();// * 1e-1 ;
+//        }
 
         // Pr certas do arquivo .derived:
 //        Lb[0] = 190839015.701;
@@ -1149,9 +1152,9 @@ public class ProcessamentoPPS {
 //        double Ye = -4620683.42055526;
 //        double Ze = -2387155.01580668;
         // USANDO O EP2:
-        double Xe = 3942590.30657541;
-        double Ye = -4940172.84476568;
-        double Ze = -2553313.07836198;
+//        double Xe = 3942590.30657541;
+//        double Ye = -4940172.84476568;
+//        double Ze = -2553313.07836198;
 
 
         double[] X0 = new double[]{Xe, Ye, Ze,0d};
@@ -1163,12 +1166,12 @@ public class ProcessamentoPPS {
 
         Log.i("Inicio","Iniciando solução iterativa!");
 
-        Log.i("Iteracao_Line","============================================");
-        Log.i("Iteracao_CONT","Nº da iteração: " + 0);
-        Log.i("Iteracao_X","Vetor X: " + Arrays.toString(X));
-        Log.i("Iteracao_Xa","Vetor Xa: " + Arrays.toString(Xa));
-        Log.i("Iteracao_ERRO","Erro: " + erro);
-        Log.i("Iteracao_Line","============================================");
+//        Log.i("Iteracao_Line","============================================");
+//        Log.i("Iteracao_CONT","Nº da iteração: " + 0);
+//        Log.i("Iteracao_X","Vetor X: " + Arrays.toString(X));
+//        Log.i("Iteracao_Xa","Vetor Xa: " + Arrays.toString(Xa));
+//        Log.i("Iteracao_ERRO","Erro: " + erro);
+//        Log.i("Iteracao_Line","============================================");
 
         int MAX_ITERACOES = 6;
 
@@ -1191,7 +1194,7 @@ public class ProcessamentoPPS {
             //L = Lb-L0;
             for (int i = 0; i < Lb.length; i++){
 //                L[i] = Lb[i] - L0[i];
-                L[i] = Lb[i] - L0[i] + c * (0 - listaCoord.get(i).getDts());
+                L[i] = Lb[i] - (L0[i] + c * (0 - listaCoord.get(i).getDts()));
             }
 
             //MATRIZ A
@@ -1208,18 +1211,21 @@ public class ProcessamentoPPS {
                 A[i][3] = 1.0d;
             }
 
-//            RealMatrix rA =  MatrixUtils.createRealMatrix(A);
-             RealMatrix rA = new Array2DRowRealMatrix(A, false);
+            RealMatrix rA =  MatrixUtils.createRealMatrix(A);
+//             RealMatrix rA = new Array2DRowRealMatrix(A, false);
 
 //            Log.i("Iteracao","Matriz A recém-calculada: \n" + Arrays.deepToString(A));
             Log.i("Iteracao","Matriz A no RealMatrix: \n" + rA.toString());
 
+            RealMatrix rP = MatrixUtils.createRealIdentityMatrix(l);
+
             RealVector rL  =  MatrixUtils.createRealVector(L);
-            //  N = A'*A;
-            RealMatrix rN = rA.transpose().multiply(rA);
-            //U = A'*L;
-            RealVector rU = rA.transpose().operate(rL);
+            //  N = A'PA;
+            RealMatrix rN = rA.transpose().multiply(rP).multiply(rA);
+            //U = A'PL;
+            RealVector rU = rA.transpose().multiply(rP).operate(rL);
             //X = -inv(N)*U;
+
 //            RealMatrix rInvN = new LUDecomposition(rN).getSolver().getInverse();
             RealMatrix rInvN = MatrixUtils.inverse(rN);
             RealVector rX = rInvN.operate(rU);
@@ -1269,13 +1275,13 @@ public class ProcessamentoPPS {
                 System.arraycopy(Xa,0,X0,0,X0.length);
             }
 
-            Log.i("Iteracao","============================================");
-            Log.i("Iteracao","Nº da iteração: " + numIteracao);
-            Log.i("Iteracao","Vetor X: " + Arrays.toString(X));
-            Log.i("Iteracao","Vetor Xa: " + Arrays.toString(Xa));
-            Log.i("Iteracao","Erro: " + erro);
-            Log.i("Iteracao","============================================");
-            Log.i("Iteracao","============================================");
+//            Log.i("Iteracao","============================================");
+//            Log.i("Iteracao","Nº da iteração: " + numIteracao);
+//            Log.i("Iteracao","Vetor X: " + Arrays.toString(X));
+//            Log.i("Iteracao","Vetor Xa: " + Arrays.toString(Xa));
+//            Log.i("Iteracao","Erro: " + erro);
+//            Log.i("Iteracao","============================================");
+//            Log.i("Iteracao","============================================");
 
             contIteracoes++;
         }
@@ -1287,7 +1293,6 @@ public class ProcessamentoPPS {
         Log.i("FimFOOR","Coordenada Zr: " + Xa[2]);
         Log.i("FimFOOR","Erro do relógio do receptor: " + Xa[3]);
         Log.i("FimFOOR","Erro das coordenadas: " + erro);
-        Log.i("FimFOOR","============================================");
         Log.i("FimFOOR","============================================");
         //TODO Verificação dos operadores de precisão:
         // Vetor dos resíduos
