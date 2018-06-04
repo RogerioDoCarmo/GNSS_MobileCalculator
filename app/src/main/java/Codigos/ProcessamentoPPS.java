@@ -425,7 +425,7 @@ public class ProcessamentoPPS {
      */
     public static String readRINEX_RawAssets(Context context) throws IOException {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1410cortado20)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1410cortado20todos)));
 //        int numEfemerides = contEfemerides(context);
 
         // do reading, usually loop until end of file reading
@@ -442,7 +442,7 @@ public class ProcessamentoPPS {
         mLine = reader.readLine();
 
         String sub = "";
-        int numEfemerides = 7; // FIXME FAZER UM WHILE
+        int numEfemerides = 10; // FIXME FAZER UM WHILE
 
         for (int i = 1; i < numEfemerides; i++){
             GNSSNavMsg efemeride = new GNSSNavMsg();
@@ -960,8 +960,6 @@ public class ProcessamentoPPS {
                 listaMedicoes.get(i).setPseudorangeMeters(prMeters);
                 listaMedicoes.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
 
-//                Log.i("gpsWeek","Semana: " + weekNumber.intValue() + " Segundos da semana: " + gpsSecsWek.intValue());
-
                 GpsTime gpt = GpsTime.fromWeekTow(weekNumber.intValue(),gpsSecsWek.intValue());
                 gpt.getUtcDateTime();
 
@@ -981,12 +979,16 @@ public class ProcessamentoPPS {
 //                Log.i("minute_OBS",String.valueOf(minute));
 //                Log.i("seconds_OBS",String.valueOf(seconds));
 
-//                Log.i("hora-minuto", "Svid: " + listaMedicoes.get(i).getSvid() +
-//                        " Hora: " + String.valueOf(hour) + " Minuto: " + String.valueOf(minute));
+//                Log.i("gpsWEEK","Svid: " + listaMedicoes.get(i).getSvid() +
+//                            "Semana: " + weekNumber.intValue() +
+//                        " Segundos da semana: " + gpsSecsWek.intValue());
+                Log.i("gpsUTC", "Svid: " + listaMedicoes.get(i).getSvid() +
+                        " Hora: " + String.valueOf(hour) +
+                        " Minutos: " + String.valueOf(minute) +
+                        " Segundos: " + String.valueOf(seconds));
 
                 GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
                 listaMedicoes.get(i).setData(data);
-
 //                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
 //                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
             }
@@ -1007,23 +1009,50 @@ public class ProcessamentoPPS {
          * DEFINIÇÃO MANUAL DA ÉPOCA PARA ANÁLISE:
          */
         int YEAR = 18;
-        int MONTH = 12;
+        int MONTH = 5;
         int DAY_MONTH = 21;
         int DAY_WEEK = GNSSConstants.DAY_SEG; // FIXME
         int HOUR_DAY = 19; // FIXME
-        int MIN_HOUR = 20;
+        int MIN_HOUR = 15;
         double SEC = 0.0;
+
+        GNSSDate epocaAnalise = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
         // Analisando a última época de observações apenas
         int size = listaMedicoes.size() - 6;
+
+        ArrayList<GNSSMeasurement> listaMedicoes2 = new ArrayList<>();
 
         /**
          * A seleção da época é feita de modo manual:
          * Descarta as observações fora da época
          */
-        for (int i = 0; i < size;i++){
-            listaMedicoes.remove(0);
+        int cont = 0;
+        int kk = 0;
+
+        try{
+            do{
+                if (listaMedicoes.get(kk).getData().compareTo(epocaAnalise) == 0) { // Mesma Época
+//                    if (listaMedicoes.get(kk).getSvid() == 23){
+//                        kk++;
+//                        continue; // FIXME
+//                    }
+                    listaMedicoes2.add(listaMedicoes.get(kk));
+                    cont++;
+                }
+                kk++;
+            } while (cont < 9);
+        }catch (IndexOutOfBoundsException e){
+            Log.e("Index","Erro: " + e.getMessage());
         }
+
+        listaMedicoes = null;
+        listaMedicoes = listaMedicoes2;
+
+
+//        for (int i = 0; i < size;i++){
+//            listaMedicoes.remove(0);
+//        }
 
         /**
          * O ArrayList de Medições contem apenas medições da época em análise.
@@ -1103,10 +1132,10 @@ public class ProcessamentoPPS {
         l = listaEfemerides.size(); // FIXME
 
         /**
-         * PROCESSANDO PARA O UTC 19:20
+         * PROCESSANDO PARA O UTC 19:15:00
          */
 //        GNSSDate epocaAnalise = new GNSSDate(year,month,day,hour,min,sec);
-        GNSSDate epocaAnalise = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
+
         return epocaAnalise;
     }
 
@@ -1115,7 +1144,6 @@ public class ProcessamentoPPS {
      * <p>Calcula o <b>erro do relógio</b> para cada satélite em segundos.
      */
     public static void calcCoordenadas(){
-        //int L = 10;
         double GM = 3.9860044185E14; // 3.986004418E14;
         double We = 7.2921151467E-5; // 7.2921151467E-5;
         double c = 299792458;
@@ -1263,7 +1291,7 @@ public class ProcessamentoPPS {
             listaCoord.add(novaCoord);
         }
 
-//        Log.i("CoordFIM","Fim do cálculo das coordenadas!");
+        Log.i("CoordFIM","Fim do cálculo das coordenadas!");
 
     }
 
@@ -1383,6 +1411,10 @@ public class ProcessamentoPPS {
         double Ye = -4940172.84476568;
         double Ze = -2553313.07836198;
 
+//        // USANDO O VETOR NULO:
+//        double Xe = 0d;
+//        double Ye = 0d;
+//        double Ze = 0d;
 
         double[] X0 = new double[]{Xe, Ye, Ze,0d};
         double[][] N = new double[4][4];
