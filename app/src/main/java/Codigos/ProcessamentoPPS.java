@@ -416,7 +416,6 @@ public class ProcessamentoPPS {
         listaEfemerides = new ArrayList<>();
     }
 
-
     /**
      *
      * @param context A activity em execução atual
@@ -425,7 +424,7 @@ public class ProcessamentoPPS {
      */
     public static String readRINEX_RawAssets(Context context) throws IOException {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1410cortado20todos)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1410cortado18)));
 //        int numEfemerides = contEfemerides(context);
 
         // do reading, usually loop until end of file reading
@@ -813,7 +812,9 @@ public class ProcessamentoPPS {
 
                 if (novaMedicao.getCn0DbHz() <= C_TO_N0_THRESHOLD_DB_HZ ){
 //                    Log.e("Cn0DbHzEr","Valor: " + String.valueOf(novaMedicao.getCn0DbHz()));
-                    qntMedicoesDescartadas++;
+//                    qntMedicoesDescartadas++;
+//                    Log.i("Descarte","Svid: " + novaMedicao.getSvid() +
+//                            " TimeNanos: " + novaMedicao.getTimeNanos());
                     continue;
                 }else{
 //                    Log.i("Cn0DbHzOk","Valor: " + String.valueOf(novaMedicao.getCn0DbHz()));
@@ -1018,6 +1019,8 @@ public class ProcessamentoPPS {
 
         GNSSDate epocaAnalise = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
+
+
         // Analisando a última época de observações apenas
         int size = listaMedicoes.size() - 6;
 
@@ -1038,6 +1041,8 @@ public class ProcessamentoPPS {
 //                        continue; // FIXME
 //                    }
                     listaMedicoes2.add(listaMedicoes.get(kk));
+//                    Log.i("TimeNanosUtilizado: ",
+//                            "TimeNanos" + String.valueOf(listaMedicoes.get(kk).getTimeNanos().toString()));
                     cont++;
                 }
                 kk++;
@@ -1048,7 +1053,6 @@ public class ProcessamentoPPS {
 
         listaMedicoes = null;
         listaMedicoes = listaMedicoes2;
-
 
 //        for (int i = 0; i < size;i++){
 //            listaMedicoes.remove(0);
@@ -1090,6 +1094,7 @@ public class ProcessamentoPPS {
 
         Collections.sort(listaMedicoes);
         Collections.sort(listaEfemerides);
+
 
 //        int tamanho = listaEfemerides.size();
 //        Integer ultimoPRN = listaEfemerides.get(0).getPRN();
@@ -1147,6 +1152,8 @@ public class ProcessamentoPPS {
         double GM = 3.9860044185E14; // 3.986004418E14;
         double We = 7.2921151467E-5; // 7.2921151467E-5;
         double c = 299792458;
+
+//        inserirMedidasManuais();
 
         GNSSDate dataObservacao = ajustarEpocas();
 
@@ -1291,7 +1298,40 @@ public class ProcessamentoPPS {
             listaCoord.add(novaCoord);
         }
 
+//        CoordenadaGPS novaCoord11 = new CoordenadaGPS(11,11976995.597,-13228640.256,19156745.287,
+//                -0.00073578934199949);
+//        listaCoord.add(novaCoord11);
+//
+//        CoordenadaGPS novaCoord26 = new CoordenadaGPS(26,15957489.517,8420202.096,-19546113.765,
+//                -0.00014169401157237);
+//        listaCoord.add(novaCoord26);
+//
+//        Collections.sort(listaCoord); // FIXME
         Log.i("CoordFIM","Fim do cálculo das coordenadas!");
+
+    }
+
+    private static void inserirMedidasManuais(){
+        /**
+         * DEFINIÇÃO MANUAL DA ÉPOCA PARA ANÁLISE:
+         */
+        int YEAR = 18;
+        int MONTH = 5;
+        int DAY_MONTH = 21;
+        int DAY_WEEK = GNSSConstants.DAY_SEG; // FIXME
+        int HOUR_DAY = 19; // FIXME
+        int MIN_HOUR = 15;
+        double SEC = 0.0;
+
+        GNSSDate epocaAnalise = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
+
+        GNSSMeasurement novaMedicao11 = new GNSSMeasurement(11,24856683.359,epocaAnalise);
+        GNSSMeasurement novaMedicao26 = new GNSSMeasurement(26,24842838.117,epocaAnalise);
+
+        listaMedicoes.add(novaMedicao11);
+        listaMedicoes.add(novaMedicao26);
+
+
 
     }
 
@@ -1370,6 +1410,7 @@ public class ProcessamentoPPS {
         double[] L = new double[l]; // DeltaL
         double[][] A = new double[l][4];
 
+        // FIXME COMENTAR AS LINHAS ABAIXO AO ATIVAR setarExemplo!
         Lb = new double[l];
         //Carregando o vetor Lb
         for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)

@@ -1,6 +1,8 @@
 package Codigos;
 
-public class CoordenadaGPS {
+import android.support.annotation.NonNull;
+
+public class CoordenadaGPS implements Comparable<CoordenadaGPS>{
     private int PRN;
     private double X;
     private double Y;
@@ -53,5 +55,10 @@ public class CoordenadaGPS {
 
     public void setDts(double dts) {
         this.dts = dts;
+    }
+
+    @Override
+    public int compareTo(@NonNull CoordenadaGPS another) {
+        return (this.PRN - another.getPRN());
     }
 }
