@@ -53,6 +53,15 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
     }
 
+    /**
+     * Contrói uma medição com o valor direto da pseudodistancia para testes.
+     * @param pseudorange
+     */
+    public GNSSMeasurement(int PRN, Double pseudorange, GNSSDate data){
+        this.Svid = PRN;
+        this.PseudorangeMeters = pseudorange;
+        this.data = data;
+    }
 
     public double getCn0DbHz() {
         return Cn0DbHz;
