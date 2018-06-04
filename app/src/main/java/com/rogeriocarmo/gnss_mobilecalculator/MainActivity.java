@@ -22,13 +22,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        try { // Teste para um único satélite
-            testeCoord_G05(getApplicationContext());
-            calcCoordendasTeste_G05();
-            Log.i("TesteCoord","Fim do teste de coordenada de G05");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try { // Teste para um único satélite
+//            testeCoord_G05(getApplicationContext());
+//            calcCoordendasTeste_G05();
+//            Log.i("TesteCoord","Fim do teste de coordenada de G05");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         try {
             readRINEX_RawAssets(MainActivity.this);
