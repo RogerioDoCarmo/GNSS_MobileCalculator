@@ -31,16 +31,6 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
         try {
-            readRINEX_RawAssets(MainActivity.this);
-        } catch (IOException e) {
-            Log.e("ERR_ef","Erro ao abrir o RINEX");
-            String msg = e.getMessage();
-            Toast.makeText(getApplicationContext(),
-                    "Erro ao abrir o arquivo de efemérides: " + msg,
-                    Toast.LENGTH_LONG).show();
-        }
-
-        try {
             readLogger_RawAssets(MainActivity.this);
         } catch (IOException e) {
             Log.e("ERR_log","Erro ao abrir o arquivo de Log");
@@ -60,15 +50,15 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
 
-//        try{
-//            epocasAntigo();
-//        } catch (Exception e){
-//            Log.e("ERR_ajEpch","Erro ao ajustar a época para processamento");
-//            String msg = e.getMessage();
-//            Toast.makeText(getApplicationContext(),
-//                    "Erro ao ajustar as épocas: " + msg,
-//                    Toast.LENGTH_LONG).show();
-//        }
+        try {
+            readRINEX_RawAssets(MainActivity.this);
+        } catch (IOException e) {
+            Log.e("ERR_ef","Erro ao abrir o RINEX");
+            String msg = e.getMessage();
+            Toast.makeText(getApplicationContext(),
+                    "Erro ao abrir o arquivo de efemérides: " + msg,
+                    Toast.LENGTH_LONG).show();
+        }
 
         try{
             calcCoordenadas();

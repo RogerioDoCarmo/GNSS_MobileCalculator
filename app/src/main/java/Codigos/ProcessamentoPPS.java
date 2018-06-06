@@ -26,7 +26,8 @@ public class ProcessamentoPPS {
     public static ArrayList<GNSSMeasurement> listaMedicoes = new ArrayList<>();
     public static ArrayList<CoordenadaGPS> listaCoord = new ArrayList<>();
     public static ArrayList<Integer> listaPRNs = new ArrayList<>();
-    private static int l;
+    public static ArrayList<EpocaGPS> listaEpocas = new ArrayList<>();
+    private static int qntSatProcessar;
 
 
     public ProcessamentoPPS(){ //TODO Por enquanto pegar da pasta raw assets msm!
@@ -424,7 +425,7 @@ public class ProcessamentoPPS {
      */
     public static String readRINEX_RawAssets(Context context) throws IOException {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1410cortado18)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1550original)));
 //        int numEfemerides = contEfemerides(context);
 
         // do reading, usually loop until end of file reading
@@ -441,9 +442,9 @@ public class ProcessamentoPPS {
         mLine = reader.readLine();
 
         String sub = "";
-        int numEfemerides = 10; // FIXME FAZER UM WHILE
+        int numEfemerides = contEfemerides(context) - 2; // FIXME FAZER UM WHILE
 
-        for (int i = 1; i < numEfemerides; i++){
+        for (int i = 0; i < numEfemerides; i++){
             GNSSNavMsg efemeride = new GNSSNavMsg();
             mLine = reader.readLine();
 
@@ -671,7 +672,7 @@ public class ProcessamentoPPS {
      * @return Segundos da semana GPS correspondente
      * @see GNSSDate
      */
-    public static double calc_Tr(GNSSDate dataGNSS) {
+    public static double calc_Tr(GNSSDate dataGNSS) { // FIXME DIA DA SEMANA
         return (  (GNSSConstants.DAY_SEG * 24 + dataGNSS.getHour()) * 3600 + dataGNSS.getMin() * 60 + dataGNSS.getSec() );
     }
 
@@ -713,7 +714,7 @@ public class ProcessamentoPPS {
      */
     public static String readLogger_RawAssets(Context context) throws  IOException{
         int qntMedicoesDescartadas = 0;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.logtainanep1))); // FIXME DEIXAR DINAMICO
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.logdia05hora15))); // FIXME DEIXAR DINAMICO
 
         // do reading, usually loop until end of file reading
         StringBuilder sb = new StringBuilder();
@@ -867,7 +868,10 @@ public class ProcessamentoPPS {
 
         int FLAG_OPCAO = 2;
 
-        for (int i = 0; i < listaMedicoes.size(); i++){
+        GNSSDate dataAnterior;
+        EpocaGPS epocaanterior = null;
+
+        for (int i = 0; i < listaMedicoes.size(); i++){ // FIXME
 
             if (FLAG_OPCAO == 1) { // IMPLEMENTAÇÃO SEGUNDO A GSA
                 double pseudorangeMeters = 0d;
@@ -925,12 +929,12 @@ public class ProcessamentoPPS {
                 int minute = gpt.getUtcDateTime().getMinuteOfHour();
                 double seconds = gpt.getUtcDateTime().getSecondOfMinute();
 
-                Log.i("year_OBS",String.valueOf(year));
-                Log.i("month_OBS",String.valueOf(month));
-                Log.i("day_OBS",String.valueOf(day));
-                Log.i("hour_OBS",String.valueOf(hour));
-                Log.i("minute_OBS",String.valueOf(minute));
-                Log.i("seconds_OBS",String.valueOf(seconds));
+//                Log.i("year_OBS",String.valueOf(year));
+//                Log.i("month_OBS",String.valueOf(month));
+//                Log.i("day_OBS",String.valueOf(day));
+//                Log.i("hour_OBS",String.valueOf(hour));
+//                Log.i("minute_OBS",String.valueOf(minute));
+//                Log.i("seconds_OBS",String.valueOf(seconds));
 
                 Log.i("hora-minuto", "Svid: " + listaMedicoes.get(i).getSvid() +
                         " Hora: " + String.valueOf(hour) + " Minuto: " + String.valueOf(minute));
@@ -938,10 +942,35 @@ public class ProcessamentoPPS {
                 GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
                 listaMedicoes.get(i).setData(data);
 
-                Log.i("tTx/tRx","Svid: " +  listaMedicoes.get(i).getSvid() + " tTx: " + tTx + " tRx: " + tRx + " Intervalo: " + prMilliSeconds);
+//                Log.i("tTx/tRx","Svid: " +  listaMedicoes.get(i).getSvid() + " tTx: " + tTx + " tRx: " + tRx + " Intervalo: " + prMilliSeconds);
+//                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
+//                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
 
-                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
-                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
+                GNSSDate dataAtual = new GNSSDate(year, month, day, hour, minute, seconds);
+                listaMedicoes.get(i).setData(dataAtual);
+//                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
+//                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
+                //FIXME !!!!!!!!!!
+                if (i == 0){
+                    dataAnterior = listaMedicoes.get(0).getData();
+                    epocaanterior = new EpocaGPS(dataAtual);
+                }else{
+                    dataAnterior = listaMedicoes.get(i-1).getData();
+                }
+
+//                if (i == 20){
+//                    Log.i("Teste","Teste");
+//                }
+
+                if (dataAtual.compareTo(dataAnterior) != 0){ // Início de uma nova época
+                    listaEpocas.add(epocaanterior); // Guarda a época anterior que já acabou e cria uma nova
+                    epocaanterior = new EpocaGPS(dataAtual);
+                    epocaanterior.setId(i + 1);
+                    epocaanterior.addSatelite(listaMedicoes.get(i).getSvid());
+                }else{ // Continua na mesma época
+                    epocaanterior.addSatelite(listaMedicoes.get(i).getSvid());
+                }
+
             }else{ // IMPLEMENTAÇÃO SEGUNDO A PLANILHA
                 /**
                  * GPS Week Number within this week
@@ -983,18 +1012,46 @@ public class ProcessamentoPPS {
 //                Log.i("gpsWEEK","Svid: " + listaMedicoes.get(i).getSvid() +
 //                            "Semana: " + weekNumber.intValue() +
 //                        " Segundos da semana: " + gpsSecsWek.intValue());
-                Log.i("gpsUTC", "Svid: " + listaMedicoes.get(i).getSvid() +
-                        " Hora: " + String.valueOf(hour) +
-                        " Minutos: " + String.valueOf(minute) +
-                        " Segundos: " + String.valueOf(seconds));
+//                Log.i("gpsUTC", "Svid: " + listaMedicoes.get(i).getSvid() +
+//                        " Hora: " + String.valueOf(hour) +
+//                        " Minutos: " + String.valueOf(minute) +
+//                        " Segundos: " + String.valueOf(seconds));
 
-                GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
-                listaMedicoes.get(i).setData(data);
+                GNSSDate dataAtual = new GNSSDate(year, month, day, hour, minute, seconds);
+                listaMedicoes.get(i).setData(dataAtual);
 //                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
 //                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
-            }
+                //FIXME !!!!!!!!!!
+                if (i == 0){
+                    dataAnterior = listaMedicoes.get(0).getData();
+                    epocaanterior = new EpocaGPS(dataAtual);
+                }else{
+                    dataAnterior = listaMedicoes.get(i-1).getData();
+                }
 
+//                if (i == 20){
+//                    Log.i("Teste","Teste");
+//                }
+
+                if (dataAtual.compareTo(dataAnterior) != 0){ // Início de uma nova época
+                    listaEpocas.add(epocaanterior); // Guarda a época anterior que já acabou e cria uma nova
+                    epocaanterior = new EpocaGPS(dataAtual);
+                    epocaanterior.setId(listaEpocas.size() - 1);
+                    epocaanterior.addSatelite(listaMedicoes.get(i).getSvid());
+                }else{ // Continua na mesma época
+                    epocaanterior.addSatelite(listaMedicoes.get(i).getSvid());
+                }
+            }
         }
+        int qntEpocas = listaEpocas.size();
+
+        for (int i = 0; i < listaEpocas.size(); i++){
+            if (listaEpocas.get(i).getNumSatelites() >= 5 )
+                Log.i("EpocaS",listaEpocas.get(i).toString() + "\n--------------------------------");
+        }
+
+        Log.i("FimPr","Fim do cálculo das pseudodistâncias");
+        Log.i("FimPr","Foram encontradas " + qntEpocas + " épocas!");
     }
 
     /**
@@ -1005,92 +1062,108 @@ public class ProcessamentoPPS {
      * </p>
      *@return A data para a época considerada no ajustamento.
      */
-    public static GNSSDate ajustarEpocas(){
+    public static EpocaGPS ajustarEpocas(){
         /**
          * DEFINIÇÃO MANUAL DA ÉPOCA PARA ANÁLISE:
          */
         int YEAR = 18;
-        int MONTH = 5;
-        int DAY_MONTH = 21;
+        int MONTH = 6;
+        int DAY_MONTH = 4;
         int DAY_WEEK = GNSSConstants.DAY_SEG; // FIXME
-        int HOUR_DAY = 19; // FIXME
-        int MIN_HOUR = 15;
+        int HOUR_DAY = 20; // FIXME
+        int MIN_HOUR = 0;
         double SEC = 0.0;
 
-        GNSSDate epocaAnalise = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
+        GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
+        int INDEX_ANALISE = 2559; //TODO
 
+        EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
+        qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
 
-        // Analisando a última época de observações apenas
-        int size = listaMedicoes.size() - 6;
 
         ArrayList<GNSSMeasurement> listaMedicoes2 = new ArrayList<>();
+        ArrayList<GNSSNavMsg> listaEfemerides2 = new ArrayList<>();
 
         /**
          * A seleção da época é feita de modo manual:
          * Descarta as observações fora da época
          */
         int cont = 0;
-        int kk = 0;
+        int j = 0;
 
         try{
             do{
-                if (listaMedicoes.get(kk).getData().compareTo(epocaAnalise) == 0) { // Mesma Época
-//                    if (listaMedicoes.get(kk).getSvid() == 23){
-//                        kk++;
-//                        continue; // FIXME
-//                    }
-                    listaMedicoes2.add(listaMedicoes.get(kk));
-//                    Log.i("TimeNanosUtilizado: ",
-//                            "TimeNanos" + String.valueOf(listaMedicoes.get(kk).getTimeNanos().toString()));
+                if ( (listaMedicoes.get(j).getData().compareTo(epocaEmAnalise.getDateUTC()) == 0) && // Mesma época
+                        epocaEmAnalise.containsSatellite(listaMedicoes.get(j).getSvid()) )
+                { // Satélite da Mesma Época
+//                    Log.i("TimeNanosUtilizado: ","TimeNanos" + String.valueOf(listaMedicoes.get(j).getTimeNanos().toString()));
+                    listaMedicoes2.add(listaMedicoes.get(j));
                     cont++;
                 }
-                kk++;
-            } while (cont < 9);
+                j++;
+            } while (cont < qntSatProcessar);
         }catch (IndexOutOfBoundsException e){
-            Log.e("Index","Erro: " + e.getMessage());
+            Log.e("Index","Erro nas medições: " + e.getMessage());
         }
 
         listaMedicoes = null;
-        listaMedicoes = listaMedicoes2;
+        listaMedicoes = listaMedicoes2; // FIXME VAI PERDER AS ORIGINAIS
 
-//        for (int i = 0; i < size;i++){
-//            listaMedicoes.remove(0);
-//        }
+        cont = 0;
+        j = 0;
+
+        try{
+            do{
+                if ( (listaEfemerides.get(j).getData().compareTo(dataRINEX) == 0) && // Mesma época
+                        epocaEmAnalise.containsSatellite(listaEfemerides.get(j).getPRN()) )
+                { // Satélite da Mesma Época
+//                    Log.i("TimeNanosUtilizado: ","TimeNanos" + String.valueOf(listaMedicoes.get(j).getTimeNanos().toString()));
+                    listaEfemerides2.add(listaEfemerides.get(j));
+                    cont++;
+                }
+                j++;
+            } while (cont < qntSatProcessar);
+        }catch (IndexOutOfBoundsException e){
+            Log.e("Index","Erro nas efemérides: " + e.getMessage());
+        }
+
+        listaEfemerides = null;
+        listaEfemerides = listaEfemerides2; // FIXME VAI PERDER AS ORIGINAIS
 
         /**
          * O ArrayList de Medições contem apenas medições da época em análise.
          * Preenche uma Lista com os PRNs dos satélites presentes nas medições que serão utilizadas
          */
-        for (int i = 0; i < listaMedicoes.size(); i++){
-            listaPRNs.add(listaMedicoes.get(i).getSvid());
-        }
-
-        Collections.sort(listaPRNs);
-
-        /**
-         * Remove do ArrayList de Efemérides aqueles que não estão na epoca
-         * E cujo PRN não está no ArrayList de Observações
-         *  Obtem uma lista com os PRNs das observações para a época selecionada
-         */
-       // FIXME
-//        for (int i = 0; i < listaEfemerides.size(); i++){
-//            GNSSNavMsg efemerideAtual = listaEfemerides.get(i);
-//            Integer PRNatual = Integer.valueOf(efemerideAtual.getPRN().trim());
-//
-//            if ( (efemerideAtual.getData().getHour() != HOUR_DAY ||
-//                    efemerideAtual.getData().getMin()  != MIN_HOUR) )
-//            {
-//                listaEfemerides.remove(i);
-////                continue;
-//            }else{
-//                Log.i("Efe","PRN: "+ efemerideAtual.getPRN() + " Efemeride mantida - Hora:" + efemerideAtual.getData().getHour() + " Minutos: " +efemerideAtual.getData().getMin() );
-//            }
-//
-////            if (!listaPRNs.contains(PRNatual)){
-////                listaEfemerides.remove(i);
-////            }
+//        for (int i = 0; i < listaMedicoes.size(); i++){
+//            listaPRNs.add(listaMedicoes.get(i).getSvid());
 //        }
+//
+//        Collections.sort(listaPRNs);
+//
+//        /**
+//         * Remove do ArrayList de Efemérides aqueles que não estão na epoca
+//         * E cujo PRN não está no ArrayList de Observações
+//         *  Obtem uma lista com os PRNs das observações para a época selecionada
+//         */
+//       // FIXME
+////        for (int i = 0; i < listaEfemerides.size(); i++){
+////            GNSSNavMsg efemerideAtual = listaEfemerides.get(i);
+////            Integer PRNatual = Integer.valueOf(efemerideAtual.getPRN().trim());
+////
+////            if ( (efemerideAtual.getData().getHour() != HOUR_DAY ||
+////                    efemerideAtual.getData().getMin()  != MIN_HOUR) )
+////            {
+////                listaEfemerides.remove(i);
+//////                continue;
+////            }else{
+////                Log.i("Efe","PRN: "+ efemerideAtual.getPRN() + " Efemeride mantida - Hora:" + efemerideAtual.getData().getHour() + " Minutos: " +efemerideAtual.getData().getMin() );
+////            }
+////
+//////            if (!listaPRNs.contains(PRNatual)){
+//////                listaEfemerides.remove(i);
+//////            }
+////        }
 
         Collections.sort(listaMedicoes);
         Collections.sort(listaEfemerides);
@@ -1134,14 +1207,14 @@ public class ProcessamentoPPS {
 //            Log.e("Erro_Index","Erro listaEfemerides");
 //        }
 
-        l = listaEfemerides.size(); // FIXME
+//        qntSatProcessar = listaEfemerides.size(); // FIXME
 
         /**
          * PROCESSANDO PARA O UTC 19:15:00
          */
-//        GNSSDate epocaAnalise = new GNSSDate(year,month,day,hour,min,sec);
+//        GNSSDate dataRINEX = new GNSSDate(year,month,day,hour,min,sec);
 
-        return epocaAnalise;
+        return epocaEmAnalise;
     }
 
     /**
@@ -1155,11 +1228,12 @@ public class ProcessamentoPPS {
 
 //        inserirMedidasManuais();
 
-        GNSSDate dataObservacao = ajustarEpocas();
+        EpocaGPS epocaEmAnalise = ajustarEpocas();
+        GNSSDate dataObservacao = epocaEmAnalise.getDateUTC();
 
 //        Log.i("Coord","Inicio do calculo das coordenadas dos satélites.");
 
-        for (int i = 0; i < l; i++ ){// FIXME
+        for (int i = 0; i < qntSatProcessar; i++ ){// FIXME
             //------------------------------------------
             //Dados de entrada
             //------------------------------------------
@@ -1345,10 +1419,10 @@ public class ProcessamentoPPS {
      * Exemplo do livro
      */
     private static void setarExemplo(){
-        l = 7;
+        qntSatProcessar = 7;
         listaCoord = null;
         listaCoord = new ArrayList<>();
-        Lb = new double[l];
+        Lb = new double[qntSatProcessar];
 
         /*Exemplo do livro do Galera pg 292-299*/
         Xe = 3687627.3634;
@@ -1406,14 +1480,14 @@ public class ProcessamentoPPS {
 
         int contIteracoes = 0;
         double c = 2.99792458e8;
-        double[] L0 = new double[l];
-        double[] L = new double[l]; // DeltaL
-        double[][] A = new double[l][4];
+        double[] L0 = new double[qntSatProcessar];
+        double[] L = new double[qntSatProcessar]; // DeltaL
+        double[][] A = new double[qntSatProcessar][4];
 
         // FIXME COMENTAR AS LINHAS ABAIXO AO ATIVAR setarExemplo!
-        Lb = new double[l];
+        Lb = new double[qntSatProcessar];
         //Carregando o vetor Lb
-        for (int i = 0; i < l; i++) { //listaMedicoes.size(); i++)
+        for (int i = 0; i < qntSatProcessar; i++) { //listaMedicoes.size(); i++)
             Lb[i] = listaMedicoes.get(i).getPseudorangeMeters();// * 1e-1 ;
         }
 
@@ -1469,7 +1543,7 @@ public class ProcessamentoPPS {
         // Solucao iterativa pelo metodo parametrico
         for (int k = 0; k < MAX_ITERACOES; k++){
             // Vetor L0
-            for (int i = 0; i < l; i++){ // PARA CADA SATÉLITE
+            for (int i = 0; i < qntSatProcessar; i++){ // PARA CADA SATÉLITE
                 // dx = coord(i,2)-X0(1);
                 double dx = listaCoord.get(i).getX() - X0[0];
                 double dy = listaCoord.get(i).getY() - X0[1];
@@ -1489,7 +1563,7 @@ public class ProcessamentoPPS {
             }
 
             //MATRIZ A
-            for (int i = 0; i < l; i++){
+            for (int i = 0; i < qntSatProcessar; i++){
                 double dx = listaCoord.get(i).getX() - X0[0];
                 double dy = listaCoord.get(i).getY() - X0[1];
                 double dz = listaCoord.get(i).getZ() - X0[2];
@@ -1507,7 +1581,7 @@ public class ProcessamentoPPS {
             RealMatrix rA =  MatrixUtils.createRealMatrix(A);
 //             RealMatrix rA = new Array2DRowRealMatrix(A, false);
 
-            RealMatrix rP = MatrixUtils.createRealIdentityMatrix(l);
+            RealMatrix rP = MatrixUtils.createRealIdentityMatrix(qntSatProcessar);
 
             RealVector rL  =  MatrixUtils.createRealVector(L);
             //  N = A'PA;
