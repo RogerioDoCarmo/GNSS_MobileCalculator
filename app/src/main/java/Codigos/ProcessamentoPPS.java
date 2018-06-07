@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -1126,7 +1127,7 @@ public class ProcessamentoPPS {
         GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
         //2700, 2594 foi a melhor
-        int INDEX_ANALISE = 2715; //TODO
+        int INDEX_ANALISE = 2715; //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
         qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
@@ -1649,6 +1650,7 @@ public class ProcessamentoPPS {
 //            RealVector rX = rInvN.operate(rU).mapMultiply(-1.0d);
 
             X = rX.toArray();
+            double[] X2 = X;
             X[3] = X[3] / c;
 
             //Xa = X0+X; // FIXME FAZER UMA FUNÇÃO PARA ISSO
@@ -1657,13 +1659,39 @@ public class ProcessamentoPPS {
             }
 
             //TODO VERIFICAR O LUGAR
-            // TODO Verificação dos operadores de precisão:
             // Vetor dos resíduos V = AX+L
-//            RealMatrix rV = rA.operate(rX).add(rL);
+            RealVector rV = rA.operate(rX).add(rL);
             // Setup VtPV
-//            RealVector VtPV = rv.tr
-            // Fator de variância a posteriori
-            //        // MVC das coordenadas ajustadas
+            RealMatrix rVt = MatrixUtils.createRowRealMatrix(rV.toArray());
+            RealVector VtPV = rVt.operate(rP.operate(rV));
+            // Fator de variância a posteriori:
+            double S0post = VtPV.getEntry(0) / (qntSatProcessar - 4);
+
+            Log.i("VtPV","VtPV: " + VtPV.getEntry(0));
+            Log.i("Posteriori","SigmaP: " + S0post);
+
+            // MVC das coordenadas ajustadas
+            RealMatrix MVCXa = rInvN.scalarMultiply(S0post); // TODO TESTAR NO OCTAVE
+
+            if (!MatrixUtils.isSymmetric(MVCXa,0)){
+                Log.e("MVCXa","Should be symmetric!");
+            }
+
+            Double[] precision = new Double[4];
+
+            // Desvio padrão das coordenadas:
+            precision[0] = Math.sqrt(MVCXa.getEntry(0,0)); // Coordenada Xa
+            precision[1] = Math.sqrt(MVCXa.getEntry(1,1)); // Coordenada Ya
+            precision[2] = Math.sqrt(MVCXa.getEntry(2,2)); // Coordenada Za
+            precision[3] = Math.sqrt(MVCXa.getEntry(3,3)); // Coordenada dtr
+            Log.i("Precisao", Arrays.deepToString(precision));
+
+            // Discrepâncias em relação as coordenadas originais
+            Double[] discrepanciesXYZ = new Double[3];
+            discrepanciesXYZ[0] = Xe - Xa[0];
+            discrepanciesXYZ[1] = Ye - Xa[1];
+            discrepanciesXYZ[2] = Ze - Xa[2];
+            Log.i("Discrepancias", Arrays.deepToString(discrepanciesXYZ));
 
             //Verificação da Tolerancia
             erro = Math.abs(maxValue(X));
