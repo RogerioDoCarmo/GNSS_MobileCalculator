@@ -8,6 +8,7 @@ import com.rogeriocarmo.gnss_mobilecalculator.R;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.stat.descriptive.moment.Variance;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -1655,6 +1656,15 @@ public class ProcessamentoPPS {
                 Xa[j] = X0[j] + X[j];
             }
 
+            //TODO VERIFICAR O LUGAR
+            // TODO Verificação dos operadores de precisão:
+            // Vetor dos resíduos V = AX+L
+//            RealMatrix rV = rA.operate(rX).add(rL);
+            // Setup VtPV
+//            RealVector VtPV = rv.tr
+            // Fator de variância a posteriori
+            //        // MVC das coordenadas ajustadas
+
             //Verificação da Tolerancia
             erro = Math.abs(maxValue(X));
             int numIteracao = contIteracoes + 1;
@@ -1689,11 +1699,6 @@ public class ProcessamentoPPS {
             Log.i("FimFOOR","Erro das coordenadas: " + erro);
             Log.i("FimFOOR","============================================");
         }
-
-        //TODO Verificação dos operadores de precisão:
-        // Vetor dos resíduos
-        // Fator de variância a posteriori
-        // MVC das coordenadas ajustadas
     }
 
     /**
@@ -1711,4 +1716,11 @@ public class ProcessamentoPPS {
         return Collections.max(list);
     }
 
+    private static double getDesvioPadrao(double [] valores){
+        return Math.sqrt(new Variance().evaluate(valores));
+    }
+
+    private static double getVariancia(double [] valores){
+        return (new Variance().evaluate(valores));
+    }
 }
