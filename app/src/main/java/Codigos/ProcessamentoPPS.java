@@ -35,7 +35,6 @@ public class ProcessamentoPPS {
 
     private static int qntSatProcessar;
 
-
     public ProcessamentoPPS(){ //TODO Por enquanto pegar da pasta raw assets msm!
         this.listaEfemeridesOriginal = new ArrayList<>();
         this.listaMedicoesOriginal = new ArrayList<>();
@@ -436,7 +435,7 @@ public class ProcessamentoPPS {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
 
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1550original)));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc1070)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1550)));
 
 //        int numEfemerides = contEfemerides(context);
 
@@ -685,7 +684,7 @@ public class ProcessamentoPPS {
      * @see GNSSDate
      */
     public static double calc_Tr(GNSSDate dataGNSS) { // FIXME DIA DA SEMANA
-        return (  (GNSSConstants.DAY_TER * 24 + dataGNSS.getHour()) * 3600 + dataGNSS.getMin() * 60 + dataGNSS.getSec() );
+        return (  (GNSSConstants.DAY_SEG * 24 + dataGNSS.getHour()) * 3600 + dataGNSS.getMin() * 60 + dataGNSS.getSec() );
     }
 
     /**
@@ -696,7 +695,7 @@ public class ProcessamentoPPS {
      */
     public static int contEfemerides(Context context) throws IOException{
         int numLines = 0;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc1070)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1550)));
 
         StringBuilder sb = new StringBuilder();
         /*PULANDO O CABEÇALHO DE 8 LINHAS*/
@@ -709,7 +708,7 @@ public class ProcessamentoPPS {
                mLine = reader.readLine();
                mLine = reader.readLine();
 
-        while (mLine != null) {
+        while (mLine != null && !mLine.equals("")) {
             numLines++;
             mLine = reader.readLine();
         }
@@ -729,7 +728,7 @@ public class ProcessamentoPPS {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.logdia05hora15))); // FIXME DEIXAR DINAMICO
 
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.italo))); // FIXME DEIXAR DINAMICO
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log1550))); // FIXME DEIXAR DINAMICO
 
 
         // do reading, usually loop until end of file reading
@@ -780,6 +779,11 @@ public class ProcessamentoPPS {
                 }
 
                 novaMedicao.setFullBiasNanos(Long.parseLong(linhaRaw[5]));
+
+                if (novaMedicao.getFullBiasNanos() > 0){
+                    Log.e("Raw","FullBiasNanos: Should de negative");
+                    novaMedicao.setFullBiasNanos(novaMedicao.getFullBiasNanos() * -1);
+                }
 
                 try{
                     novaMedicao.setBiasNanos(Double.parseDouble(linhaRaw[6]));
@@ -836,28 +840,30 @@ public class ProcessamentoPPS {
                 novaMedicao.setReceivedSvTimeUncertaintyNanos(Double.parseDouble(linhaRaw[15]));
 
                 if (novaMedicao.getReceivedSvTimeUncertaintyNanos() > 500){
+                    qntMedicoesDescartadas++;
+                    Log.e("Raw","TimeUncertainty");
                     continue;
                 }
 
                 novaMedicao.setCn0DbHz(Double.parseDouble(linhaRaw[16]));
 
                 if (novaMedicao.getCn0DbHz() <= C_TO_N0_THRESHOLD_DB_HZ ){
-//                    Log.e("Cn0DbHzEr","Valor: " + String.valueOf(novaMedicao.getCn0DbHz()));
-//                    qntMedicoesDescartadas++;
-//                    Log.i("Descarte","Svid: " + novaMedicao.getSvid() +
-//                            " TimeNanos: " + novaMedicao.getTimeNanos());
+                    qntMedicoesDescartadas++;
+                    Log.e("Raw","Cn0DbHz");
                     continue;
                 }else{
 //                    Log.i("Cn0DbHzOk","Valor: " + String.valueOf(novaMedicao.getCn0DbHz()));
                 }
 
                 novaMedicao.setPseudorangeRateMetersPerSecond(Double.parseDouble(linhaRaw[17]));
+                novaMedicao.setPseudorangeRateUncertaintyMetersPerSecond(Double.parseDouble(linhaRaw[18]));
 
                 if (novaMedicao.getPseudoRangeUncertaintyMeters() > 10){ // FIXME
+                    qntMedicoesDescartadas++;
+                    Log.e("Raw","PseudoRangeUncertainty");
                     continue;
                 }
 
-                novaMedicao.setPseudorangeRateUncertaintyMetersPerSecond(Double.parseDouble(linhaRaw[18]));
                 novaMedicao.setAccumulatedDeltaRangeState(Integer.parseInt(linhaRaw[19]));
                 novaMedicao.setAccumulatedDeltaRangeMeters(Double.parseDouble(linhaRaw[20]));
                 novaMedicao.setAccumulatedDeltaRangeUncertaintyMeters(Double.parseDouble(linhaRaw[21]));
@@ -872,6 +878,12 @@ public class ProcessamentoPPS {
                 }
 
                 novaMedicao.setMultipathIndicator(Integer.parseInt(linhaRaw[26]));
+
+                if (novaMedicao.getMultipathIndicator() == 1){
+                    qntMedicoesDescartadas++;
+                    Log.e("Raw","MultipathIndicator");
+                    continue;
+                }
 
                 try{
                     novaMedicao.setSnrInDb(Double.parseDouble(linhaRaw[27]));
@@ -901,14 +913,14 @@ public class ProcessamentoPPS {
      */
     public static void calcPseudoranges(){
 
-        int FLAG_OPCAO = 1;
+        int FLAG_OPCAO = 2;
 
         GNSSDate dataAnterior;
         EpocaGPS epocaanterior = null;
 
         for (int i = 0; i < listaMedicoesOriginal.size(); i++){ // FIXME
 
-            if (FLAG_OPCAO == 1) { // IMPLEMENTAÇÃO SEGUNDO A GSA
+            if (FLAG_OPCAO == 1) {  // IMPLEMENTAÇÃO SEGUNDO A GSA
                 double pseudorangeMeters = 0d;
                 double pseudorangeUncertaintyMeters = 0d;
 
@@ -939,14 +951,14 @@ public class ProcessamentoPPS {
 
 
                 //GPS Week number and Seconds within the week:
-                int weekNumberr =  (int)Math.floor((double)Math.abs(listaMedicoesOriginal.get(i).getFullBiasNanos())*1e-9/GNSSConstants.WEEKSEC);
+                int weekNumberr =  (int)Math.floor(-(double)(listaMedicoesOriginal.get(i).getFullBiasNanos()*1e-9/GNSSConstants.WEEKSEC));
                 /**
                  * Aply gpsWeek % 1024 to get the week number in [0,1024]
                  */
                 int gpsWeek = weekNumberr;// % 1024;
                 Long gpsSecsWek = Math.round(tRx * 1e-9); // FIXME REVER
                 //TESTE FIXME
-//            gpsSecsWek = Math.round((listaMedicoesOriginal.get(i).getReceivedSvTimeNanos() + prMilliSeconds) * 1e-9);
+//            gpsSecsWek = Math.round((listaMedicoes.get(i).getReceivedSvTimeNanos() + prMilliSeconds) * 1e-9);
                 gpsSecsWek = Math.round((listaMedicoesOriginal.get(i).getReceivedSvTimeNanos()) * 1e-9);
                 Log.i("gpsWeek","Semana: " + gpsWeek + " Segundos da semana: " + gpsSecsWek.intValue());
 
@@ -977,14 +989,14 @@ public class ProcessamentoPPS {
                 GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
                 listaMedicoesOriginal.get(i).setData(data);
 
-//                Log.i("tTx/tRx","Svid: " +  listaMedicoesOriginal.get(i).getSvid() + " tTx: " + tTx + " tRx: " + tRx + " Intervalo: " + prMilliSeconds);
-//                Log.i("prr", "Svid: " +  listaMedicoesOriginal.get(i).getSvid() + " Pseudorange: " + listaMedicoesOriginal.get(i).getPseudorangeMeters() + " m");
-//                Log.i("Uncertainty", "Svid: " +  listaMedicoesOriginal.get(i).getSvid() + " Uncertainty: " + listaMedicoesOriginal.get(i).getPseudoRangeUncertaintyMeters() + " m");
+//                Log.i("tTx/tRx","Svid: " +  listaMedicoes.get(i).getSvid() + " tTx: " + tTx + " tRx: " + tRx + " Intervalo: " + prMilliSeconds);
+//                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
+//                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
 
                 GNSSDate dataAtual = new GNSSDate(year, month, day, hour, minute, seconds);
                 listaMedicoesOriginal.get(i).setData(dataAtual);
-//                Log.i("prr", "Svid: " +  listaMedicoesOriginal.get(i).getSvid() + " Pseudorange: " + listaMedicoesOriginal.get(i).getPseudorangeMeters() + " m");
-//                Log.i("Uncertainty", "Svid: " +  listaMedicoesOriginal.get(i).getSvid() + " Uncertainty: " + listaMedicoesOriginal.get(i).getPseudoRangeUncertaintyMeters() + " m");
+//                Log.i("prr", "Svid: " +  listaMedicoes.get(i).getSvid() + " Pseudorange: " + listaMedicoes.get(i).getPseudorangeMeters() + " m");
+//                Log.i("Uncertainty", "Svid: " +  listaMedicoes.get(i).getSvid() + " Uncertainty: " + listaMedicoes.get(i).getPseudoRangeUncertaintyMeters() + " m");
                 //FIXME !!!!!!!!!!
                 if (i == 0){
                     dataAnterior = listaMedicoesOriginal.get(0).getData();
@@ -1000,7 +1012,7 @@ public class ProcessamentoPPS {
                 if (dataAtual.compareTo(dataAnterior) != 0){ // Início de uma nova época
                     listaEpocas.add(epocaanterior); // Guarda a época anterior que já acabou e cria uma nova
                     epocaanterior = new EpocaGPS(dataAtual);
-                    epocaanterior.setId(listaEpocas.size());
+                    epocaanterior.setId(i + 1);
                     epocaanterior.addSatelite(listaMedicoesOriginal.get(i).getSvid());
                 }else{ // Continua na mesma época
                     epocaanterior.addSatelite(listaMedicoesOriginal.get(i).getSvid());
@@ -1102,17 +1114,18 @@ public class ProcessamentoPPS {
         /**
          * DEFINIÇÃO MANUAL DA DATA DO RINEX:
          */
-        int YEAR = 18;
-        int MONTH = 4;
-        int DAY_MONTH = 17;
-        int DAY_WEEK = GNSSConstants.DAY_TER; // FIXME
-        int HOUR_DAY = 18; // FIXME
-        int MIN_HOUR = 0;
-        double SEC = 0.0;
+        int YEAR = 18; // FIXME RINEX
+        int MONTH = 6; // FIXME RINEX
+        int DAY_MONTH = 04; // FIXME RINEX
+        int DAY_WEEK = GNSSConstants.DAY_SEG; // FIXME RINEX
+        int HOUR_DAY = 20; // FIXME RINEX
+        int MIN_HOUR = 0; // FIXME RINEX
+        double SEC = 0.0; // FIXME RINEX
 
         GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
-        int INDEX_ANALISE = 250; //TODO
+        //2700, 2594 foi a melhor
+        int INDEX_ANALISE = 2715; //TODO
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
         qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
@@ -1140,6 +1153,7 @@ public class ProcessamentoPPS {
                 j++;
             } while (cont < qntSatProcessar);
         }catch (IndexOutOfBoundsException e){
+            e.printStackTrace();
             Log.e("Index","Erro nas medições: " + e.getMessage());
         }
 
@@ -1162,6 +1176,7 @@ public class ProcessamentoPPS {
             } while (cont < qntSatProcessar);
         }catch (IndexOutOfBoundsException e){
             Log.e("Index","Erro nas efemérides: " + e.getMessage());
+            e.printStackTrace();
         }
 
 //        listaEfemeridesOriginal = null;
