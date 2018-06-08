@@ -1127,7 +1127,7 @@ public class ProcessamentoPPS {
         GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
         //2700, 2594 foi a melhor
-        int INDEX_ANALISE = 2715; //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        int INDEX_ANALISE = 2594; //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
         qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
@@ -1462,9 +1462,13 @@ public class ProcessamentoPPS {
 
     }
 
-    static double Xe = 3942590.30657541;
-    static double Ye = -4940172.84476568;
-    static double Ze = -2553313.07836198;
+//    static double Xe = 3942590.30657541;
+//    static double Ye = -4940172.84476568;
+//    static double Ze = -2553313.07836198;
+
+    static double Xe = 0;
+    static double Ye = 0;
+    static double Ze = 0;
 
     static double[] Lb;
 
@@ -1544,13 +1548,12 @@ public class ProcessamentoPPS {
             Lb[i] = listaMedicoesAtual.get(i).getPseudorangeMeters();// * 1e-1 ;
         }
 
-        // Pseudoranges do arquivo .derived:
-//        Lb[0] = 190839015.701;
-//        Lb[1] = 187836742.332;
-//        Lb[2] = 188113982.596;
-//        Lb[3] = 190473995.597;
-//        Lb[4] = 188623153.103;
-//        Lb[5] = 190412833.439;
+        // FIXME COMENTAR AS LINHAS ABAIXO AO ATIVAR setarExemplo!
+        // USANDO O EP2:
+        double Xe = 3942590.30657541;
+        double Ye = -4940172.84476568;
+        double Ze = -2553313.07836198;
+
 
         Log.i("Lb","Vetor Lb criado");
 
@@ -1574,10 +1577,7 @@ public class ProcessamentoPPS {
 //        double Ye = -4620683.42055526;
 //        double Ze = -2387155.01580668;
 
-        // USANDO O EP2:
-        double Xe = 3942590.30657541;
-        double Ye = -4940172.84476568;
-        double Ze = -2553313.07836198;
+
 
 //        // USANDO O VETOR NULO:
 //        double Xe = 0d;
@@ -1612,7 +1612,9 @@ public class ProcessamentoPPS {
             //L = Lb-L0;
             for (int i = 0; i < Lb.length; i++){
 //                L[i] = Lb[i] - L0[i];
-                L[i] = Lb[i] - (L0[i] + c * (0 - listaCoordAtual.get(i).getDts()));
+//                L[i] = Lb[i] - (L0[i] + c * (0 - listaCoordAtual.get(i).getDts())); //FIXME IGUAL O DO VANI
+                L[i] = Lb[i] - ( L0[i] + c * (X0[3] - listaCoordAtual.get(i).getDts()) ) ; //FIXME IGUAL O DO GALERA
+
             }
 
             //MATRIZ A
@@ -1660,12 +1662,15 @@ public class ProcessamentoPPS {
 
             //TODO VERIFICAR O LUGAR
             // Vetor dos resíduos V = AX+L
-            RealVector rV = rA.operate(rX).add(rL);
+            RealVector rX2 = MatrixUtils.createRealVector(X2);
+            RealVector rV = rA.operate(rX2).add(rL);
+//            RealMatrix rV = MatrixUtils.createColumnRealMatrix(rA.operate(rX).add(rL).toArray());
             // Setup VtPV
-            RealMatrix rVt = MatrixUtils.createRowRealMatrix(rV.toArray());
-            RealVector VtPV = rVt.operate(rP.operate(rV));
+            RealMatrix rVt = MatrixUtils.createRowRealMatrix(rV.toArray()); // Inverte V
+            RealMatrix result = rVt.multiply(rP);
+            RealVector VtPV = result.operate(rV);
             // Fator de variância a posteriori:
-            double S0post = VtPV.getEntry(0) / (qntSatProcessar - 4);
+            double S0post = VtPV.getEntry(0) / (double) (qntSatProcessar - 4);
 
             Log.i("VtPV","VtPV: " + VtPV.getEntry(0));
             Log.i("Posteriori","SigmaP: " + S0post);
@@ -1673,9 +1678,14 @@ public class ProcessamentoPPS {
             // MVC das coordenadas ajustadas
             RealMatrix MVCXa = rInvN.scalarMultiply(S0post); // TODO TESTAR NO OCTAVE
 
-            if (!MatrixUtils.isSymmetric(MVCXa,0)){
+            if (!MatrixUtils.isSymmetric(MVCXa,0.005)){
                 Log.e("MVCXa","Should be symmetric!");
+                Log.e("MVCXa",MVCXa.toString().replace("},","},\n")
+                        .replace("BlockRealMatrix",""));
             }
+
+            Log.i("MVCXa",MVCXa.toString().replace("},","},\n")
+                    .replace("BlockRealMatrix",""));
 
             Double[] precision = new Double[4];
 
@@ -1692,6 +1702,7 @@ public class ProcessamentoPPS {
             discrepanciesXYZ[1] = Ye - Xa[1];
             discrepanciesXYZ[2] = Ze - Xa[2];
             Log.i("Discrepancias", Arrays.deepToString(discrepanciesXYZ));
+            Log.i("Discrepancias", "--------------------------------");
 
             //Verificação da Tolerancia
             erro = Math.abs(maxValue(X));
