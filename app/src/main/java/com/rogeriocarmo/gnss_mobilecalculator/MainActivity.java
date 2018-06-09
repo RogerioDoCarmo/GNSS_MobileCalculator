@@ -84,8 +84,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Log.i("THE_END","O PROGRAMA FOI FINALIZADO COM SUCESSO! xD");
-        Toast.makeText(getApplicationContext(),
-                "Programa executado com sucesso!",
-                Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(),
+//                "Programa executado com sucesso!",
+//                Toast.LENGTH_LONG).show();
     }
 }
