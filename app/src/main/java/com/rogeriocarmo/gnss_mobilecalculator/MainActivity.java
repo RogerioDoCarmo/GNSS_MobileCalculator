@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),
                     "Erro ao calcular as pseudodistâncias: " + msg,
                     Toast.LENGTH_LONG).show();
+            e.printStackTrace();
         }
 
         try {

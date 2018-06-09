@@ -8,6 +8,11 @@ public class EpocaGPS {
     private GNSSDate UTC;
     private ArrayList<Integer> listaPRNs;
     private int numSatelites;
+    private ArrayList<GNSSMeasurement> listaMedicoes;
+    private int numMedicoes;
+    private ArrayList<CoordenadaGPS> listaCoordSatelites;
+    private int numMsgNav;
+    private ArrayList<GNSSNavMsg> listaMsgNavegacao;
 
     public EpocaGPS(GNSSDate UTC, ArrayList<Integer> listaPRNs){
         this.setUTC(UTC);
@@ -18,11 +23,23 @@ public class EpocaGPS {
     public EpocaGPS(GNSSDate UTC){
         this.setUTC(UTC);
         this.listaPRNs = new ArrayList<>();
+        this.listaMedicoes = new ArrayList<>();
+        this.listaCoordSatelites = new ArrayList<>();
     }
 
-    public void addSatelite(int PRN){
+    public void addSatelitePRN(int PRN){
         getListaPRNs().add(PRN);
         this.setNumSatelites(getListaPRNs().size());
+    }
+
+    public void addMedicao(GNSSMeasurement medicao){
+        getListaMedicoes().add(medicao);
+        this.setNumMedicoes(getListaMedicoes().size());
+    }
+
+    public void addMsgNavegacao(GNSSNavMsg msgNav){
+        getListaMsgNavegacao().add(msgNav);
+        this.setNumMsgNav(getListaMsgNavegacao().size());
     }
 
     public boolean containsSatellite(int PRN){
@@ -68,5 +85,45 @@ public class EpocaGPS {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public ArrayList<GNSSMeasurement> getListaMedicoes() {
+        return listaMedicoes;
+    }
+
+    public void setListaMedicoes(ArrayList<GNSSMeasurement> listaMedicoes) {
+        this.listaMedicoes = listaMedicoes;
+    }
+
+    public int getNumMedicoes() {
+        return numMedicoes;
+    }
+
+    public void setNumMedicoes(int numMedicoes) {
+        this.numMedicoes = numMedicoes;
+    }
+
+    public ArrayList<CoordenadaGPS> getListaCoordSatelites() {
+        return listaCoordSatelites;
+    }
+
+    public void setListaCoordSatelites(ArrayList<CoordenadaGPS> listaCoordSatelites) {
+        this.listaCoordSatelites = listaCoordSatelites;
+    }
+
+    public ArrayList<GNSSNavMsg> getListaMsgNavegacao() {
+        return listaMsgNavegacao;
+    }
+
+    public void setListaMsgNavegacao(ArrayList<GNSSNavMsg> listaMsgNavegacao) {
+        this.listaMsgNavegacao = listaMsgNavegacao;
+    }
+
+    public int getNumMsgNav() {
+        return numMsgNav;
+    }
+
+    public void setNumMsgNav(int numMsgNav) {
+        this.numMsgNav = numMsgNav;
     }
 }

@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 
 public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
+    private int ID_rray;
+
     /*Campos adicionados manualmente:*/
     private Long tTx;
     private Long tRx;
@@ -382,5 +384,17 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
     @Override
     public int compareTo(@NonNull GNSSMeasurement another) {
         return (this.getSvid() - another.getSvid());
+    }
+
+    /**
+     * Retorna o indice da medicao no vetor de medicoes original
+      * @return
+     */
+    public int getID_rray() {
+        return ID_rray;
+    }
+
+    public void setID_rray(int ID_rray) {
+        this.ID_rray = ID_rray;
     }
 }
