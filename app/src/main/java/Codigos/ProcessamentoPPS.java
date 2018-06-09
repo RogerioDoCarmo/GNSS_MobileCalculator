@@ -926,6 +926,8 @@ public class ProcessamentoPPS {
 
                 Double NumberNanoSecondsWeek =  604800e9;
 
+                int INDEX_BIAS = 390;
+
                 /**
                  * GPS Week Number within this week
                  * Aply gpsWeek % 1024 to get the week number in [0,1024]
@@ -935,7 +937,7 @@ public class ProcessamentoPPS {
 
                 Long tTx = listaMedicoesOriginal.get(i).getReceivedSvTimeNanos();
                 Double tRxGNSS = listaMedicoesOriginal.get(i).getTimeNanos() + listaMedicoesOriginal.get(i).getTimeOffsetNanos()
-                        - (listaMedicoesOriginal.get(0).getFullBiasNanos() + listaMedicoesOriginal.get(0).getBiasNanos());// FIXME
+                        - (listaMedicoesOriginal.get(INDEX_BIAS).getFullBiasNanos() + listaMedicoesOriginal.get(INDEX_BIAS).getBiasNanos());// FIXME
 
                 Double weekNumberNanos = Math.floor( (- listaMedicoesOriginal.get(i).getFullBiasNanos() ) / NumberNanoSecondsWeek)
                         * NumberNanoSecondsWeek;
@@ -969,6 +971,9 @@ public class ProcessamentoPPS {
                 int hour = gpt.getUtcDateTime().getHourOfDay();
                 int minute = gpt.getUtcDateTime().getMinuteOfHour();
                 double seconds = gpt.getUtcDateTime().getSecondOfMinute();
+
+//                if (hour == 17 && minute == 9 && seconds == 56.0)
+//                    Log.i("Achei", "Valor de i: " + i);
 
 //                Log.i("year_OBS",String.valueOf(year));
 //                Log.i("month_OBS",String.valueOf(month));
@@ -1220,7 +1225,7 @@ public class ProcessamentoPPS {
         GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
         //2700, 2594 foi a melhor
-        int INDEX_ANALISE = 40; //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        int INDEX_ANALISE = 36; //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
         qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
@@ -1640,6 +1645,19 @@ public class ProcessamentoPPS {
         for (int i = 0; i < qntSatProcessar; i++) { //listaMedicoesOriginal.size(); i++)
             Lb[i] = listaMedicoesAtual.get(i).getPseudorangeMeters();// * 1e-1 ;
         }
+
+        // Arquivos do RINEX da PPTE
+        Lb[0]  = 21657934.484;
+        Lb[1]  = 20547814.773;
+        Lb[2]  = 24213537.063;
+        Lb[3]  = 22751699.742;
+        Lb[4]  = 22283378.414;
+        Lb[5]  = 23496573.281;
+        Lb[6]  = 23551611.313;
+        Lb[7]  = 23115567.406;
+        Lb[8]  = 21126337.508;
+        Lb[9]  = 21124172.734;
+        Lb[10] = 24081286.938;
 
         // FIXME COMENTAR AS LINHAS ABAIXO AO ATIVAR setarExemplo!
         // USANDO O EP2:
