@@ -14,6 +14,13 @@ public class EpocaGPS {
     private int numMsgNav;
     private ArrayList<GNSSNavMsg> listaMsgNavegacao;
 
+    public EpocaGPS(){
+        this.listaPRNs = new ArrayList<>();
+        this.listaCoordSatelites = new ArrayList<>();
+        this.listaMedicoes = new ArrayList<>();
+        this.listaMsgNavegacao = new ArrayList<>();
+    }
+
     public EpocaGPS(GNSSDate UTC, ArrayList<Integer> listaPRNs){
         this.setUTC(UTC);
         this.setListaPRNs(listaPRNs);
