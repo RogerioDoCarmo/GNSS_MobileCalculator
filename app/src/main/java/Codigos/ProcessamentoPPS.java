@@ -9,13 +9,15 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.stat.descriptive.moment.Variance;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -908,6 +910,12 @@ public class ProcessamentoPPS {
 //                novaMedicao.setAgcDb(Double.parseDouble(linhaRaw[29]));
 //                novaMedicao.setCarrierFrequencyHz(Double.parseDouble(linhaRaw[30]));
 
+                // FIXME %compute full cycle time of measurement, in milliseonds
+                Long allRxMillis = Math.round((novaMedicao.getTimeNanos() - novaMedicao.getFullBiasNanos()) * 1e-6);
+                // FIXME %%llRxMillis is now accurate to one millisecond (because it's an integer)
+
+                novaMedicao.setAllRxMillis(allRxMillis);
+
                 listaMedicoesOriginal.add(novaMedicao);
             }
         }
@@ -1310,8 +1318,8 @@ public class ProcessamentoPPS {
                 listaMedicoesOriginal.get(i).setPseudorangeMeters(pseudorangeMeters);
                 listaMedicoesOriginal.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
 
-                listaMedicoesOriginal.get(i).settTx(tTx);
-                listaMedicoesOriginal.get(i).settRx(tRx);
+//                listaMedicoesOriginal.get(i).settTx(tTx); // FIXME RECÉM ALTERADO
+//                listaMedicoesOriginal.get(i).settRxSeconds(tRx); // FIXME RECÉM ALTERADO
 
 //            int year = Integer.valueOf(2017);
 //            int month = Integer.valueOf(12);
@@ -1470,6 +1478,153 @@ public class ProcessamentoPPS {
         Log.i("FimPr","Foram encontradas " + qntEpocas + " épocas!");
     }
 
+    public static void calcPseudorangesMatlab(){
+
+        GNSSDate dataAnterior;
+        EpocaGPS epocaanterior = null;
+
+        ArrayList<Double> FctSeconds = new ArrayList<>();
+        ArrayList<Integer> SvIds = new ArrayList<>();
+
+        //listaMedicoesOriginal.size();
+
+        DateTime agora = DateTime.now(DateTimeZone.UTC);
+        GpsTime agoraGPS = GpsTime.fromUtc(agora);
+
+        for (int i = 0; i < 13; i++){
+            Double allRxMilliseconds = (double) listaMedicoesOriginal.get(i).getAllRxMillis();
+            Double FctSecondsMeas = allRxMilliseconds * 1e-3;
+
+            listaMedicoesOriginal.get(i).setFctSeconds(FctSecondsMeas);
+
+            if ( ! FctSeconds.contains(FctSecondsMeas) ) { // Armazena apenas Fct Unicos
+                FctSeconds.add(FctSecondsMeas);
+            }
+
+            if ( ! SvIds.contains(listaMedicoesOriginal.get(i).getSvid()) ) { // Armazena apenas SvIds Unicos
+                SvIds.add(listaMedicoesOriginal.get(i).getSvid());
+            }
+
+            //FIXME EEEEEEEE
+            Long weekNumber =  Math.round(Math.floor(-listaMedicoesOriginal.get(i).getFullBiasNanos() * 1e-9 / GNSSConstants.WEEKSEC));
+//                Long gpsSecsWek = Math.round((listaMedicoesOriginal.get(i).getReceivedSvTimeNanos()) * 1e-9);
+
+            Long WEEKNANOS = Math.round(GNSSConstants.WEEKSEC*1e9);
+            Long weekNumberNanos = Math.round(weekNumber) * Math.round(GNSSConstants.WEEKSEC*1e9);
+
+            Long tRxNanos = listaMedicoesOriginal.get(i).getTimeNanos() -
+                    listaMedicoesOriginal.get(0).getFullBiasNanos() - weekNumberNanos;
+
+            if (tRxNanos < 0){
+                Log.e("tRx","tRxNanos should be positive!");
+            }
+
+            Double tRxSeconds  = ( (double)(tRxNanos) - listaMedicoesOriginal.get(i).getTimeOffsetNanos() -
+                    listaMedicoesOriginal.get(i).getBiasNanos()) * 1e-9;
+            Double tTxSeconds  = (double)(listaMedicoesOriginal.get(i).getReceivedSvTimeNanos())*1e-9;
+
+            Double prSeconds = tRxSeconds - tTxSeconds;
+            // Checking for week Rollover
+
+            boolean iRollover = (prSeconds > GNSSConstants.WEEKSEC/2);
+
+            if (iRollover) {
+                double prS = prSeconds;
+                double delS = Math.round(prS/GNSSConstants.WEEKSEC)*GNSSConstants.WEEKSEC;
+                prS = prS - delS;
+
+                int maxBiasSeconds = 10;
+
+                if (prS > maxBiasSeconds) {
+                    Log.e("Week Rollover", "Failed to correct week rollover\n");
+                }
+                else{
+                    prSeconds = prS;
+                    tRxSeconds = tRxSeconds - delS;
+                    Log.i("Week Rollover", "Corrected week rollover\n");
+                }
+            }
+
+            double pseudorange = prSeconds*GNSSConstants.LIGHTSPEED;
+            double pseudorangeUncertaintyMeters = (double)(listaMedicoesOriginal.get(i).getReceivedSvTimeUncertaintyNanos())
+                    *1e-9* GNSSConstants.LIGHTSPEED;
+
+            listaMedicoesOriginal.get(i).setPseudorangeMeters(pseudorange);
+            listaMedicoesOriginal.get(i).setPseudoRangeUncertaintyMeters(pseudorangeUncertaintyMeters);
+            listaMedicoesOriginal.get(i).setGpsWeek(weekNumber.intValue());
+            listaMedicoesOriginal.get(i).settTx(tTxSeconds);
+            listaMedicoesOriginal.get(i).settRxSeconds(tRxSeconds);
+
+//            Long tRxINT = DecimalFormat
+
+            int truncado = truncateSafely(tRxSeconds);
+
+            GpsTime tempo = GpsTime.fromWeekTow(weekNumber.intValue(),truncado);
+            Log.i("Tempo convertido","Truncado: " + truncado + " == "
+                    + tempo.getGpsDateTime().toString());
+
+            //FIXME @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            int year = tempo.getGpsDateTime().getYear() % 2000;
+            int month = tempo.getGpsDateTime().getMonthOfYear();
+            int day = tempo.getGpsDateTime().getDayOfMonth();
+            int hour = tempo.getGpsDateTime().getHourOfDay();
+            int minute = tempo.getGpsDateTime().getMinuteOfHour();
+            double seconds = tempo.getGpsDateTime().getSecondOfMinute();
+
+//                if (hour == 17 && minute == 9 && seconds == 56.0)
+//                    Log.i("Achei", "Valor de i: " + i);
+
+            if (hour == 17 && minute == 9 && seconds == 38.0)
+                Log.i("Achei", "Valor de i: " + i);
+
+//                Log.i("year_OBS",String.valueOf(year));
+//                Log.i("month_OBS",String.valueOf(month));
+//                Log.i("day_OBS",String.valueOf(day));
+//                Log.i("hour_OBS",String.valueOf(hour));
+//                Log.i("minute_OBS",String.valueOf(minute));
+//                Log.i("seconds_OBS",String.valueOf(seconds));
+
+//                Log.i("gpsWEEK","Svid: " + listaMedicoesOriginal.get(i).getSvid() +
+//                            "Semana: " + weekNumber.intValue() +
+//                        " Segundos da semana: " + gpsSecsWek.intValue());
+
+//                Log.i("gpsUTC", "Svid: " + listaMedicoesOriginal.get(i).getSvid() +
+//                        " Hora: " + String.valueOf(hour) +
+//                        " Minutos: " + String.valueOf(minute) +
+//                        " Segundos: " + String.valueOf(seconds));
+
+            GNSSDate dataAtual = new GNSSDate(year, month, day, hour, minute, seconds);
+            listaMedicoesOriginal.get(i).setData(dataAtual);
+//                Log.i("prr", "Svid: " +  listaMedicoesOriginal.get(i).getSvid() + " Pseudorange: " + listaMedicoesOriginal.get(i).getPseudorangeMeters() + " m");
+//                Log.i("Uncertainty", "Svid: " +  listaMedicoesOriginal.get(i).getSvid() + " Uncertainty: " + listaMedicoesOriginal.get(i).getPseudoRangeUncertaintyMeters() + " m");
+            //FIXME !!!!!!!!!!
+            if (i == 0){
+                dataAnterior = listaMedicoesOriginal.get(0).getData();
+                epocaanterior = new EpocaGPS(dataAtual);
+            }else{
+                dataAnterior = listaMedicoesOriginal.get(i-1).getData();
+            }
+
+//                if (i == 20){
+//                    Log.i("Teste","Teste");
+//                }
+
+            if (dataAtual.compareTo(dataAnterior) != 0){ // Início de uma nova época
+                listaEpocas.add(epocaanterior); // Guarda a época anterior que já acabou e cria uma nova
+                epocaanterior = new EpocaGPS(dataAtual);
+                epocaanterior.setId(listaEpocas.size());
+                epocaanterior.addSatelitePRN(listaMedicoesOriginal.get(i).getSvid());
+            }else{ // Continua na mesma época
+                epocaanterior.addSatelitePRN(listaMedicoesOriginal.get(i).getSvid());
+            }
+
+        }
+
+        Log.i("Pr","Fim implementacao Matlab");
+        // JUNTAR EM EPOCAS TODO
+
+    }
+
     /**
      * Ajusta as medições GNSS (pseudodistancias) e as efemérides transmitidas (dados de navegação) para pertencer a mesma época.
      * <p> Elimina as medições e efemérides de outra época e mantem apenas as da época em análise.</p>
@@ -1495,6 +1650,8 @@ public class ProcessamentoPPS {
         //2700, 2594 foi a melhor
 //        int INDEX_ANALISE = 36; //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         int INDEX_ANALISE = 0; //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+//        EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
         qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
@@ -2144,6 +2301,16 @@ public class ProcessamentoPPS {
 
     private static double getVariancia(double [] valores){
         return (new Variance().evaluate(valores));
+    }
+
+    private static int truncateSafely(double value) {
+        // For negative numbers, use Math.ceil.
+        // ... For positive numbers, use Math.floor.
+        if (value < 0) {
+            return (int) Math.ceil(value);
+        } else {
+            return (int) Math.floor(value);
+        }
     }
 
 }

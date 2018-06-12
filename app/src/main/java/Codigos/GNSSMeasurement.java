@@ -5,10 +5,12 @@ import android.support.annotation.NonNull;
 public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
     private int ID_rray;
+    private Long allRxMillis;
+    private Double fctSeconds;
 
     /*Campos adicionados manualmente:*/
-    private Long tTx;
-    private Long tRx;
+    private Double tTx;
+    private Double tRx;
     private GNSSDate data;
     private int gpsWeek;
 
@@ -326,15 +328,15 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
      * Retorna o instante de transmissão do sinal em segundos da semana GPS.
      * @return Tempo de <b>transmissão</b> em segundos da semana GPS
      */
-    public Long gettTx() {
+    public Double gettTxSeconds() {
         return tTx;
     }
 
     /**
-     *{@link GNSSMeasurement#gettTx}
+     *{@link GNSSMeasurement#gettTxSeconds}
      * @param tTx O instante de transmissão do sinal em segundos da semana GPS.
      */
-    public void settTx(Long tTx) {
+    public void settTx(Double tTx) {
         this.tTx = tTx;
     }
 
@@ -342,7 +344,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
      * Retorna o instate de recepção do sinal em segundos da semana GPS.
      * @return Tempo de <b>recepção</b> em segundos da semana GPS.
      */
-    public Long gettRx() {
+    public Double gettRx() {
         return tRx;
     }
 
@@ -350,7 +352,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
      * {@link GNSSMeasurement#gettRx}
      * @param tRx O instante de recepção do sinal em segundos da semana GPS.
      */
-    public void settRx(Long tRx) {
+    public void settRxSeconds(Double tRx) {
         this.tRx = tRx;
     }
 
@@ -396,5 +398,21 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
     public void setID_rray(int ID_rray) {
         this.ID_rray = ID_rray;
+    }
+
+    public Long getAllRxMillis() {
+        return allRxMillis;
+    }
+
+    public void setAllRxMillis(Long allRxMillis) {
+        this.allRxMillis = allRxMillis;
+    }
+
+    public void setFctSeconds(Double fctSeconds) {
+        this.fctSeconds = fctSeconds;
+    }
+
+    public Double getFctSeconds() {
+        return fctSeconds;
     }
 }
