@@ -336,7 +336,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
      *{@link GNSSMeasurement#gettTxSeconds}
      * @param tTx O instante de transmissão do sinal em segundos da semana GPS.
      */
-    public void settTx(Double tTx) {
+    public void settTxSeconds(Double tTx) {
         this.tTx = tTx;
     }
 

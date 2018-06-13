@@ -6,6 +6,7 @@ public class GNSSDate implements Comparable<GNSSDate>{
     private int year;
     private int month;
     private int day;
+    private int day_week;
     private int hour;
     private int min;
     private double sec;
@@ -77,4 +78,11 @@ public class GNSSDate implements Comparable<GNSSDate>{
             return -1;
     }
 
+    public int getDay_week() {
+        return day_week;
+    }
+
+    public void setDay_week(int day_week) {
+        this.day_week = day_week;
+    }
 }
