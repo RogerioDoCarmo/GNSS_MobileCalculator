@@ -1,9 +1,14 @@
 package Codigos;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class EpocaGPS {
+
+    private Double FctSeconds;
+
     private int id;
     private GNSSDate UTC;
     private ArrayList<Integer> listaPRNs;
@@ -13,6 +18,17 @@ public class EpocaGPS {
     private ArrayList<CoordenadaGPS> listaCoordSatelites;
     private int numMsgNav;
     private ArrayList<GNSSNavMsg> listaMsgNavegacao;
+    private int GPSweekNumber;
+    private int GPSsecondsWeek;
+
+
+    public EpocaGPS(Double FctSeconds){
+        this.setFctSeconds(FctSeconds);
+        this.listaPRNs = new ArrayList<>();
+        this.listaCoordSatelites = new ArrayList<>();
+        this.listaMedicoes = new ArrayList<>();
+        this.listaMsgNavegacao = new ArrayList<>();
+    }
 
     public EpocaGPS(){
         this.listaPRNs = new ArrayList<>();
@@ -35,8 +51,12 @@ public class EpocaGPS {
     }
 
     public void addSatelitePRN(int PRN){
-        getListaPRNs().add(PRN);
-        this.setNumSatelites(getListaPRNs().size());
+        if (!listaPRNs.contains(PRN)) { // FIXME REVER
+            getListaPRNs().add(PRN);
+            this.setNumSatelites(getListaPRNs().size());
+        }else{
+            Log.e("PRN-Epch","Repetindo satélite!");
+        }
     }
 
     public void addMedicao(GNSSMeasurement medicao){
@@ -132,5 +152,29 @@ public class EpocaGPS {
 
     public void setNumMsgNav(int numMsgNav) {
         this.numMsgNav = numMsgNav;
+    }
+
+    public Double getFctSeconds() {
+        return FctSeconds;
+    }
+
+    public void setFctSeconds(Double fctSeconds) {
+        FctSeconds = fctSeconds;
+    }
+
+    public int getGPSweekNumber() {
+        return GPSweekNumber;
+    }
+
+    public void setGPSweekNumber(int GPSweekNumber) {
+        this.GPSweekNumber = GPSweekNumber;
+    }
+
+    public int getGPSsecondsWeek() {
+        return GPSsecondsWeek;
+    }
+
+    public void setGPSsecondsWeek(int GPSsecondsWeek) {
+        this.GPSsecondsWeek = GPSsecondsWeek;
     }
 }
