@@ -1844,7 +1844,7 @@ public class ProcessamentoPPS {
                 if (listaMedicoesOriginal.get(j).getAllRxSeconds().equals
                         (AllRxSecondsAtuall)){ // TODO CONDIÇÃO DE MESMA EPOCA
                     if (novaEpoca.getNumMedicoes() == 0){ // Primeira medição da época
-                        Long mArrivalTimeSinceGpsEpochNs = listaMedicoesOriginal.get(i).getAllRxNanos();
+                        Long mArrivalTimeSinceGpsEpochNs = listaMedicoesOriginal.get(j).getAllRxNanos();
 
                         GpsTime gpsTime = new GpsTime(mArrivalTimeSinceGpsEpochNs);
                         long gpsWeekEpochNs = GpsTime.getGpsWeekEpochNano(gpsTime);
