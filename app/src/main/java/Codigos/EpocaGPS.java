@@ -38,13 +38,13 @@ public class EpocaGPS {
     }
 
     public EpocaGPS(GNSSDate UTC, ArrayList<Integer> listaPRNs){
-        this.setUTC(UTC);
+        this.setData(UTC);
         this.setListaPRNs(listaPRNs);
         this.setNumSatelites(listaPRNs.size());
     }
 
     public EpocaGPS(GNSSDate UTC){
-        this.setUTC(UTC);
+        this.setData(UTC);
         this.listaPRNs = new ArrayList<>();
         this.listaMedicoes = new ArrayList<>();
         this.listaCoordSatelites = new ArrayList<>();
@@ -75,18 +75,24 @@ public class EpocaGPS {
 
     @Override
     public String toString() {
+        if (this.UTC != null){
         String msg = "ID: " + this.id + "\n" +
                      "UTC: Hora: " + getDateUTC().getHour() + " Minutos: " + getDateUTC().getMin() + " Segundos: " + getDateUTC().getSec() + " \n" +
                      "Nº de satélites: " + getNumSatelites() + " \n" +
                      "Lista de satélites: " + Arrays.toString(getListaPRNs().toArray());
         return msg;
+        }else{
+//            String msg = "ID: " + this.id + "\n";
+
+            return "EPOCA EM CONSTRUÇÃO!";
+        }
     }
 
     public GNSSDate getDateUTC() {
         return UTC;
     }
 
-    public void setUTC(GNSSDate UTC) {
+    public void setData(GNSSDate UTC) {
         this.UTC = UTC;
     }
 
