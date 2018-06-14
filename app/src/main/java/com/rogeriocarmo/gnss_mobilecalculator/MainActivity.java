@@ -11,6 +11,7 @@ import static Codigos.ProcessamentoPPS.calcCoordenadas;
 import static Codigos.ProcessamentoPPS.calcCoordendasTeste_G05;
 import static Codigos.ProcessamentoPPS.calcPseudoranges;
 import static Codigos.ProcessamentoPPS.calcPseudorangesMatlab;
+import static Codigos.ProcessamentoPPS.calcPseudorangesMatlab2222222;
 import static Codigos.ProcessamentoPPS.calcularMMQ;
 import static Codigos.ProcessamentoPPS.readLogger_RawAssets;
 import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         try{
 //            calcPseudoranges();
-            calcPseudorangesMatlab();
+            calcPseudorangesMatlab2222222();
         } catch (Exception e){
             Log.e("ERR_pr","Erro ao calcular pseudodistâncias");
             String msg = e.getMessage();

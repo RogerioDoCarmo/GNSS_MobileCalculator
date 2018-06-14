@@ -4,8 +4,12 @@ import android.support.annotation.NonNull;
 
 public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
+    private Double allRxSeconds;
+
     private int ID_rray;
     private Long allRxMillis;
+    private Long allRxNanos;
+
     private Double fctSeconds;
 
     /*Campos adicionados manualmente:*/
@@ -414,5 +418,21 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
     public Double getFctSeconds() {
         return fctSeconds;
+    }
+
+    public Double getAllRxSeconds() {
+        return allRxSeconds;
+    }
+
+    public void setAllRxSeconds(Double allRxSeconds) {
+        this.allRxSeconds = allRxSeconds;
+    }
+
+    public Long getAllRxNanos() {
+        return allRxNanos;
+    }
+
+    public void setAllRxNanos(Long allRxNanos) {
+        this.allRxNanos = allRxNanos;
     }
 }
