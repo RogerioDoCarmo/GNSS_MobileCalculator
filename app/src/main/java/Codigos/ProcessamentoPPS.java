@@ -1668,11 +1668,11 @@ public class ProcessamentoPPS {
 //        DateTime agora = DateTime.now(DateTimeZone.UTC);
 //        GpsTime agoraGPS = GpsTime.fromUtc(agora);
 
-        for (int i = 0; i < 11; i++){
+        for (int i = 0; i < listaMedicoesOriginal.size(); i++){
             Double allRxMilliseconds = (double) listaMedicoesOriginal.get(i).getAllRxMillis();
             Double FctSecondsAtual = allRxMilliseconds * 1e-3;
 
-            listaMedicoesOriginal.get(i).setFctSeconds(FctSecondsAtual);
+            listaMedicoesOriginal.get(i).setFctSeconds(FctSecondsAtual); // FIXME ALL!
 
 //            if ( ! FctSeconds.contains(FctSecondsAtual) ) { // Armazena apenas Fct Unicos
 //                FctSeconds.add(FctSecondsAtual);
@@ -1731,8 +1731,8 @@ public class ProcessamentoPPS {
             Double allRxSecondsatual = (listaMedicoesOriginal.get(i).getTimeNanos() -
                     listaMedicoesOriginal.get(i).getFullBiasNanos()) * 1e-9;
 
-            listaMedicoesOriginal.get(i).setAllRxSeconds(allRxSecondsatual);
-            listaMedicoesOriginal.get(i).setAllRxNanos(allRxNanos);
+            listaMedicoesOriginal.get(i).setAllRxSeconds(allRxSecondsatual);  // FIXME ALL!
+            listaMedicoesOriginal.get(i).setAllRxNanos(allRxNanos); // FIXME ALL!
 
 //            if (i == 0){
 ////                FctSeconsAnterior = listaMedicoesOriginal.get(0).getFctSeconds();
@@ -1826,47 +1826,70 @@ public class ProcessamentoPPS {
         for (int i = 0; i < listaMedicoesOriginal.size(); i++) { // FIXME
             Double AllRxSecondsAtuall = listaMedicoesOriginal.get(i).getAllRxSeconds();
 
-            if (!listaAllRxSeconds.contains(AllRxSecondsAtuall)){ // Inicio de uma nova época
+            if (!listaAllRxSeconds.contains(AllRxSecondsAtuall)) { // Inicio de uma nova época
                 listaAllRxSeconds.add(AllRxSecondsAtuall);
-                EpocaGPS novaEpoca = new EpocaGPS(AllRxSecondsAtuall);
-
-                Long mArrivalTimeSinceGpsEpochNs = listaMedicoesOriginal.get(i).getAllRxNanos();
-
-                GpsTime gpsTime = new GpsTime(mArrivalTimeSinceGpsEpochNs);
-                long gpsWeekEpochNs = GpsTime.getGpsWeekEpochNano(gpsTime);
-                double mArrivalTimeSinceGPSWeekNs = mArrivalTimeSinceGpsEpochNs - gpsWeekEpochNs;
-                int mGpsWeekNumber = gpsTime.getGpsWeekSecond().first;
-                // calculate day of the year between 1 and 366
-                Calendar cal = gpsTime.getTimeInCalendar();
-                int mDayOfYear1To366 = cal.get(Calendar.DAY_OF_YEAR);
-
-                int year = gpsTime.getGpsDateTime().getYear() % 2000;
-                int month = gpsTime.getGpsDateTime().getMonthOfYear();
-                int day_month = gpsTime.getGpsDateTime().getDayOfMonth();
-                int day_week = gpsTime.getGpsDateTime().getDayOfWeek();
-                int hour = gpsTime.getGpsDateTime().getHourOfDay();
-                int minute = gpsTime.getGpsDateTime().getMinuteOfHour();
-                double seconds = gpsTime.getGpsDateTime().getSecondOfMinute();
-
-                GNSSDate dataAtual = new GNSSDate(year, month, day_month, hour, minute, seconds);
-                dataAtual.setDay_week(day_week);
-                novaEpoca.setData(dataAtual);
-
-                for (int j = 0; j < listaMedicoesOriginal.size(); j++){
-                    try {
-                        if (listaMedicoesOriginal.get(j).getAllRxSeconds().equals(AllRxSecondsAtuall)) {
-                            novaEpoca.setId(listaEpocas.size());
-                            novaEpoca.addSatelitePRN(listaMedicoesOriginal.get(j).getSvid());
-                            novaEpoca.addMedicao(listaMedicoesOriginal.get(j));
-                        }
-                    }catch (NullPointerException e) {
-                        Log.e("ErroNULL", "Erro na posicao X: " + j); // FIXME
-                        break; // FIXME
-                    }
-                }
-                listaEpocas.add(novaEpoca);
-                break; // FIXME
             }
+        }
+
+
+
+        for (int i = 0; i < listaAllRxSeconds.size(); i++) { // FIXME
+
+            Double AllRxSecondsAtuall = listaAllRxSeconds.get(i); // TODO CADA i É UMA ÉPOCA
+
+            EpocaGPS novaEpoca = new EpocaGPS(AllRxSecondsAtuall); // rever
+
+            for (int j = 0; j < listaMedicoesOriginal.size(); j++) {
+                // A medição pertence à época
+                if (listaMedicoesOriginal.get(j).getAllRxSeconds().equals
+                        (AllRxSecondsAtuall)){ // TODO CONDIÇÃO DE MESMA EPOCA
+                    if (novaEpoca.getNumMedicoes() == 0){ // Primeira medição da época
+                        Long mArrivalTimeSinceGpsEpochNs = listaMedicoesOriginal.get(i).getAllRxNanos();
+
+                        GpsTime gpsTime = new GpsTime(mArrivalTimeSinceGpsEpochNs);
+                        long gpsWeekEpochNs = GpsTime.getGpsWeekEpochNano(gpsTime);
+                        double mArrivalTimeSinceGPSWeekNs = mArrivalTimeSinceGpsEpochNs - gpsWeekEpochNs;
+                        int mGpsWeekNumber = gpsTime.getGpsWeekSecond().first;
+                        // calculate day of the year between 1 and 366
+                        Calendar cal = gpsTime.getTimeInCalendar();
+                        int mDayOfYear1To366 = cal.get(Calendar.DAY_OF_YEAR);
+
+                        int year = gpsTime.getGpsDateTime().getYear() % 2000;
+                        int month = gpsTime.getGpsDateTime().getMonthOfYear();
+                        int day_month = gpsTime.getGpsDateTime().getDayOfMonth();
+                        int day_week = gpsTime.getGpsDateTime().getDayOfWeek();
+                        int hour = gpsTime.getGpsDateTime().getHourOfDay();
+                        int minute = gpsTime.getGpsDateTime().getMinuteOfHour();
+                        double seconds = gpsTime.getGpsDateTime().getSecondOfMinute();
+
+                        GNSSDate dataAtual = new GNSSDate(year, month, day_month, hour, minute, seconds);
+                        dataAtual.setDay_week(day_week);
+                        novaEpoca.setData(dataAtual);
+                        novaEpoca.setId(listaEpocas.size());
+                    }
+                    novaEpoca.addSatelitePRN(listaMedicoesOriginal.get(j).getSvid());
+                    novaEpoca.addMedicao(listaMedicoesOriginal.get(j));
+                }
+            }
+            listaEpocas.add(novaEpoca);
+//            if (!listaAllRxSeconds.contains(AllRxSecondsAtuall)){ // Inicio de uma nova época
+//                listaAllRxSeconds.add(AllRxSecondsAtuall);
+//
+//
+//                for (int j = 0; j < listaMedicoesOriginal.size(); j++){
+//                    try {
+//                        if (listaMedicoesOriginal.get(j).getAllRxSeconds().equals(AllRxSecondsAtuall)) {
+//
+//
+//                        }
+//                    }catch (NullPointerException e) {
+//                        Log.e("ErroNULL", "Erro na posicao X: " + j); // FIXME
+//                        break; // FIXME
+//                    }
+//                }
+//                listaEpocas.add(novaEpoca);
+//                break; // FIXME
+//            }
         }
 
         int qntEpocas = listaEpocas.size();

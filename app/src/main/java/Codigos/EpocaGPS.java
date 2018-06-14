@@ -28,6 +28,8 @@ public class EpocaGPS {
         this.listaCoordSatelites = new ArrayList<>();
         this.listaMedicoes = new ArrayList<>();
         this.listaMsgNavegacao = new ArrayList<>();
+        this.numSatelites = 0;
+        this.numMedicoes = 0;
     }
 
     public EpocaGPS(){
