@@ -8,6 +8,9 @@ import java.util.Arrays;
 public class EpocaGPS {
 
     private Double FctSeconds;
+    private Long mArrivalTimeSinceGpsEpochNs;
+    private Long mLargestTowNs;
+
 
     private int id;
     private GNSSDate UTC;
@@ -21,6 +24,15 @@ public class EpocaGPS {
     private int GPSweekNumber;
     private int GPSsecondsWeek;
 
+    public EpocaGPS(Long allRxNanos){
+        this.mArrivalTimeSinceGpsEpochNs = allRxNanos;
+        this.listaPRNs = new ArrayList<>();
+        this.listaCoordSatelites = new ArrayList<>();
+        this.listaMedicoes = new ArrayList<>();
+        this.listaMsgNavegacao = new ArrayList<>();
+        this.numSatelites = 0;
+        this.numMedicoes = 0;
+    }
 
     public EpocaGPS(Double FctSeconds){
         this.setFctSeconds(FctSeconds);
@@ -52,12 +64,14 @@ public class EpocaGPS {
         this.listaCoordSatelites = new ArrayList<>();
     }
 
-    public void addSatelitePRN(int PRN){
+    public boolean addSatelitePRN(int PRN){
         if (!listaPRNs.contains(PRN)) { // FIXME REVER
             getListaPRNs().add(PRN);
             this.setNumSatelites(getListaPRNs().size());
+            return true;
         }else{
-            Log.e("PRN-Epch","Repetindo satélite!");
+//            Log.e("PRN-Epch","Repetindo satélite!");
+            return false;
         }
     }
 
@@ -184,5 +198,21 @@ public class EpocaGPS {
 
     public void setGPSsecondsWeek(int GPSsecondsWeek) {
         this.GPSsecondsWeek = GPSsecondsWeek;
+    }
+
+    public Long getmLargestTowNs() {
+        return mLargestTowNs;
+    }
+
+    public void setmLargestTowNs(Long mLargestTowNs) {
+        this.mLargestTowNs = mLargestTowNs;
+    }
+
+    public Long getmArrivalTimeSinceGpsEpochNs() {
+        return mArrivalTimeSinceGpsEpochNs;
+    }
+
+    public void setmArrivalTimeSinceGpsEpochNs(Long mArrivalTimeSinceGpsEpochNs) {
+        this.mArrivalTimeSinceGpsEpochNs = mArrivalTimeSinceGpsEpochNs;
     }
 }
