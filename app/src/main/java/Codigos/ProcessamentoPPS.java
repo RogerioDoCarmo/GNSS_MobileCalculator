@@ -1492,7 +1492,7 @@ public class ProcessamentoPPS {
 //        GpsTime agoraGPS = GpsTime.fromUtc(agora);
 
         for (int i = 0; i < listaMedicoesOriginal.size(); i++){
-            Double allRxMilliseconds = (double) listaMedicoesOriginal.get(i).getAllRxMillis();
+            Double allRxMilliseconds = (double) listaMedicoesOriginal.get(i).getAllRxMilliseconds();
             Double FctSecondsAtual = allRxMilliseconds * 1e-3;
 
             listaMedicoesOriginal.get(i).setFctSeconds(FctSecondsAtual);
@@ -1662,8 +1662,7 @@ public class ProcessamentoPPS {
         EpocaGPS epocaanterior = null;
 
         ArrayList<Double> ListaFctSeconds = new ArrayList<>();
-        ArrayList<Integer> ListaSvIds = new ArrayList<>();
-
+//        ArrayList<Integer> ListaSvIds = new ArrayList<>();
         ArrayList<Double> listaAllRxSeconds = new ArrayList<>();
         ArrayList<Long> listaAllRxNanos = new ArrayList<>();
 
@@ -1672,29 +1671,39 @@ public class ProcessamentoPPS {
 //        DateTime agora = DateTime.now(DateTimeZone.UTC);
 //        GpsTime agoraGPS = GpsTime.fromUtc(agora);
 
+        int INDEX_BIAS = 0;
+
         for (int i = 0; i < listaMedicoesOriginal.size(); i++){
             Double allRxMilliseconds = (double) listaMedicoesOriginal.get(i).getAllRxMillis();
+                        listaMedicoesOriginal.get(i).setAllRxMilliseconds(allRxMilliseconds);
+
             Double FctSecondsAtual = allRxMilliseconds * 1e-3;
+            listaMedicoesOriginal.get(i).setFctSeconds(FctSecondsAtual); // FIXME FctSeconds!
+            if (!ListaFctSeconds.contains(FctSecondsAtual)) { // Inicio de uma nova época
+                ListaFctSeconds.add(FctSecondsAtual);
+
+                INDEX_BIAS = i; // FIXME REVERRRRRRRRRRRRRRRRRRRRRR!!!!!!!
+            }
 
             Long allRxNanosAtual = (listaMedicoesOriginal.get(i).getTimeNanos() -
                     listaMedicoesOriginal.get(i).getFullBiasNanos());
-
-            listaMedicoesOriginal.get(i).setAllRxNanos(allRxNanosAtual); // FIXME ALL!
-
+            listaMedicoesOriginal.get(i).setAllRxNanos(allRxNanosAtual); // FIXME allRxNanos!
             if (!listaAllRxNanos.contains(allRxNanosAtual)) { // Inicio de uma nova época
                 listaAllRxNanos.add(allRxNanosAtual);
+
+                INDEX_BIAS = i; // FIXME REVERRRRRRRRRRRRRRRRRRRRRR!!!!!!!
             }
 
-            listaMedicoesOriginal.get(i).setFctSeconds(FctSecondsAtual); // FIXME ALL!
+            Double allRxSecondsAtual = (listaMedicoesOriginal.get(i).getTimeNanos() -
+                    listaMedicoesOriginal.get(i).getFullBiasNanos()) * 1e-9; // FIXME allRxSeconds!
+            listaMedicoesOriginal.get(i).setAllRxSeconds(allRxSecondsAtual);  // Inicio de uma nova época
+            if (!listaAllRxSeconds.contains(allRxSecondsAtual)) { // Inicio de uma nova época
+                listaAllRxSeconds.add(allRxSecondsAtual);
 
-            if (!ListaFctSeconds.contains(FctSecondsAtual)) { // Inicio de uma nova época
-                ListaFctSeconds.add(FctSecondsAtual);
+                INDEX_BIAS = i; // FIXME REVERRRRRRRRRRRRRRRRRRRRRR!!!!!!!
             }
 
-            Double allRxSecondsatual = (listaMedicoesOriginal.get(i).getTimeNanos() -
-                    listaMedicoesOriginal.get(i).getFullBiasNanos()) * 1e-9;
-
-            int INDEX_BIAS = 3188;
+//            int INDEX_BIAS = 3188;
 
 //            if (allRxSecondsatual == 1.2125132757127006E9){
 //                Log.i("Achei","allalalaa " + i);
@@ -1752,15 +1761,6 @@ public class ProcessamentoPPS {
             listaMedicoesOriginal.get(i).settTxSeconds(tTxSeconds);
             listaMedicoesOriginal.get(i).settRxSeconds(tRxSeconds);
 
-
-
-            listaMedicoesOriginal.get(i).setAllRxSeconds(allRxSecondsatual);  // FIXME ALL!
-
-            Double AllRxSecondsAtuall = listaMedicoesOriginal.get(i).getAllRxSeconds();
-
-            if (!listaAllRxSeconds.contains(AllRxSecondsAtuall)) { // Inicio de uma nova época
-                listaAllRxSeconds.add(AllRxSecondsAtuall);
-            }
 //            if (i == 0){
 ////                FctSeconsAnterior = listaMedicoesOriginal.get(0).getFctSeconds();
 //                allRxSecondsAnterior = (listaMedicoesOriginal.get(0).getTimeNanos() -
@@ -1861,21 +1861,21 @@ public class ProcessamentoPPS {
 //        double SECONDS_PER_NANO = 1.0e-9;
 //        double SPEED_OF_LIGHT_MPS = 299792458.0;
 
-        for (int i = 0; i < ListaFctSeconds.size(); i++) { // FIXME
-            Double FctSecondsAtual = ListaFctSeconds.get(i); // TODO CADA i É UMA ÉPOCA
-            EpocaGPS novaEpoca = new EpocaGPS(FctSecondsAtual); // rever
+        for (int i = 0; i < listaAllRxSeconds.size(); i++) { // FIXME
+            Double AllRxSecondsAtual = listaAllRxSeconds.get(i); // TODO CADA i É UMA ÉPOCA
+            EpocaGPS novaEpoca = new EpocaGPS(AllRxSecondsAtual); // rever
 
 //            long mLargestTowNs = Long.MIN_VALUE;
 
             for (int j = 0; j < listaMedicoesOriginal.size(); j++) {
                 // A medição pertence à época
-//                if (listaMedicoesOriginal.get(j).getFctSeconds().equals
-//                        (FctSecondsAtual)){ // TODOO CONDIÇÃO DE MESMA EPOCA
-
-                Double timeTag = Math.abs(FctSecondsAtual * 1e3 -
-                        listaMedicoesOriginal.get(i).getAllRxMillis());
-
-                if (timeTag < 1){
+                if (listaMedicoesOriginal.get(j).getAllRxSeconds().equals
+                        (AllRxSecondsAtual)){ // TODOO CONDIÇÃO DE MESMA EPOCA
+//
+//                Double timeTag = Math.abs(FctSecondsAtual * 1e3 -
+//                        listaMedicoesOriginal.get(i).getAllRxMilliseconds());
+//                if (timeTag < 1){
+//
                     if (novaEpoca.getNumMedicoes() == 0){ // Primeira medição da época
                         Long mArrivalTimeSinceGpsEpochNs = listaMedicoesOriginal.get(j).getAllRxNanos();
 
@@ -1992,10 +1992,17 @@ public class ProcessamentoPPS {
 //        int INDEX_ANALISE = 297; //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         int INDEX_ANALISE = 0; //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
 //        EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
+
+//EXCLUSOES TESTE INDEX_ANALISE == 0
+////        epocaEmAnalise.excluirSatelitePRN(1); EXCLUIDO
+//        epocaEmAnalise.excluirSatelitePRN(7); // MANTIDO
+////        epocaEmAnalise.excluirSatelitePRN(11); //EXCLUIDO
+//        epocaEmAnalise.excluirSatelitePRN(18); // MANTIDO
+//        epocaEmAnalise.excluirSatelitePRN(30); // MANTIDO
+
         qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
 
         Log.i("epocaAnalise","||||||||||||||||||||||||||||||\n");
