@@ -7,15 +7,14 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import Codigos.EpocaGPS;
+
+import static Codigos.ProcessamentoPPS.escolherEpoca;
 import static Codigos.ProcessamentoPPS.calcCoordenadas;
-import static Codigos.ProcessamentoPPS.calcCoordendasTeste_G05;
-import static Codigos.ProcessamentoPPS.calcPseudoranges;
-import static Codigos.ProcessamentoPPS.calcPseudorangesMatlab;
 import static Codigos.ProcessamentoPPS.calcPseudorangesMatlab2222222;
 import static Codigos.ProcessamentoPPS.calcularMMQ;
 import static Codigos.ProcessamentoPPS.readLogger_RawAssets;
 import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
-import static Codigos.ProcessamentoPPS.testeCoord_G05;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,25 +63,32 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
 
+        //TODO PROCESSAMENTO DE TODAS AS ÉPOCAS
+//        try{
+//            ArrayList<Double> resultados = processar_todas_epocas();
+//            Collections.sort(resultados);
+//            Log.i("Resultados", Arrays.toString(resultados.toArray()).replace(", ",",\n"));
+//        } catch (Exception e){
+//            Log.e("ERR_epch","Erro ao processar todas as epocas");
+//            e.printStackTrace();
+//            String msg = e.getMessage();
+//            Toast.makeText(getApplicationContext(),
+//                    "Erro ao processar todas as epocas: " + msg,
+//                    Toast.LENGTH_LONG).show();
+//        }
+
+        //TODO PROCESSAMENTO DE UMA ÚNICA ÉPOCA
         try{
-            calcCoordenadas();
+            //  A DATA DO RINEX PARA EXTRAÇÃO DAS EFEMÉRIDES AINDA É MANUAL!
+            EpocaGPS epocaAtual = escolherEpoca(0);
+            calcCoordenadas(epocaAtual);
+            calcularMMQ(); // para a época atual
         } catch (Exception e){
-            Log.e("ERR_coord","Erro ao calcular as coordenadas dos satélites");
+            Log.e("ERR_coord","Execucao unica");
             e.printStackTrace();
             String msg = e.getMessage();
             Toast.makeText(getApplicationContext(),
                     "Erro ao calcular as coordenadas do satélite: " + msg,
-                    Toast.LENGTH_LONG).show();
-        }
-
-        try{
-            calcularMMQ();
-        } catch (Exception e){
-            Log.e("ERR_MMQ","Erro ao processar o ajustamento");
-            e.printStackTrace();
-            String msg = e.getMessage();
-            Toast.makeText(getApplicationContext(),
-                    "Erro ao calcular o ajustamento: " + msg,
                     Toast.LENGTH_LONG).show();
         }
 
