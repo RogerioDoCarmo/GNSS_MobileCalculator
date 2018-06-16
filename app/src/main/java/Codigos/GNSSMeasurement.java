@@ -8,6 +8,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
     private int ID_rray;
     private Long allRxMillis;
+    private Double allRxMilliseconds;
     private Long allRxNanos;
 
     private Double fctSeconds;
@@ -404,12 +405,12 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
         this.ID_rray = ID_rray;
     }
 
-    public Long getAllRxMillis() {
-        return allRxMillis;
+    public Double getAllRxMilliseconds() {
+        return allRxMilliseconds;
     }
 
-    public void setAllRxMillis(Long allRxMillis) {
-        this.allRxMillis = allRxMillis;
+    public void setAllRxMilliseconds(Double allRxMilliseconds) {
+        this.allRxMilliseconds = allRxMilliseconds;
     }
 
     public void setFctSeconds(Double fctSeconds) {
@@ -434,5 +435,18 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
     public void setAllRxNanos(Long allRxNanos) {
         this.allRxNanos = allRxNanos;
+    }
+
+    public Long getAllRxMillis() {
+        return allRxMillis;
+    }
+
+    public void setAllRxMillis(Long allRxMillis) {
+        this.allRxMillis = allRxMillis;
+    }
+
+    @Override
+    public String toString() {
+        return "PRN: " + this.getSvid() + " Pr: " + this.getPseudorangeMeters() +  " \n";
     }
 }

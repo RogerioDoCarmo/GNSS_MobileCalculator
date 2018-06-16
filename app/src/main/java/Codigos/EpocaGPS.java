@@ -85,6 +85,23 @@ public class EpocaGPS {
         this.setNumMsgNav(getListaMsgNavegacao().size());
     }
 
+    public boolean excluirSatelitePRN(int PRN){
+        Integer prnExcluir = PRN;
+        if (listaPRNs.remove(prnExcluir)){
+            for (int i = 0; i < listaMedicoes.size(); i++){
+                if (listaMedicoes.get(i).getSvid() == prnExcluir){
+                    listaMedicoes.remove(i);
+                }
+            }
+
+            this.numSatelites = listaPRNs.size();
+            this.numMedicoes = listaMedicoes.size();
+
+            return true;
+        }
+        return false;
+    }
+
     public boolean containsSatellite(int PRN){
         return this.listaPRNs.contains(PRN);
     }
