@@ -439,7 +439,10 @@ public class ProcessamentoPPS {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
 
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.hour1550original)));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc159)));
+        // TODO PPTE
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc159)));
+        // TODO EP01
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc155)));
 
 //        int numEfemerides = contEfemerides(context);
 
@@ -732,7 +735,12 @@ public class ProcessamentoPPS {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.logdia05hora15))); // FIXME DEIXAR DINAMICO
 
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log15901))); // FIXME DEIXAR DINAMICO
+        // TODO PPTE
+        //TODO PPTE
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log15901))); // FIXME DEIXAR DINAMICO
+
+        //TODO EP01
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log15501))); // FIXME DEIXAR DINAMICO
 
 
         // do reading, usually loop until end of file reading
@@ -1926,7 +1934,8 @@ public class ProcessamentoPPS {
 //                novaEpoca.getListaMedicoes().get(k).setPseudorangeMeters(pseudorangeMeters);
 //
 //            }
-            listaEpocas.add(novaEpoca);
+            if (novaEpoca.getNumSatelites() >= 5)
+                listaEpocas.add(novaEpoca);
 //            if (!listaAllRxSeconds.contains(AllRxSecondsAtuall)){ // Inicio de uma nova época
 //                listaAllRxSeconds.add(AllRxSecondsAtuall);
 //
@@ -1949,13 +1958,13 @@ public class ProcessamentoPPS {
 
 //        int qntEpocas = listaEpocas.size();
 //        int qntEpocasMaior5 = 0;
-//        for (int i = 0; i < listaEpocas.size(); i++){
+        for (int i = 0; i < listaEpocas.size(); i++){
 //            if (listaEpocas.get(i).getNumSatelites() >= 5 ){
 //                qntEpocasMaior5++;
-//                Log.i("Epocas",listaEpocas.get(i).toString() + "\n--------------------------------");
+                Log.i("Epocas",listaEpocas.get(i).toString() + "\n--------------------------------");
 //            }
-//
-//        }
+
+        }
         Log.i("FimPr","Fim do cálculo das pseudodistâncias MATLAB!!!!!!!!!!");
 //        Log.i("FimPr","Foram encontradas " + qntEpocas + " épocas!");
 //        Log.i("FimPr","Foram encontradas " + qntEpocasMaior5 + " épocas com 5+ sats!");
@@ -1986,18 +1995,26 @@ public class ProcessamentoPPS {
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
 
+
+
 //EXCLUSOES TESTE INDEX_ANALISE == 0
-//        epocaEmAnalise.excluirSatelitePRN(1); //EXCLUIDO
-        epocaEmAnalise.excluirSatelitePRN(7); // MANTIDO
-        epocaEmAnalise.excluirSatelitePRN(11); // TIRADO 3º
-        epocaEmAnalise.excluirSatelitePRN(18); // TIRADO 2º
-        epocaEmAnalise.excluirSatelitePRN(30); // TIRADO 1º
+//      epocaEmAnalise.excluirSatelitePRN(1); //MANTIDO
+        epocaEmAnalise.excluirSatelitePRN(7);  // EXCLUIDO
+        epocaEmAnalise.excluirSatelitePRN(11); // EXCLUIDO
+        epocaEmAnalise.excluirSatelitePRN(18); // EXCLUIDO
+        epocaEmAnalise.excluirSatelitePRN(30); // EXCLUIDO
 
         qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
 
         Log.i("epocaAnalise","||||||||||||||||||||||||||||||\n");
         Log.i("epocaAnalise",epocaEmAnalise.toString());
         Log.i("epocaAnalise","||||||||||||||||||||||||||||||\n");
+
+        Log.i("epocaAnalise","Pseudodistancias da epoca escolhida:\n");
+
+        for (int i = 0; i < epocaEmAnalise.getListaMedicoes().size(); i++) {
+            Log.i("epocaAnalise",epocaEmAnalise.getListaMedicoes().get(i).toString());
+        }
 
 //        ArrayList<GNSSMeasurement> listaMedicoes2 = new ArrayList<>();
 //        ArrayList<GNSSNavMsg> listaEfemerides2 = new ArrayList<>();
@@ -2053,6 +2070,106 @@ public class ProcessamentoPPS {
         return epocaEmAnalise;
     }
 
+    /**
+     * Ajusta as medições GNSS (pseudodistancias) e as efemérides transmitidas (dados de navegação) para pertencer a mesma época.
+     * <p> Elimina as medições e efemérides de outra época e mantem apenas as da época em análise.</p>
+     * <p>
+     *     Tudo dentro de uma mesmo UTC é considerado a mesma época.
+     * </p>
+     *@return A data para a época considerada no ajustamento.
+     */
+    public static EpocaGPS escolherEpocaEP01(int INDEX_ANALISE){
+        /**
+         * DEFINIÇÃO MANUAL DA DATA DO RINEX:
+         */
+        int YEAR = 18; // FIXME RINEX
+        int MONTH = 6; // FIXME RINEX
+        int DAY_MONTH = 4; // FIXME RINEX
+        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+        int HOUR_DAY = 20; // FIXME RINEX
+        int MIN_HOUR = 0; // FIXME RINEX
+        double SEC = 0.0; // FIXME RINEX
+
+        GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
+
+        EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
+
+
+
+//EXCLUSOES TESTE INDEX_ANALISE == 0
+//      epocaEmAnalise.excluirSatelitePRN(1); //MANTIDO
+//        epocaEmAnalise.excluirSatelitePRN(3);  // EXCLUIDO NA PPTE
+//        epocaEmAnalise.excluirSatelitePRN(7); // EXCLUIDO NA PPTE
+//        epocaEmAnalise.excluirSatelitePRN(9); // EXCLUIDO NA PPTE
+//        epocaEmAnalise.excluirSatelitePRN(30); // EXCLUIDO NA PPTE
+
+        qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
+
+        Log.i("epocaAnalise","||||||||||||||||||||||||||||||\n");
+        Log.i("epocaAnalise",epocaEmAnalise.toString());
+        Log.i("epocaAnalise","||||||||||||||||||||||||||||||\n");
+
+        Log.i("epocaAnalise","Pseudodistancias da epoca escolhida:\n");
+
+        for (int i = 0; i < epocaEmAnalise.getListaMedicoes().size(); i++) {
+            Log.i("epocaAnalise",epocaEmAnalise.getListaMedicoes().get(i).toString());
+        }
+
+//        ArrayList<GNSSMeasurement> listaMedicoes2 = new ArrayList<>();
+//        ArrayList<GNSSNavMsg> listaEfemerides2 = new ArrayList<>();
+//        A seleção da época é feita de modo manual:
+//        Descarta as observações fora da época
+//        int cont = 0;
+//        int j = 0;
+//        try{
+//            do{
+//                if ( (listaMedicoesOriginal.get(j).getData().compareTo(epocaEmAnalise.getDateUTC()) == 0) && // Mesma época
+//                        epocaEmAnalise.containsSatellite(listaMedicoesOriginal.get(j).getSvid()) )
+//                { // Satélite da Mesma Época
+////                    Log.i("TimeNanosUtilizado: ","TimeNanos" + String.valueOf(listaMedicoesOriginal.get(j).getTimeNanos().toString()));
+//                    listaMedicoesAtual.add(listaMedicoesOriginal.get(j));
+//                    cont++;
+//                }
+//                j++;
+//            } while (cont < qntSatProcessar);
+//        }catch (IndexOutOfBoundsException e){
+//            e.printStackTrace();
+//            Log.e("Index","Erro nas medições: " + e.getMessage());
+//        }
+
+        for (int i = 0; i < epocaEmAnalise.getListaMedicoes().size(); i++) {
+            listaMedicoesAtual.add(epocaEmAnalise.getListaMedicoes().get(i));
+        }
+
+//        listaMedicoesOriginal = null;
+//        listaMedicoesOriginal = listaMedicoes2; // FIXME VAI PERDER AS ORIGINAIS
+
+        int cont = 0;
+        int j = 0;
+
+        try{
+            do{
+                if ( (listaEfemeridesOriginal.get(j).getData().compareTo(dataRINEX) == 0) && // Mesma época
+                        epocaEmAnalise.containsSatellite(listaEfemeridesOriginal.get(j).getPRN()) )
+                { // Satélite da Mesma Época
+//                    Log.i("TimeNanosUtilizado: ","TimeNanos" + String.valueOf(listaMedicoesOriginal.get(j).getTimeNanos().toString()));
+                    listaEfemeridesAtual.add(listaEfemeridesOriginal.get(j));
+                    cont++;
+                }
+                j++;
+            } while (cont < qntSatProcessar);
+        }catch (IndexOutOfBoundsException e){
+            Log.e("Index","Erro nas efemérides: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        Collections.sort(listaMedicoesAtual);
+        Collections.sort(listaEfemeridesAtual);
+
+        return epocaEmAnalise;
+    }
+
+
     public static ArrayList<Double> processar_todas_epocas(){
         ArrayList<Double> resultadosMMQ = new ArrayList<>();
 
@@ -2061,9 +2178,9 @@ public class ProcessamentoPPS {
          */
         int YEAR = 18; // FIXME RINEX
         int MONTH = 6; // FIXME RINEX
-        int DAY_MONTH = 8; // FIXME RINEX
+        int DAY_MONTH = 4; // FIXME RINEX
         //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
-        int HOUR_DAY = 16; // FIXME RINEX
+        int HOUR_DAY = 20; // FIXME RINEX
         int MIN_HOUR = 0; // FIXME RINEX
         double SEC = 0.0; // FIXME RINEX
 
@@ -2428,7 +2545,7 @@ public class ProcessamentoPPS {
             Lb[i] = listaMedicoesAtual.get(i).getPseudorangeMeters();
         }
 
-        Lb[0] = 21648268.359;
+//        Lb[0] = 21648268.359;
 
         // Arquivos do RINEX da PPTE
 //        Lb[0]  = 0;
@@ -2445,9 +2562,9 @@ public class ProcessamentoPPS {
 
         // FIXME COMENTAR AS LINHAS ABAIXO AO ATIVAR setarExemplo!
         //USANDO A PPTE - COORDENADAS APROXIMADAS:
-        double Xe = 3687624.3673;
-        double Ye = -4620818.6831;
-        double Ze = -2386880.3817;
+//        double Xe = 3687624.3673;
+//        double Ye = -4620818.6831;
+//        double Ze = -2386880.3817;
 
 //      USANDO O VETOR NULO:
 //      double Xe = 0d;
@@ -2460,14 +2577,14 @@ public class ProcessamentoPPS {
 //      double Ze = -2387155.01580668;
 
 //        USANDO O EP2:
-//      double Xe = 3942590.30657541;
-//      double Ye = -4940172.84476568;
-//      double Ze = -2553313.07836198;
+      double Xe = 3687623.9881914;
+      double Ye = -4620693.11583979;
+      double Ze = -2387150.62016113;
 
         // COORDENADAS REAIS
-        double Xok = 3687624.3674;
-        double Yok = -4620818.6827;
-        double Zok = -2386880.3805;
+        double Xok = 3687646.46323107;
+        double Yok = -4620675.32588841;
+        double Zok = -2387150.66678273;
 
 //        Log.i("Lb","Vetor Lb criado");
 
@@ -2536,8 +2653,17 @@ public class ProcessamentoPPS {
             //X = -inv(N)*U;
 
 //            RealMatrix rInvN = new LUDecomposition(rN).getSolver().getInverse();
-            RealMatrix rInvN = MatrixUtils.inverse(rN);
-            RealVector rX = rInvN.operate(rU);
+
+            RealMatrix rInvN;
+            RealVector rX;
+            try {
+                rInvN = MatrixUtils.inverse(rN);
+                rX = rInvN.operate(rU);
+            } catch (org.apache.commons.math3.linear.SingularMatrixException e){
+                Log.e("Inv","Matrix is singular!");
+                return Double.NaN;
+            }
+
 //            RealVector rX = rInvN.scalarMultiply(-1.0d).operate(rU);
 //            RealVector rX = rInvN.operate(rU).mapMultiply(-1.0d);
 
@@ -2585,7 +2711,7 @@ public class ProcessamentoPPS {
             precision[2] = Math.sqrt(MVCXa.getEntry(2,2)); // Coordenada Za
             precision[3] = Math.sqrt(MVCXa.getEntry(3,3)); // Coordenada dtr
 
-//            Log.i("Precisao", Arrays.deepToString(precision));
+            Log.i("Precisao", Arrays.deepToString(precision));
 
             // Discrepâncias em relação as coordenadas originais
             Double[] discrepanciesXYZ = new Double[3];
@@ -2593,7 +2719,7 @@ public class ProcessamentoPPS {
             discrepanciesXYZ[1] = Ye - Xa[1];
             discrepanciesXYZ[2] = Ze - Xa[2];
 
-//            Log.i("Discrepancias", Arrays.deepToString(discrepanciesXYZ));
+            Log.i("Discrepancias", Arrays.deepToString(discrepanciesXYZ));
 //            Log.i("Discrepancias", "--------------------------------");
 
             //Verificação da Tolerancia

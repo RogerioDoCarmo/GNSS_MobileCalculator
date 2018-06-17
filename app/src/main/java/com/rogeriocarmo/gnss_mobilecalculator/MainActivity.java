@@ -6,6 +6,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import Codigos.EpocaGPS;
 
@@ -13,6 +15,8 @@ import static Codigos.ProcessamentoPPS.escolherEpoca;
 import static Codigos.ProcessamentoPPS.calcCoordenadas;
 import static Codigos.ProcessamentoPPS.calcPseudorangesMatlab2222222;
 import static Codigos.ProcessamentoPPS.calcularMMQ;
+import static Codigos.ProcessamentoPPS.escolherEpocaEP01;
+import static Codigos.ProcessamentoPPS.processar_todas_epocas;
 import static Codigos.ProcessamentoPPS.readLogger_RawAssets;
 import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
 
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         //TODO PROCESSAMENTO DE TODAS AS ÉPOCAS
 //        try{
 //            ArrayList<Double> resultados = processar_todas_epocas();
-//            Collections.sort(resultados);
+//            //Collections.sort(resultados);
 //            Log.i("Resultados", Arrays.toString(resultados.toArray()).replace(", ",",\n"));
 //        } catch (Exception e){
 //            Log.e("ERR_epch","Erro ao processar todas as epocas");
@@ -80,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         //TODO PROCESSAMENTO DE UMA ÚNICA ÉPOCA
         try{
             //  A DATA DO RINEX PARA EXTRAÇÃO DAS EFEMÉRIDES AINDA É MANUAL!
-            EpocaGPS epocaAtual = escolherEpoca(0);
+            EpocaGPS epocaAtual = escolherEpocaEP01(1);
             calcCoordenadas(epocaAtual);
             calcularMMQ(); // para a época atual
         } catch (Exception e){
