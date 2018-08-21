@@ -52,10 +52,10 @@ public class MainActivity extends AppCompatActivity {
             Log.e("ERR_pr","Erro ao calcular pseudodistâncias");
             String msg = e.getMessage();
             Toast.makeText(getApplicationContext(),
-                    "Erro ao calcular as pseudodistâncias: " + msg,
-                    Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        }
+                "Erro ao calcular as pseudodistâncias: " + msg,
+                Toast.LENGTH_LONG).show();
+        e.printStackTrace();
+    }
 
         try {
             readRINEX_RawAssets(MainActivity.this);
@@ -80,12 +80,9 @@ public class MainActivity extends AppCompatActivity {
 //                    "Erro ao processar todas as epocas: " + msg,
 //                    Toast.LENGTH_LONG).show();
 //        }
-
+        ~[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
         //TODO PROCESSAMENTO DE UMA ÚNICA ÉPOCA
-        try{
-            //  A DATA DO RINEX PARA EXTRAÇÃO DAS EFEMÉRIDES AINDA É MANUAL!
-            EpocaGPS epocaAtual = escolherEpocaEP01(1);
-            calcCoordenadas(epocaAtual);
+        try{ alcCoordenadas(epocaAtual);
             calcularMMQ(); // para a época atual
         } catch (Exception e){
             Log.e("ERR_coord","Execucao unica");
@@ -102,3 +99,22 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.LENGTH_LONG).show();
     }
 }
+[[[[[[[[[]]]]]]]]][]~ç=[[]]?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
