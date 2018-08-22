@@ -6,17 +6,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import Codigos.EpocaGPS;
 
-import static Codigos.ProcessamentoPPS.escolherEpoca;
 import static Codigos.ProcessamentoPPS.calcCoordenadas;
-import static Codigos.ProcessamentoPPS.calcPseudorangesMatlab2222222;
+import static Codigos.ProcessamentoPPS.calcPseudorange;
 import static Codigos.ProcessamentoPPS.calcularMMQ;
+import static Codigos.ProcessamentoPPS.escolherEpoca;
 import static Codigos.ProcessamentoPPS.escolherEpocaEP01;
-import static Codigos.ProcessamentoPPS.processar_todas_epocas;
 import static Codigos.ProcessamentoPPS.readLogger_RawAssets;
 import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
 
@@ -26,14 +23,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        try { // Teste para um único satélite
-//            testeCoord_G05(getApplicationContext());
-//            calcCoordendasTeste_G05();
-//            Log.i("TesteCoord","Fim do teste de coordenada de G05");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
         try {
             readLogger_RawAssets(MainActivity.this);
@@ -46,8 +35,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try{
-//            calcPseudoranges();
-            calcPseudorangesMatlab2222222();
+            calcPseudorange();
         } catch (Exception e){
             Log.e("ERR_pr","Erro ao calcular pseudodistâncias");
             String msg = e.getMessage();
@@ -55,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 "Erro ao calcular as pseudodistâncias: " + msg,
                 Toast.LENGTH_LONG).show();
         e.printStackTrace();
-    }
+        }
 
         try {
             readRINEX_RawAssets(MainActivity.this);
@@ -80,9 +68,12 @@ public class MainActivity extends AppCompatActivity {
 //                    "Erro ao processar todas as epocas: " + msg,
 //                    Toast.LENGTH_LONG).show();
 //        }
-        ~[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+
         //TODO PROCESSAMENTO DE UMA ÚNICA ÉPOCA
-        try{ alcCoordenadas(epocaAtual);
+        try{
+//            calcCoordenadas(1);
+            EpocaGPS epoca = escolherEpoca(0);
+            calcCoordenadas(epoca);
             calcularMMQ(); // para a época atual
         } catch (Exception e){
             Log.e("ERR_coord","Execucao unica");
@@ -99,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.LENGTH_LONG).show();
     }
 }
-[[[[[[[[[]]]]]]]]][]~ç=[[]]?
+
 
 
 
