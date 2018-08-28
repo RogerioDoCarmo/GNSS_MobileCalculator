@@ -745,4 +745,59 @@
     }
 =========================================
 
+    /*Constantes do GNSSLogger*/
+
+    public static final byte IONOSPHERIC_PARAMETERS_PAGE_18_SV_ID = 56;
+
+    public static final int WORD_SIZE_BITS = 30;
+    public static final int WORD_PADDING_BITS = 2;
+    public static final int BYTE_AS_BITS = 8;
+    public static final int GPS_CYCLE_WEEKS = 1024;
+    public static final int IODE_TO_IODC_MASK = 0xFF;
+
+    public static final int SUBFRAME_1 = (1 << 0);
+    public static final int SUBFRAME_2 = (1 << 1);
+    public static final int SUBFRAME_3 = (1 << 2);
+    public static final int SUBFRAME_4 = (1 << 3);
+    public static final int SUBFRAME_5 = (1 << 4);
+
+    public static final long INTEGER_RANGE = 0xFFFFFFFFL;
+    // 3657 is the number of days between the unix epoch and GPS epoch as the GPS epoch started on
+    // Jan 6, 1980
+
+
+    public static final int L1_CA_MESSAGE_LENGTH_BYTES = 40;
+
+    public static final String TAG = "PseudorangePositionVelocityFromRealTimeEvents";
+
+===================================================
+
+    private static void inserirMedidasManuais(){
+        /**
+         * DEFINIÇÃO MANUAL DA ÉPOCA PARA ANÁLISE:
+         */
+        int YEAR = 18;
+        int MONTH = 5;
+        int DAY_MONTH = 21;
+        int DAY_WEEK = GNSSConstants.DAY_SEG; // FIXME
+        int HOUR_DAY = 19; // FIXME
+        int MIN_HOUR = 15;
+        double SEC = 0.0;
+
+        GNSSDate epocaAnalise = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
+
+        GNSSMeasurement novaMedicao11 = new GNSSMeasurement(11,24856683.359,epocaAnalise);
+        GNSSMeasurement novaMedicao26 = new GNSSMeasurement(26,24842838.117,epocaAnalise);
+
+        listaMedicoesOriginal.add(novaMedicao11);
+        listaMedicoesOriginal.add(novaMedicao26);
+
+
+
+    }
+============================ MMQ =========
+//                A[i][0] = (double)Math.round((-( dx / distGeo)) * 1000d) / 1000d;
+//                A[i][1] = (double)Math.round((-( dy / distGeo)) * 1000d) / 1000d;
+//                A[i][2] = (double)Math.round((-( dz / distGeo)) * 1000d) / 1000d;
+
 

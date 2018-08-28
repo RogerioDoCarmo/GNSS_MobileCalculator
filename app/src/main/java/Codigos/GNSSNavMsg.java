@@ -8,7 +8,7 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
      * clock variable names af0, af1, af2 follow IS GPS 200
     */
     private GNSSDate data;
-    private Integer PRN;          // SV PRN number TODO Verificar se fica como int msm!
+    private Integer PRN;         // SV PRN number
     private double Toc;          // Time of clock (seconds)
     private double af0;          // SV clock bias (seconds)
     private double af1;          // SV clock drift (sec/sec)
@@ -23,16 +23,16 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
     private double Asqrt;        // Square root of semi-major axis (meters^1/2)
     private double Toe;          // Reference time of ephemeris (seconds)
     private double Cic;          // Sine harmonic correction to angle of inclination (radians)
-    private double Omega0;        // Longitude of ascending node at weekly epoch (radians)
+    private double Omega0;       // Longitude of ascending node at weekly epoch (radians)
     private double Cis;          // Sine harmonic correction to angle of inclination (radians)
     private double i0;           // Inclination angle at reference time (radians)
     private double Crc;	         // Cosine harmonic correction to the orbit radius (meters)
-    private double w;	     // Argument of perigee (radians)
-    private double Omega_v;    // Rate of right ascension (radians/sec)
+    private double w;	         // Argument of perigee (radians)
+    private double Omega_v;      // Rate of right ascension (radians/sec)
     private double IDOT;	     // Rate of inclination angle (radians/sec)
     private double codeL2;       // codes on L2 channel
     private double GPS_Week;     // GPS week (to go with Toe), (NOT Mod 1024)
-    private double L2PdataFlag;      // L2 P data flag
+    private double L2PdataFlag;  // L2 P data flag
     private double accuracy;     // SV user range accuracy (meters)
     private double health;       // Satellite health
     private double TGD;          // Group delay (seconds)

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GNSS_MobileCalculator</string>
+    <string name="title_activity_resultado">Posição no mapa</string>
 </resources>

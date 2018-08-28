@@ -22,6 +22,9 @@ import java.util.List;
 
 import static Codigos.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
 import static Codigos.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
+import static Codigos.GNSSConstants.GM;
+import static Codigos.GNSSConstants.We;
+import static Codigos.GNSSConstants.c;
 import static Codigos.GNSSConstants.WEEKSEC;
 
 public class ProcessamentoPPS {
@@ -37,6 +40,7 @@ public class ProcessamentoPPS {
     public static ArrayList<EpocaGPS> listaEpocas = new ArrayList<>();
     public static ArrayList<CoordenadaGPS> listaCoordReceptor = new ArrayList<>();
 
+    /**Quantidade de satélites disponíveis para processamento na época atual*/
     private static int qntSatProcessar;
 
     public ProcessamentoPPS(){ //TODO Por enquanto pegar da pasta raw assets msm!
@@ -108,7 +112,6 @@ public class ProcessamentoPPS {
 //                Log.i("seconds_RINEX",String.valueOf(seconds));
 //                Log.i("seconds_RINEX",String.valueOf(seconds));
 //                Log.i("Fim_TOC","=============================");
-
              GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
              efemeride.setGNSSDate(data);
 
@@ -121,7 +124,6 @@ public class ProcessamentoPPS {
 //            Log.i("af0","af0: " + mLine.substring(22,41).replace('D','e').replaceAll("\\s",""));
 //            Log.i("af1","af1: " + mLine.substring(41,60).replace('D','e').replaceAll("\\s",""));
 //            Log.i("af2","af2: " + mLine.substring(60,79).replace('D','e').replaceAll("\\s",""));
-
             double af0 = Double.valueOf(mLine.substring(22,41).replace('D','e')
                     .replaceAll("\\s",""));
 
@@ -986,8 +988,6 @@ public class ProcessamentoPPS {
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
 
-
-
 //EXCLUSOES TESTE INDEX_ANALISE == 0
 //      epocaEmAnalise.excluirSatelitePRN(1); //MANTIDO
 //        epocaEmAnalise.excluirSatelitePRN(3);  // EXCLUIDO NA PPTE
@@ -1029,9 +1029,7 @@ public class ProcessamentoPPS {
 //            Log.e("Index","Erro nas medições: " + e.getMessage());
 //        }
 
-        for (int i = 0; i < epocaEmAnalise.getListaMedicoes().size(); i++) {
-            listaMedicoesAtual.add(epocaEmAnalise.getListaMedicoes().get(i));
-        }
+        listaMedicoesAtual.addAll(epocaEmAnalise.getListaMedicoes());
 
 //        listaMedicoesOriginal = null;
 //        listaMedicoesOriginal = listaMedicoes2; // FIXME VAI PERDER AS ORIGINAIS
@@ -1161,16 +1159,7 @@ public class ProcessamentoPPS {
      * <p>Calcula o <b>erro do relógio</b> para cada satélite em segundos.
      */
     public static void calcCoordenadas(EpocaGPS epocaEmAnalise){
-        double GM = 3.9860044185E14; // 3.986004418E14;
-        double We = 7.2921151467E-5; // 7.2921151467E-5;
-        double c = 299792458;
-
-//        inserirMedidasManuais();
-
         GNSSDate dataObservacao = epocaEmAnalise.getDateUTC();
-
-//        EpocaGPS epocaEmAnalise = escolherEpoca();
-//        GNSSDate dataObservacao = epocaEmAnalise.getDateUTC();
 
 //        Log.i("Coord","Inicio do calculo das coordenadas dos satélites.");
 
@@ -1205,14 +1194,12 @@ public class ProcessamentoPPS {
             double omega_v = listaEfemeridesAtual.get(i).getOmega_v();
             double idot = listaEfemeridesAtual.get(i).getIDOT();
 
-            // ------------------------------------------
-            //Tempo de transmisao do sinal
-            // ------------------------------------------
-            double dtr = 0d; // ERRO DO RELÓGIO
+            /**Tempo de transmisao do sinal*/
+            double dtr = 0d; // ERRO DO RELÓGIO DO RECEPTOR
             double tr = calc_Tr(dataObservacao);
             double tgps = tr - (listaMedicoesAtual.get(i).getPseudorangeMeters() / c);
 
-            double dts = a0 + a1 * (tgps - toe) + a2 * (Math.pow(tgps - toe,2.0)); // ERRO DO SATÉLITE
+            double dts = a0 + a1 * (tgps - toe) + a2 * (Math.pow(tgps - toe,2.0)); // ERRO DO SATÉLITE fixme É O TOC
             double tpropag = listaMedicoesAtual.get(i).getPseudorangeMeters()/c - dtr + dts;
 
             tgps = tr - dtr- tpropag + dts; // melhoria no tempo de transmissao
@@ -1326,34 +1313,6 @@ public class ProcessamentoPPS {
 
     }
 
-    private static void inserirMedidasManuais(){
-        /**
-         * DEFINIÇÃO MANUAL DA ÉPOCA PARA ANÁLISE:
-         */
-        int YEAR = 18;
-        int MONTH = 5;
-        int DAY_MONTH = 21;
-        int DAY_WEEK = GNSSConstants.DAY_SEG; // FIXME
-        int HOUR_DAY = 19; // FIXME
-        int MIN_HOUR = 15;
-        double SEC = 0.0;
-
-        GNSSDate epocaAnalise = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
-
-        GNSSMeasurement novaMedicao11 = new GNSSMeasurement(11,24856683.359,epocaAnalise);
-        GNSSMeasurement novaMedicao26 = new GNSSMeasurement(26,24842838.117,epocaAnalise);
-
-        listaMedicoesOriginal.add(novaMedicao11);
-        listaMedicoesOriginal.add(novaMedicao26);
-
-
-
-    }
-
-//    static double Xe = 3942590.30657541;
-//    static double Ye = -4940172.84476568;
-//    static double Ze = -2553313.07836198;
-
     static double Xe = 0;
     static double Ye = 0;
     static double Ze = 0;
@@ -1365,9 +1324,6 @@ public class ProcessamentoPPS {
      * Utiliza a abordagem encontrada em (MONICO, 2008) p. 292-300.
      */
     public static double calcularMMQ(){
-
-//        setarExemplo();
-
         boolean flag = false;
 
         int contIteracoes = 0;
@@ -1455,7 +1411,7 @@ public class ProcessamentoPPS {
             for (int i = 0; i < Lb.length; i++){
 //                L[i] = Lb[i] - L0[i];
 //                L[i] = Lb[i] - (L0[i] + c * (0 - listaCoordAtual.get(i).getDts())); //FIXME IGUAL O DO VANI
-                L[i] = Lb[i] - ( L0[i] + c * (X0[3] - listaCoordAtual.get(i).getDts()) ) ; //FIXME IGUAL O DO GALERA
+                L[i] = Lb[i] - ( L0[i] + c * (X0[3] - listaCoordAtual.get(i).getDts()) ) ;
 
             }
 
@@ -1468,11 +1424,8 @@ public class ProcessamentoPPS {
                 double distGeo = Math.sqrt(( dx*dx) + (dy*dy) + (dz*dz) );
 
                 A[i][0] = -( dx / distGeo);
-//                A[i][0] = (double)Math.round((-( dx / distGeo)) * 1000d) / 1000d;
                 A[i][1] = -( dy / distGeo);
-//                A[i][1] = (double)Math.round((-( dy / distGeo)) * 1000d) / 1000d;
                 A[i][2] = -( dz / distGeo);
-//                A[i][2] = (double)Math.round((-( dz / distGeo)) * 1000d) / 1000d;
                 A[i][3] = 1.0d;
             }
 
@@ -1526,8 +1479,11 @@ public class ProcessamentoPPS {
             // Fator de variância a posteriori:
             double S0post = VtPV.getEntry(0) / (double) (qntSatProcessar - 4);
 
-//            Log.i("VtPV","VtPV: " + VtPV.getEntry(0));
-//            Log.i("Posteriori","SigmaP: " + S0post);
+            Log.i("VetorRESÍDUOS", rVt.toString());
+
+            Log.i("VtPV","\n=================================================");
+            Log.i("VtPV","VtPV: " + VtPV.getEntry(0));
+            Log.i("Posteriori","SigmaP: " + S0post);
 
             // MVC das coordenadas ajustadas
             RealMatrix MVCXa = rInvN.scalarMultiply(S0post); // TODO TESTAR NO OCTAVE
