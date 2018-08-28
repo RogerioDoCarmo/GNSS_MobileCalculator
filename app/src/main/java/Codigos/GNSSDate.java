@@ -14,7 +14,6 @@ public class GNSSDate implements Comparable<GNSSDate>{
     /**
      * Creates a GNSS date using an UTC timestamp as entry.
      * <p> Used to determine an epoch for processing.
-     * @see ProcessamentoPPS#epocasAntigo()
      * @param year UTC year (0~99)
      * @param month UTC month (1~12)
      * @param day UTC day (1~31)

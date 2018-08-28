@@ -1,7 +1,6 @@
 package Codigos;
 
 import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -10,7 +9,6 @@ public class EpocaGPS {
     private Double FctSeconds;
     private Long mArrivalTimeSinceGpsEpochNs;
     private Long mLargestTowNs;
-
 
     private int id;
     private GNSSDate UTC;
@@ -24,16 +22,6 @@ public class EpocaGPS {
     private int GPSweekNumber;
     private int GPSsecondsWeek;
 
-    public EpocaGPS(Long allRxNanos){
-        this.mArrivalTimeSinceGpsEpochNs = allRxNanos;
-        this.listaPRNs = new ArrayList<>();
-        this.listaCoordSatelites = new ArrayList<>();
-        this.listaMedicoes = new ArrayList<>();
-        this.listaMsgNavegacao = new ArrayList<>();
-        this.numSatelites = 0;
-        this.numMedicoes = 0;
-    }
-
     public EpocaGPS(Double FctSeconds){
         this.setFctSeconds(FctSeconds);
         this.listaPRNs = new ArrayList<>();
@@ -44,6 +32,7 @@ public class EpocaGPS {
         this.numMedicoes = 0;
     }
 
+    /*Construtores não-utilizados*/
     public EpocaGPS(){
         this.listaPRNs = new ArrayList<>();
         this.listaCoordSatelites = new ArrayList<>();
@@ -51,10 +40,14 @@ public class EpocaGPS {
         this.listaMsgNavegacao = new ArrayList<>();
     }
 
-    public EpocaGPS(GNSSDate UTC, ArrayList<Integer> listaPRNs){
-        this.setData(UTC);
-        this.setListaPRNs(listaPRNs);
-        this.setNumSatelites(listaPRNs.size());
+    public EpocaGPS(Long allRxNanos){
+        this.mArrivalTimeSinceGpsEpochNs = allRxNanos;
+        this.listaPRNs = new ArrayList<>();
+        this.listaCoordSatelites = new ArrayList<>();
+        this.listaMedicoes = new ArrayList<>();
+        this.listaMsgNavegacao = new ArrayList<>();
+        this.numSatelites = 0;
+        this.numMedicoes = 0;
     }
 
     public EpocaGPS(GNSSDate UTC){
@@ -62,6 +55,12 @@ public class EpocaGPS {
         this.listaPRNs = new ArrayList<>();
         this.listaMedicoes = new ArrayList<>();
         this.listaCoordSatelites = new ArrayList<>();
+    }
+
+    public EpocaGPS(GNSSDate UTC, ArrayList<Integer> listaPRNs){
+        this.setData(UTC);
+        this.setListaPRNs(listaPRNs);
+        this.setNumSatelites(listaPRNs.size());
     }
 
     public boolean addSatelitePRN(int PRN){
@@ -80,11 +79,6 @@ public class EpocaGPS {
         this.setNumMedicoes(getListaMedicoes().size());
     }
 
-    public void addMsgNavegacao(GNSSNavMsg msgNav){
-        getListaMsgNavegacao().add(msgNav);
-        this.setNumMsgNav(getListaMsgNavegacao().size());
-    }
-
     public boolean excluirSatelitePRN(int PRN){
         Integer prnExcluir = PRN;
         if (listaPRNs.remove(prnExcluir)){
@@ -93,10 +87,8 @@ public class EpocaGPS {
                     listaMedicoes.remove(i);
                 }
             }
-
             this.numSatelites = listaPRNs.size();
             this.numMedicoes = listaMedicoes.size();
-
             return true;
         }
         return false;
@@ -104,6 +96,11 @@ public class EpocaGPS {
 
     public boolean containsSatellite(int PRN){
         return this.listaPRNs.contains(PRN);
+    }
+
+    public void addMsgNavegacao(GNSSNavMsg msgNav){
+        getListaMsgNavegacao().add(msgNav);
+        this.setNumMsgNav(getListaMsgNavegacao().size());
     }
 
     @Override
@@ -116,7 +113,6 @@ public class EpocaGPS {
         return msg;
         }else{
 //            String msg = "ID: " + this.id + "\n";
-
             return "EPOCA EM CONSTRUÇÃO!";
         }
     }

@@ -19,7 +19,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
     private GNSSDate data;
     private int gpsWeek;
 
-    /*Pseudo-distâncias calculadas*/ // FIXME VER SE NÃO SERÁ EM OUTRO LUGAR
+    /*Pseudo-distâncias calculadas*/
     private double PseudorangeMeters;
     private double PseudoRangeUncertaintyMeters;
 
@@ -46,8 +46,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
     private double AccumulatedDeltaRangeMeters;
     private double AccumulatedDeltaRangeUncertaintyMeters;
 
-    /*TODO TALVEZ SEPARAR OS CAMPOS ABAIXO NA CLASSE GNSSCLOCK*/
-
+    /*Campos da classe GnssClock*/
     private Long TimeNanos;
     private double TimeUncertaintyNanos;
     private int LeapSecond;
@@ -56,7 +55,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
     private double DriftNanosPerSecond;
     private double DriftUncertaintyNanosPerSecond;
     private double HardwareClockDiscontinuityCount;
-    private double BiasNanos; // FIXME VER SE É LONG
+    private double BiasNanos;
 
     public GNSSMeasurement(){
 
@@ -165,8 +164,6 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
         AccumulatedDeltaRangeUncertaintyMeters = accumulatedDeltaRangeUncertaintyMeters;
     }
 
-    /*TODO TALVEZ SEPARAR OS CAMPOS ABAIXO NA CLASSE GNSSCLOCK*/
-
     public Long getTimeNanos() {
         return TimeNanos;
     }
@@ -240,7 +237,6 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
     }
 
     /*TODO Campos nao-utilizados*/
-
     public int getElapsedRealtimeMillis() {
         return ElapsedRealtimeMillis;
     }
@@ -331,7 +327,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
     /**
      * Retorna o instante de transmissão do sinal em segundos da semana GPS.
-     * @return Tempo de <b>transmissão</b> em segundos da semana GPS
+     * @return Tempo de <b>transmissão</b> em segundos da semana GPS.
      */
     public Double gettTxSeconds() {
         return tTx;
