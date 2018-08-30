@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -21,10 +23,32 @@ import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Button btnVisualizar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        btnVisualizar = findViewById(R.id.idVisualizar);
+
+        btnVisualizar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Resultado.class);
+                Ecef2LlaConverter.GeodeticLlaValues valores =
+
+                Ecef2LlaConverter.convertECEFToLLACloseForm(
+                            3687512.700731742,
+                            -4620834.607939523,
+                            -2387174.1063294816);
+
+                intent.putExtra("Coord",valores);
+                startActivity(intent);
+
+                Log.i("THE_END","O PROGRAMA FOI FINALIZADO COM SUCESSO! xD");
+            }
+        });
 
         try {
             readLogger_RawAssets(MainActivity.this);
@@ -82,18 +106,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.LENGTH_LONG).show();
         }
 
-        Intent intent = new Intent(this, Resultado.class);
-
-        Ecef2LlaConverter.GeodeticLlaValues valores =
-
-                Ecef2LlaConverter.convertECEFToLLACloseForm(3687512.700731742,
-                        -4620834.607939523,
-                        -2387174.1063294816);
-
-        intent.putExtra("Coord",valores);
-        startActivity(intent);
-
-        Log.i("THE_END","O PROGRAMA FOI FINALIZADO COM SUCESSO! xD");
     }
 }
 
