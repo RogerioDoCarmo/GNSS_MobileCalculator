@@ -1059,6 +1059,22 @@ public class ProcessamentoPPS {
         return epocaEmAnalise;
     }
 
+    public static void processarTodasEpocas(){
+        //TODO PROCESSAMENTO DE TODAS AS ÉPOCAS
+//        try{
+//            ArrayList<Double> resultados = processar_todas_epocas();
+//            //Collections.sort(resultados);
+//            Log.i("Resultados", Arrays.toString(resultados.toArray()).replace(", ",",\n"));
+//        } catch (Exception e){
+//            Log.e("ERR_epch","Erro ao processar todas as epocas");
+//            e.printStackTrace();
+//            String msg = e.getMessage();
+//            Toast.makeText(getApplicationContext(),
+//                    "Erro ao processar todas as epocas: " + msg,
+//                    Toast.LENGTH_LONG).show();
+//        }
+    }
+
     public static ArrayList<Double> processar_todas_epocas(){
         ArrayList<Double> resultadosMMQ = new ArrayList<>();
 
@@ -1082,12 +1098,6 @@ public class ProcessamentoPPS {
 
             EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
 
-//EXCLUSOES TESTE INDEX_ANALISE == 0
-//        epocaEmAnalise.excluirSatelitePRN(1); //EXCLUIDO
-//        epocaEmAnalise.excluirSatelitePRN(7); // MANTIDO
-//        epocaEmAnalise.excluirSatelitePRN(11); //EXCLUIDO
-//        epocaEmAnalise.excluirSatelitePRN(18); // MANTIDO
-//            epocaEmAnalise.excluirSatelitePRN(30); // MANTIDO
 
             qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
 
