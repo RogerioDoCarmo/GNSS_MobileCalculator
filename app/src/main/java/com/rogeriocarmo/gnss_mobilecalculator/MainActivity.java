@@ -78,20 +78,6 @@ public class MainActivity extends AppCompatActivity {
                 "Erro ao abrir o arquivo de efemérides: " + msg, Toast.LENGTH_LONG).show();
         }
 
-        //TODO PROCESSAMENTO DE TODAS AS ÉPOCAS
-//        try{
-//            ArrayList<Double> resultados = processar_todas_epocas();
-//            //Collections.sort(resultados);
-//            Log.i("Resultados", Arrays.toString(resultados.toArray()).replace(", ",",\n"));
-//        } catch (Exception e){
-//            Log.e("ERR_epch","Erro ao processar todas as epocas");
-//            e.printStackTrace();
-//            String msg = e.getMessage();
-//            Toast.makeText(getApplicationContext(),
-//                    "Erro ao processar todas as epocas: " + msg,
-//                    Toast.LENGTH_LONG).show();
-//        }
-
         //TODO PROCESSAMENTO DE UMA ÚNICA ÉPOCA
         try{
             EpocaGPS epoca = escolherEpocaEP01(0);
