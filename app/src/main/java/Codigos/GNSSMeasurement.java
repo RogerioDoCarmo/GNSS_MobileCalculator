@@ -23,7 +23,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
     private double PseudorangeMeters;
     private double PseudoRangeUncertaintyMeters;
 
-    /*TODO Campos nao-utilizados*/
+    /*Campos nao-utilizados*/
     private int ElapsedRealtimeMillis;
     private  double TimeOffsetNanos;
     private int AccumulatedDeltaRangeState;
@@ -33,13 +33,14 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
     private double CarrierPhaseUncertainty;
     private double SnrInDb;
     private double AgcDb;
+    /*Campos nao-utilizados*/
 
     private double Cn0DbHz;
     private int ConstellationType;
     private int State;
     private int Svid;
     private int MultipathIndicator;
-    private double PseudorangeRateMetersPerSecond;
+    private double PseudorangeRateMetersPerSecond; // PSEUDODISTANCIA EM METROS
     private double PseudorangeRateUncertaintyMetersPerSecond;
     private Long ReceivedSvTimeNanos;
     private double ReceivedSvTimeUncertaintyNanos;
@@ -59,16 +60,6 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
 
     public GNSSMeasurement(){
 
-    }
-
-    /**
-     * Contrói uma medição com o valor direto da pseudodistancia para testes.
-     * @param pseudorange
-     */
-    public GNSSMeasurement(int PRN, Double pseudorange, GNSSDate data){
-        this.Svid = PRN;
-        this.PseudorangeMeters = pseudorange;
-        this.data = data;
     }
 
     public double getCn0DbHz() {
@@ -366,7 +357,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
     }
 
     /**
-     * Since 1980
+     * GPS Week number since 1980
      */
     public int getGpsWeek() {
         return gpsWeek;
@@ -377,7 +368,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
     }
 
     /**
-     * Comparable methot to sort all the Measurements by the satelite id (PRN)
+     * Comparable method to sort all the Measurements by the satellite id (PRN)
      * TODO: Implement Comparator methods
      * @param another Another instance of the GNSSMeasurement class.
      * @return A negative number if this object PRN is lesser than another.

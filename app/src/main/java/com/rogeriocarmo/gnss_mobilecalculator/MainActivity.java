@@ -9,15 +9,13 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
-import Codigos.Ecef2LlaConverter;
-import Codigos.EpocaGPS;
+import Codigos.CoordenadaGPS;
 
-import static Codigos.ProcessamentoPPS.calcCoordenadas;
 import static Codigos.ProcessamentoPPS.calcPseudorange;
-import static Codigos.ProcessamentoPPS.calcularMMQ;
-import static Codigos.ProcessamentoPPS.escolherEpoca;
-import static Codigos.ProcessamentoPPS.escolherEpocaEP01;
+import static Codigos.ProcessamentoPPS.getResultadosGeodeticos;
+import static Codigos.ProcessamentoPPS.processar_todas_epocas;
 import static Codigos.ProcessamentoPPS.readLogger_RawAssets;
 import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
 
@@ -36,14 +34,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), Resultado.class);
-                Ecef2LlaConverter.GeodeticLlaValues valores =
 
-                Ecef2LlaConverter.convertECEFToLLACloseForm(
-                            3687512.700731742,
-                            -4620834.607939523,
-                            -2387174.1063294816);
+//                Ecef2LlaConverter.GeodeticLlaValues valores =
+//                Ecef2LlaConverter.convertECEFToLLACloseForm(
+//                            3687512.700731742,
+//                            -4620834.607939523,
+//                            -2387174.1063294816);
+                ArrayList<CoordenadaGPS> valores = getResultadosGeodeticos();
 
-                intent.putExtra("Coord",valores);
+                Log.i("teste",valores.toString());
+
+                intent.putParcelableArrayListExtra("Coord",valores);
+//                intent.putExtra("Coord",valores);
+
                 startActivity(intent);
 
                 Log.i("THE_END","O PROGRAMA FOI FINALIZADO COM SUCESSO! xD");
@@ -78,11 +81,13 @@ public class MainActivity extends AppCompatActivity {
                 "Erro ao abrir o arquivo de efemérides: " + msg, Toast.LENGTH_LONG).show();
         }
 
-        //TODO PROCESSAMENTO DE UMA ÚNICA ÉPOCA
+        //TODO PROCESSAMENTO DE TODAS AS EPOCAS
         try{
-            EpocaGPS epoca = escolherEpocaEP01(0);
-            calcCoordenadas(epoca);
-            calcularMMQ(); // para a época atual
+//            EpocaGPS epoca = escolherEpoca(0);
+//            calcCoordenadas(epoca);
+//            calcularMMQ(); // para a época atual
+            processar_todas_epocas();
+
         } catch (Exception e){
             Log.e("ERR_coord","Execucao unica");
             e.printStackTrace();
@@ -91,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
                 "Erro ao calcular as coordenadas do satélite: " + msg,
                 Toast.LENGTH_LONG).show();
         }
+
+
 
     }
 }

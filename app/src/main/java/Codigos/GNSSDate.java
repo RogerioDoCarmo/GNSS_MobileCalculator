@@ -60,9 +60,8 @@ public class GNSSDate implements Comparable<GNSSDate>{
 
     /**
      *
-     * @param another anote UTC GNSS datestamp to compare.
+     * @param another another UTC GNSS datestamp to compare.
      * @return 0 if the two dates are equal. So we have the same epoch to process further.
-     * @see ProcessamentoPPS#epocasAntigo()
      */
     @Override
     public int compareTo(@NonNull GNSSDate another) {

@@ -800,4 +800,221 @@
 //                A[i][1] = (double)Math.round((-( dy / distGeo)) * 1000d) / 1000d;
 //                A[i][2] = (double)Math.round((-( dz / distGeo)) * 1000d) / 1000d;
 
+==========================================================================================
 
+ /**
+     * Ajusta as medições GNSS (pseudodistancias) e as efemérides transmitidas (dados de navegação) para pertencer a mesma época.
+     * <p> Elimina as medições e efemérides de outra época e mantem apenas as da época em análise.</p>
+     * <p>
+     *     Tudo dentro de uma mesmo UTC é considerado a mesma época.
+     * </p>
+     *@return A data para a época considerada no ajustamento.
+     */
+    public static EpocaGPS escolherEpoca(int INDEX_ANALISE){
+        /**
+         * DEFINIÇÃO MANUAL DA DATA DO RINEX:
+         */
+        int YEAR = 18; // FIXME RINEX
+        int MONTH = 6; // FIXME RINEX
+        int DAY_MONTH = 8; // FIXME RINEX
+        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+        int HOUR_DAY = 16; // FIXME RINEX
+        int MIN_HOUR = 0; // FIXME RINEX
+        double SEC = 0.0; // FIXME RINEX
+
+        GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
+
+        EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
+
+
+
+//EXCLUSOES TESTE INDEX_ANALISE == 0
+//      epocaEmAnalise.excluirSatelitePRN(1); //MANTIDO
+        epocaEmAnalise.excluirSatelitePRN(7);  // EXCLUIDO
+        epocaEmAnalise.excluirSatelitePRN(11); // EXCLUIDO
+        epocaEmAnalise.excluirSatelitePRN(18); // EXCLUIDO
+        epocaEmAnalise.excluirSatelitePRN(30); // EXCLUIDO
+
+        qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
+
+        Log.i("epocaAnalise","||||||||||||||||||||||||||||||\n");
+        Log.i("epocaAnalise",epocaEmAnalise.toString());
+        Log.i("epocaAnalise","||||||||||||||||||||||||||||||\n");
+
+        Log.i("epocaAnalise","Pseudodistancias da epoca escolhida:\n");
+
+        for (int i = 0; i < epocaEmAnalise.getListaMedicoes().size(); i++) {
+            Log.i("epocaAnalise",epocaEmAnalise.getListaMedicoes().get(i).toString());
+        }
+
+//        ArrayList<GNSSMeasurement> listaMedicoes2 = new ArrayList<>();
+//        ArrayList<GNSSNavMsg> listaEfemerides2 = new ArrayList<>();
+//        A seleção da época é feita de modo manual:
+//        Descarta as observações fora da época
+//        int cont = 0;
+//        int j = 0;
+//        try{
+//            do{
+//                if ( (listaMedicoesOriginal.get(j).getData().compareTo(epocaEmAnalise.getDateUTC()) == 0) && // Mesma época
+//                        epocaEmAnalise.containsSatellite(listaMedicoesOriginal.get(j).getSvid()) )
+//                { // Satélite da Mesma Época
+////                    Log.i("TimeNanosUtilizado: ","TimeNanos" + String.valueOf(listaMedicoesOriginal.get(j).getTimeNanos().toString()));
+//                    listaMedicoesAtual.add(listaMedicoesOriginal.get(j));
+//                    cont++;
+//                }
+//                j++;
+//            } while (cont < qntSatProcessar);
+//        }catch (IndexOutOfBoundsException e){
+//            e.printStackTrace();
+//            Log.e("Index","Erro nas medições: " + e.getMessage());
+//        }
+
+        for (int i = 0; i < epocaEmAnalise.getListaMedicoes().size(); i++) {
+            listaMedicoesAtual.add(epocaEmAnalise.getListaMedicoes().get(i));
+        }
+
+//        listaMedicoesOriginal = null;
+//        listaMedicoesOriginal = listaMedicoes2; // FIXME VAI PERDER AS ORIGINAIS
+
+        int cont = 0;
+        int j = 0;
+
+        try{
+            do{
+                if ( (listaEfemeridesOriginal.get(j).getData().compareTo(dataRINEX) == 0) && // Mesma época
+                        epocaEmAnalise.containsSatellite(listaEfemeridesOriginal.get(j).getPRN()) )
+                { // Satélite da Mesma Época
+//                    Log.i("TimeNanosUtilizado: ","TimeNanos" + String.valueOf(listaMedicoesOriginal.get(j).getTimeNanos().toString()));
+                    listaEfemeridesAtual.add(listaEfemeridesOriginal.get(j));
+                    cont++;
+                }
+                j++;
+            } while (cont < qntSatProcessar);
+        }catch (IndexOutOfBoundsException e){
+            Log.e("Index","Erro nas efemérides: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        Collections.sort(listaMedicoesAtual);
+        Collections.sort(listaEfemeridesAtual);
+
+        return epocaEmAnalise;
+    }
+
+===========================================================================================================================
+
+//        ArrayList<GNSSMeasurement> listaMedicoes2 = new ArrayList<>();
+//        ArrayList<GNSSNavMsg> listaEfemerides2 = new ArrayList<>();
+//        A seleção da época é feita de modo manual:
+//        Descarta as observações fora da época
+//        int cont = 0;
+//        int j = 0;
+//        try{
+//            do{
+//                if ( (listaMedicoesOriginal.get(j).getData().compareTo(epocaEmAnalise.getDateUTC()) == 0) && // Mesma época
+//                        epocaEmAnalise.containsSatellite(listaMedicoesOriginal.get(j).getSvid()) )
+//                { // Satélite da Mesma Época
+////                    Log.i("TimeNanosUtilizado: ","TimeNanos" + String.valueOf(listaMedicoesOriginal.get(j).getTimeNanos().toString()));
+//                    listaMedicoesAtual.add(listaMedicoesOriginal.get(j));
+//                    cont++;
+//                }
+//                j++;
+//            } while (cont < qntSatProcessar);
+//        }catch (IndexOutOfBoundsException e){
+//            e.printStackTrace();
+//            Log.e("Index","Erro nas medições: " + e.getMessage());
+//        }
+
+//        listaMedicoesOriginal = null;
+//        listaMedicoesOriginal = listaMedicoes2; // FIXME VAI PERDER AS ORIGINAIS
+
+===========================================================================================
+
+    public static ArrayList<Double> processar_todas_epocas(){
+        ArrayList<Double> resultadosMMQ = new ArrayList<>();
+
+        /**
+         * DEFINIÇÃO MANUAL DA DATA DO RINEX:
+         */
+        int YEAR = 18; // FIXME RINEX
+        int MONTH = 6; // FIXME RINEX
+        int DAY_MONTH = 4; // FIXME RINEX
+        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+        int HOUR_DAY = 20; // FIXME RINEX
+        int MIN_HOUR = 0; // FIXME RINEX
+        double SEC = 0.0; // FIXME RINEX
+
+        GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
+
+        for (int i = 0; i < 3; i++){
+            int INDEX_ANALISE = i; //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+//        EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
+
+            EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
+
+
+            qntSatProcessar = epocaEmAnalise.getNumSatelites(); // FIXME
+
+//            Log.i("epocaAnalise","||||||||||||||||||||||||||||||\n");
+//            Log.i("epocaAnalise",epocaEmAnalise.toString());
+//            Log.i("epocaAnalise","||||||||||||||||||||||||||||||\n");
+
+//        ArrayList<GNSSMeasurement> listaMedicoes2 = new ArrayList<>();
+//        ArrayList<GNSSNavMsg> listaEfemerides2 = new ArrayList<>();
+//        A seleção da época é feita de modo manual:
+//        Descarta as observações fora da época
+//        int cont = 0;
+//        int j = 0;
+//        try{
+//            do{
+//                if ( (listaMedicoesOriginal.get(j).getData().compareTo(epocaEmAnalise.getDateUTC()) == 0) && // Mesma época
+//                        epocaEmAnalise.containsSatellite(listaMedicoesOriginal.get(j).getSvid()) )
+//                { // Satélite da Mesma Época
+////                    Log.i("TimeNanosUtilizado: ","TimeNanos" + String.valueOf(listaMedicoesOriginal.get(j).getTimeNanos().toString()));
+//                    listaMedicoesAtual.add(listaMedicoesOriginal.get(j));
+//                    cont++;
+//                }
+//                j++;
+//            } while (cont < qntSatProcessar);
+//        }catch (IndexOutOfBoundsException e){
+//            e.printStackTrace();
+//            Log.e("Index","Erro nas medições: " + e.getMessage());
+//        }
+
+            for (int k = 0; k < epocaEmAnalise.getListaMedicoes().size(); k++) {
+                listaMedicoesAtual.add(epocaEmAnalise.getListaMedicoes().get(k));
+            }
+
+//        listaMedicoesOriginal = null;
+//        listaMedicoesOriginal = listaMedicoes2; // FIXME VAI PERDER AS ORIGINAIS
+
+            int cont = 0;
+            int j = 0;
+
+            try{
+                do{
+                    if ( (listaEfemeridesOriginal.get(j).getData().compareTo(dataRINEX) == 0) && // Mesma época
+                            epocaEmAnalise.containsSatellite(listaEfemeridesOriginal.get(j).getPRN()) )
+                    { // Satélite da Mesma Época
+//                    Log.i("TimeNanosUtilizado: ","TimeNanos" + String.valueOf(listaMedicoesOriginal.get(j).getTimeNanos().toString()));
+                        listaEfemeridesAtual.add(listaEfemeridesOriginal.get(j));
+                        cont++;
+                    }
+                    j++;
+                } while (cont < qntSatProcessar);
+            }catch (IndexOutOfBoundsException e){
+                Log.e("Index","Erro nas efemérides: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            Collections.sort(listaMedicoesAtual);
+            Collections.sort(listaEfemeridesAtual);
+
+            listaCoordAtual = new ArrayList<>();
+            calcCoordenadas(epocaEmAnalise);
+            resultadosMMQ.add(calcularMMQ());
+        }
+
+        return  resultadosMMQ;
+    }
