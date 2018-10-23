@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import Codigos.CoordenadaGPS;
+import Codigos.Rinex2Writer;
 
 import static Codigos.ProcessamentoPPS.calcPseudorange;
 import static Codigos.ProcessamentoPPS.getResultadosGeodeticos;
@@ -87,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
 //            calcCoordenadas(epoca);
 //            calcularMMQ(); // para a época atual
             processar_todas_epocas();
+
+            Rinex2Writer RINEX = new Rinex2Writer();
+            String file;
+            file = RINEX.print();
 
         } catch (Exception e){
             Log.e("ERR_coord","Execucao unica");
