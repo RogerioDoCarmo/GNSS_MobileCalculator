@@ -298,7 +298,7 @@ public class GNSSNavMsg implements Comparable<GNSSNavMsg>{
 
 
     /**
-     * Comparable methot to sort all the Navigation Messages by the satelite id (PRN)
+     * Comparable method to sort all the Navigation Messages by the satellite id (PRN)
      * TODO: Implement Comparator methods
      * @param another Another instance of the GNSSNavMsg class.
      * @return A negative number if this object PRN is lesser than another.

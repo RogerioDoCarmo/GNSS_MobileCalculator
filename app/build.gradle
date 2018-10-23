@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    buildToolsVersion '28.0.2'
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.rogeriocarmo.gnss_mobilecalculator"
@@ -54,6 +54,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
     compile files('libs/guava-22.0-android.jar')
+    //compile group: 'com.google.guava', name: 'guava', version: '22.0'
 //    https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation('org.apache.commons:commons-math3:3.6.1')
     implementation 'joda-time:joda-time:2.9.4'

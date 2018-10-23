@@ -16,9 +16,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Objects;
 
+import Codigos.CoordenadaGPS;
 import Codigos.Ecef2LlaConverter;
+import Codigos.EpocaGPS;
 
 public class Resultado extends FragmentActivity implements OnMapReadyCallback {
 
@@ -52,23 +55,35 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
         googleMap.setMinZoomPreference(6.0f);
         googleMap.setMaxZoomPreference(20.0f);
 
-        Ecef2LlaConverter.GeodeticLlaValues valores = (Ecef2LlaConverter.GeodeticLlaValues)
-                getIntent().getSerializableExtra("Coord");
+//        Ecef2LlaConverter.GeodeticLlaValues valores = (Ecef2LlaConverter.GeodeticLlaValues)
+//                getIntent().getSerializableExtra("Coord");
 
-        Double latDegrees = Math.toDegrees(valores.latitudeRadians);
-        Double longDegrees = Math.toDegrees(valores.longitudeRadians);
-        Double altitudeMeters = valores.altitudeMeters;
+        ArrayList<CoordenadaGPS> resultados =  getIntent().getParcelableArrayListExtra("Coord");
 
-        LatLng coord = new LatLng(latDegrees,longDegrees);
+        int limite = resultados.size() - 1;
+        for (int i = 0; i < limite ; i++){
+            Double latDegrees = resultados.get(i).getX();
+            Double longDegrees = resultados.get(i).getY();
+
+            LatLng coord = new LatLng(latDegrees,longDegrees);
+            mMap.addMarker(new MarkerOptions().position(coord).title(i + "a iteração"));
+        }
+
+
+        Double latFinal = resultados.get(resultados.size() - 1).getX();
+        Double longFinal = resultados.get(resultados.size() - 1).getY();
+        Double altFinal = resultados.get(resultados.size() - 1).getZ();
+
+        LatLng coord = new LatLng(latFinal, longFinal);
 
         mMap.addMarker(new MarkerOptions().position(coord).title("Solução Final"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord,14));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord,12));
 
         Snackbar snackbar = Snackbar
                 .make(Objects.requireNonNull(mapFragment.getActivity()).findViewById(R.id.map),
-                         "Lat:  " +  new DecimalFormat("#.#### ").format(latDegrees) +
-                             "Lon: " + new DecimalFormat("#.#### ").format(longDegrees)  +
-                             "Alt: " + new DecimalFormat("#.### ").format(altitudeMeters),
+                         "Lat:  " +  new DecimalFormat("#.#### ").format(latFinal) +
+                             "Lon: " + new DecimalFormat("#.#### ").format(longFinal)  +
+                             "Alt: " + new DecimalFormat("#.### ").format(altFinal),
                         Snackbar.LENGTH_INDEFINITE)
                 .setAction("Voltar", new View.OnClickListener() {
                     @Override
