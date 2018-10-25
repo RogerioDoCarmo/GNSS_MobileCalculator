@@ -22,6 +22,7 @@ import java.util.Objects;
 import Codigos.CoordenadaGPS;
 import Codigos.Ecef2LlaConverter;
 import Codigos.EpocaGPS;
+import Codigos.Rinex2Writer;
 
 public class Resultado extends FragmentActivity implements OnMapReadyCallback {
 
@@ -52,8 +53,8 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        googleMap.setMinZoomPreference(6.0f);
-        googleMap.setMaxZoomPreference(20.0f);
+        googleMap.setMinZoomPreference(14.0f);
+        googleMap.setMaxZoomPreference(14.0f);
 
 //        Ecef2LlaConverter.GeodeticLlaValues valores = (Ecef2LlaConverter.GeodeticLlaValues)
 //                getIntent().getSerializableExtra("Coord");
@@ -93,5 +94,13 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
                     }
                 });
         snackbar.show();
+
+        Rinex2Writer RINEX = new Rinex2Writer(getApplicationContext());
+        String file;
+        file = RINEX.print();
+
+        RINEX.Teste();
+
+
     }
 }

@@ -41,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
 //                            3687512.700731742,
 //                            -4620834.607939523,
 //                            -2387174.1063294816);
+
+
+
                 ArrayList<CoordenadaGPS> valores = getResultadosGeodeticos();
 
                 Log.i("teste",valores.toString());
@@ -49,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
 //                intent.putExtra("Coord",valores);
 
                 startActivity(intent);
+
+
 
                 Log.i("THE_END","O PROGRAMA FOI FINALIZADO COM SUCESSO! xD");
             }
@@ -89,9 +94,7 @@ public class MainActivity extends AppCompatActivity {
 //            calcularMMQ(); // para a época atual
             processar_todas_epocas();
 
-            Rinex2Writer RINEX = new Rinex2Writer();
-            String file;
-            file = RINEX.print();
+
 
         } catch (Exception e){
             Log.e("ERR_coord","Execucao unica");
