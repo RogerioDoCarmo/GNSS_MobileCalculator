@@ -53,8 +53,8 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        googleMap.setMinZoomPreference(14.0f);
-        googleMap.setMaxZoomPreference(14.0f);
+        googleMap.setMinZoomPreference(13.0f);
+        googleMap.setMaxZoomPreference(18.0f);
 
 //        Ecef2LlaConverter.GeodeticLlaValues valores = (Ecef2LlaConverter.GeodeticLlaValues)
 //                getIntent().getSerializableExtra("Coord");
@@ -70,7 +70,6 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
             mMap.addMarker(new MarkerOptions().position(coord).title(i + "a iteração"));
         }
 
-
         Double latFinal = resultados.get(resultados.size() - 1).getX();
         Double longFinal = resultados.get(resultados.size() - 1).getY();
         Double altFinal = resultados.get(resultados.size() - 1).getZ();
@@ -78,7 +77,7 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
         LatLng coord = new LatLng(latFinal, longFinal);
 
         mMap.addMarker(new MarkerOptions().position(coord).title("Solução Final"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord,12));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coord,16));
 
         Snackbar snackbar = Snackbar
                 .make(Objects.requireNonNull(mapFragment.getActivity()).findViewById(R.id.map),
@@ -96,11 +95,8 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
         snackbar.show();
 
         Rinex2Writer RINEX = new Rinex2Writer(getApplicationContext());
-        String file;
-        file = RINEX.print();
+        RINEX.gravarRINEX();
 
-        RINEX.Teste();
-
-
+        //RINEX.Teste();
     }
 }

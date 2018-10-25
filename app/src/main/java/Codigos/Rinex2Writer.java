@@ -20,12 +20,15 @@ import java.util.ArrayList;
 import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
+import static Codigos.FileHelper.getPrivateStorageDir;
+import static Codigos.FileHelper.isExternalStorageWritable;
+import static Codigos.FileHelper.writeTextFile2External;
+
 public class Rinex2Writer {
 
     private final Object mFileLock = new Object();
     private final Context mContext;
     private StringBuilder mFileWriter;
-    private File mFile;
 
 //    private final Context mContext;
 
@@ -40,14 +43,18 @@ public class Rinex2Writer {
 
     StringBuilder builder = new StringBuilder();
     File novoArquivo;
+
+    ArrayList<String> content;//TODO IMPLEMENTAR OS APENDS NESSE ARRAYLIST
+
     public boolean gravarRINEX(){
-        if (FileHelper.isExternalStorageWritable()){
+        if (isExternalStorageWritable()){
             novoArquivo = startNewLog();
             criarCabecalho();
 //            escrever_observacoes();
             try {
 //                novoArquivo = FileHelper.getPrivateStorageDir(mContext,"R.txt");
-                FileHelper.writeTextFile2External(novoArquivo, builder);
+                writeTextFile2External(novoArquivo, builder);
+                Log.i("Builder",builder.toString());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -128,21 +135,29 @@ public class Rinex2Writer {
 
     }
 
-    public String print() {
-        Log.i("RINEX",builder.toString());
-        return builder.toString();
+    public boolean saveRINEX() {
+
+        writeTextFile2External(novoArquivo,builder);
+
+       return true;
     }
 
     public File startNewLog() {
-        synchronized (mFileLock) {
-            File baseDirectory;
-            String state = Environment.getExternalStorageState();
-            if (Environment.MEDIA_MOUNTED.equals(state)) { //FIXME
-                baseDirectory = new File(Environment.getExternalStorageDirectory(), FILE_PREFIX);
-                baseDirectory.mkdirs();
-            } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-                Log.e("RINEX", "Cannot write to external storage.");
-                return null;
+            File baseDirectory = null;
+//            String state = Environment.getExternalStorageState();
+            if ( isExternalStorageWritable() ) {
+                try {
+                    String fileName = String.format("%s_%s.18o", FILE_PREFIX, "TESTE1");
+
+                    baseDirectory = getPrivateStorageDir(mContext,fileName);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+//                baseDirectory = new File(Environment.getExternalStorageDirectory(), FILE_PREFIX);
+//                baseDirectory.mkdirs();
+//            } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+//                Log.e("RINEX", "Cannot write to external storage.");
+//                return null;
             } else {
                 Log.e("RINEX", "Cannot read external storage.");
                 return null;
@@ -150,11 +165,11 @@ public class Rinex2Writer {
 
 //            SimpleDateFormat formatter = new SimpleDateFormat("yyy_MM_dd_HH_mm_ss");
 //            Date now = new Date();
-            String fileName = String.format("%s_%s.18o", FILE_PREFIX, "TESTE1");
 
-            File Teste = mContext.getFilesDir();
 
-            return Teste;
+//            File TESTE1 = mContext.getFilesDir();
+
+            return baseDirectory;
 //            File currentFile = new File(baseDirectory, fileName);
 ////            File currentFile = new File(baseDirectory, fileName);
 //            String currentFilePath = currentFile.getAbsolutePath();
@@ -167,44 +182,11 @@ public class Rinex2Writer {
 //                return;
 //            }
 //            }
-        }
+
     }
 
     private void escrever_observacoes(){
         throw new java.lang.UnsupportedOperationException("Not supported yet.");
-    }
-
-    /**
-     * Send the current log via email or other options selected from a pop menu shown to the user. A
-     * new log is started when calling this function.
-     */
-    public void send() {
-        if (mFile == null) {
-            return;
-        }
-//
-//        Intent emailIntent = new Intent(Intent.ACTION_SEND); // TODO IMPLEMENTAR SEND
-//        emailIntent.setType("*/*");
-//        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "SensorLog");
-//        emailIntent.putExtra(Intent.EXTRA_TEXT, "");
-////        // attach the file
-//        Uri fileURI =
-//                FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", mFile);
-////        emailIntent.putExtra(Intent.EXTRA_STREAM, fileURI);
-////        getUiComponent().startActivity(Intent.createChooser(emailIntent, "Send log.."));
-//        if (mFileWriter != null) {
-//            try {
-//                mFileWriter.flush();
-//                mFileWriter.close();
-//                mFileWriter = null;
-//
-//                Log.i("RINEX_FINAL", mFileWriter.toString());
-//
-//            } catch (IOException e) {
-//                Log.e("Unable to close", e.getMessage());
-//                return;
-//            }
-//        }
     }
 
 }

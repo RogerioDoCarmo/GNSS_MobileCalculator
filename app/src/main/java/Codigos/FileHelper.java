@@ -45,8 +45,11 @@ public class FileHelper {
             fileOutput = new FileOutputStream(file);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutput);
 
+            String[] Result = content.toString().split("\n");
 
-            outputStreamWriter.write(content.toString());
+            for (int i = 0; i < Result.length; i++){
+                outputStreamWriter.write(Result[i]);
+            }
 
             outputStreamWriter.flush();
             fileOutput.getFD().sync();
