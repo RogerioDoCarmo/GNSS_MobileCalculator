@@ -1,24 +1,16 @@
 package Codigos;
 
-import android.arch.lifecycle.BuildConfig;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 //import android.support.v4.BuildConfig;
-import android.support.v4.content.FileProvider;
-import android.widget.Toast;
 
 import static Codigos.FileHelper.getPrivateStorageDir;
 import static Codigos.FileHelper.isExternalStorageWritable;
@@ -26,35 +18,26 @@ import static Codigos.FileHelper.writeTextFile2External;
 
 public class Rinex2Writer {
 
-    private final Object mFileLock = new Object();
-    private final Context mContext;
-    private StringBuilder mFileWriter;
-
-//    private final Context mContext;
-
-    private static final String FILE_PREFIX = "gnss";
 
     private ArrayList<CoordenadaGPS> listaEpocas;
-    private static final String pseudorange = "C"; // GPS C/A
-    private static final String Frequency_GPS = "L1";
-    private static final String TYPE = "O";
-
+    private static final String FILE_PREFIX = "GNSS";
+    private static final String PSEUDORANGE = "C"; // GPS C/A
+    private static final String FREQ_GPS = "L1";
+    private static final String RINEX_TYPE = "O"; // Observation File
     private static final String MARKER = "GNSS Mobile Calculator";
 
-    StringBuilder builder = new StringBuilder();
-    File novoArquivo;
-
-    ArrayList<String> content;//TODO IMPLEMENTAR OS APENDS NESSE ARRAYLIST
+    private File newFile;
+    private final Context mContext;
+    private ArrayList<String> txtContent;
 
     public boolean gravarRINEX(){
         if (isExternalStorageWritable()){
-            novoArquivo = startNewLog();
+            newFile = startNewLog();
             criarCabecalho();
-//            escrever_observacoes();
+//            escrever_observacoes(); TODO
             try {
-//                novoArquivo = FileHelper.getPrivateStorageDir(mContext,"R.txt");
-                writeTextFile2External(novoArquivo, builder);
-                Log.i("Builder",builder.toString());
+                writeTextFile2External(newFile,
+                                        txtContent.toArray(new String[txtContent.size()]));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -66,127 +49,101 @@ public class Rinex2Writer {
 
     public Rinex2Writer(Context mContext, ArrayList<CoordenadaGPS> epocas) {
         this.mContext = mContext;
-//        this.mContext = mContext;
+        this.txtContent = new ArrayList<>();
         this.listaEpocas = epocas;
     }
 
     public Rinex2Writer(Context context){
         this.mContext = context;
-        startNewLog();
-//        send(); FIXME
+        this.txtContent = new ArrayList<>();
     }
-
-    public Rinex2Writer(){
-
-        startNewLog();
-//        send(); FIXME
-        mContext = null;
-    }
-
-
 
     private void criarCabecalho() {
-        if (mFileWriter == null) {
-            return;
-        }
+        txtContent.add("     2.11           OBSERVATION DATA    M (MIXED)           RINEX VERSION / TYPE"); // TODO SEPARAR EM 2 COLUNAS COM 2 APPENDS
+        txtContent.add("\n");
+        txtContent.add("teqc  2018Mar15                         20180605 08:43:32UTCPGM / RUN BY / DATE");
+        txtContent.add("\n");
+        txtContent.add("PPTE                                                        MARKER NAME");
+        txtContent.add("\n");
+        txtContent.add("41611M002                                                   MARKER NUMBER");
+        txtContent.add("\n");
+        txtContent.add("RBMC                IBGE/CGED                               OBSERVER / AGENCY");
+        txtContent.add("\n");
+        txtContent.add("5215K84090          TRIMBLE NETR9       5.33                REC # / TYPE / VERS");
+        txtContent.add("\n");
+        txtContent.add("4923353208          TRM59800.00     NONE                    ANT # / TYPE");
+        txtContent.add("\n");
 
-//        try{
-            builder.append("     2.11           OBSERVATION DATA    M (MIXED)           RINEX VERSION / TYPE"); // TODO SEPARAR EM 2 COLUNAS COM 2 APPENDS
-            builder.append("\n");
-            builder.append("teqc  2018Mar15                         20180605 08:43:32UTCPGM / RUN BY / DATE");
-            builder.append("\n");
-            builder.append("PPTE                                                        MARKER NAME");
-            builder.append("\n");
-            builder.append("41611M002                                                   MARKER NUMBER");
-            builder.append("\n");
-            builder.append("RBMC                IBGE/CGED                               OBSERVER / AGENCY");
-            builder.append("\n");
-            builder.append("5215K84090          TRIMBLE NETR9       5.33                REC # / TYPE / VERS");
-            builder.append("\n");
-            builder.append("5215K84090          TRIMBLE NETR9       5.33                REC # / TYPE / VERS");
-            builder.append("\n");
+        //TODO AUTOMATIZAR
+        String Xaprx = new DecimalFormat("########.####").format(3687624.3674);
+        String Yaprx = new DecimalFormat("########.####").format(-4620818.6827);
+        String Zaprx = new DecimalFormat("########.####").format(-2386880.3805);
 
-//        String Xaprx = new DecimalFormat("########.#### ").format(listaEpocas.get(0).getX());
-            String Xaprx = new DecimalFormat("########.#### ").format(3687624.3674);
-//        String Yaprx = new DecimalFormat("########.#### ").format(listaEpocas.get(0).getY());
-            String Yaprx = new DecimalFormat("########.#### ").format(-4620818.6827);
-//        String Zaprx = new DecimalFormat("########.#### ").format(listaEpocas.get(0).getZ());
-            String Zaprx = new DecimalFormat("########.#### ").format(-2386880.3805);
+        StringBuilder lineAprx = new StringBuilder();
 
-            StringBuilder lineAprx = new StringBuilder();
+        lineAprx.append("  " + Xaprx);
+        lineAprx.append(" "  + Yaprx);
+        lineAprx.append(" "  + Zaprx);
 
-            lineAprx.append("  " + Xaprx);
-            lineAprx.append("  " + Yaprx);
-            lineAprx.append("  " + Zaprx);
+        lineAprx.append("                  APPROX POSITION XYZ");
+        txtContent.add(lineAprx.toString());
+        txtContent.add("\n");
 
-            lineAprx.append("             APPROX POSITION XYZ");
+        txtContent.add("        0.0020        0.0000        0.0000                  ANTENNA: DELTA H/E/N");//fixme rever
+        txtContent.add("\n");
+        txtContent.add("     1     1                                                WAVELENGTH FACT L1/2");
+        txtContent.add("\n");
+        txtContent.add("    11    L1    L2    L5    C1    P1    C2    P2    C5    S1# / TYPES OF OBSERV"); // FIXME USAR String.format
+        txtContent.add("\n");
+        txtContent.add("          S2    S5                                          # / TYPES OF OBSERV");// FIXME USAR String.form
+        txtContent.add("\n");
+        txtContent.add("    15.0000                                                 INTERVAL");// FIXME USAR String.form
+        txtContent.add("\n");
+        txtContent.add("    18                                                      LEAP SECONDS");
+        txtContent.add("\n");
+        txtContent.add("Trabalho de Conclusao de Curso - FCT/UNESP                  COMMENT");
+        txtContent.add("\n");
+        txtContent.add("Autor: Rogerio Ramos Rodrigues do Carmo                     COMMENT");
+        txtContent.add("\n");
+        txtContent.add("Arquivo gerado a partir de medicos de aparelho Android      COMMENT");
+        txtContent.add("\n");
 
-            builder.append(lineAprx.toString());
+        //TODO AUTOMATIZAR ESSES NÚMEROS
+        String firstObs = String.format("  %d     %d     %d     %d     %d    0.0000000     GPS         TIME OF FIRST OBS",
+                2018, 6, 4,0,0, new DecimalFormat("#.####### ").format(0.0000000) );
 
-            builder.append("\n");
-            builder.append("        0.0020        0.0000        0.0000                  ANTENNA: DELTA H/E/N");
-            builder.append("\n");
-            builder.append("     1     1                                                WAVELENGTH FACT L1/2");
-            builder.append("\n");
-//        }// catch (IOException e) {
-//            Log.e("ERROR_WRITING_FILE", e.getMessage());
-//        }
-
-
-    }
-
-    public boolean saveRINEX() {
-
-        writeTextFile2External(novoArquivo,builder);
-
-       return true;
+        txtContent.add(firstObs);
+        txtContent.add("\n");
+        txtContent.add("                                                            END OF HEADER");
+        txtContent.add("\n");
     }
 
     public File startNewLog() {
             File baseDirectory = null;
-//            String state = Environment.getExternalStorageState();
             if ( isExternalStorageWritable() ) {
                 try {
-                    String fileName = String.format("%s_%s.18o", FILE_PREFIX, "TESTE1");
-
+                    String fileName = String.format("%s_%s.18o", FILE_PREFIX, "Teste_01");
                     baseDirectory = getPrivateStorageDir(mContext,fileName);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-//                baseDirectory = new File(Environment.getExternalStorageDirectory(), FILE_PREFIX);
-//                baseDirectory.mkdirs();
-//            } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-//                Log.e("RINEX", "Cannot write to external storage.");
-//                return null;
             } else {
                 Log.e("RINEX", "Cannot read external storage.");
                 return null;
             }
 
-//            SimpleDateFormat formatter = new SimpleDateFormat("yyy_MM_dd_HH_mm_ss");
-//            Date now = new Date();
-
-
-//            File TESTE1 = mContext.getFilesDir();
-
             return baseDirectory;
-//            File currentFile = new File(baseDirectory, fileName);
-////            File currentFile = new File(baseDirectory, fileName);
-//            String currentFilePath = currentFile.getAbsolutePath();
-//            BufferedWriter currentFileWriter;
-//            try {
-////                currentFileWriter = new BufferedWriter(new FileWriter(currentFile));
-//                criarCabecalho();
-//            } catch (IOException e) {
-//                Log.e("Could not open file: " + currentFilePath, e.getMessage());
-//                return;
-//            }
-//            }
-
     }
 
     private void escrever_observacoes(){
         throw new java.lang.UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void send(){
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        Uri uri = Uri.parse(newFile.getAbsolutePath());
+        intent.setDataAndType(uri, "text/plain");
+        mContext.startActivity(intent);
     }
 
 }

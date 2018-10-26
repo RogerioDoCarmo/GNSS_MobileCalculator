@@ -39,16 +39,14 @@ public class FileHelper {
         return file;
     }
 
-    public static void writeTextFile2External(File file, StringBuilder content) {
+    public static void writeTextFile2External(File file, String[] content) {
         try {
             FileOutputStream fileOutput = null;
             fileOutput = new FileOutputStream(file);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutput);
 
-            String[] Result = content.toString().split("\n");
-
-            for (int i = 0; i < Result.length; i++){
-                outputStreamWriter.write(Result[i]);
+            for (int i = 0; i < content.length; i++){
+                outputStreamWriter.write(content[i]);
             }
 
             outputStreamWriter.flush();
