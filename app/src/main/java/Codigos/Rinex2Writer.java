@@ -93,19 +93,28 @@ public class Rinex2Writer {
         txtContent.add("\n");
         txtContent.add("     1     1                                                WAVELENGTH FACT L1/2");
         txtContent.add("\n");
-        txtContent.add("    11    L1    L2    L5    C1    P1    C2    P2    C5    S1# / TYPES OF OBSERV"); // FIXME USAR String.format
+
+        //        txtContent.add("    11    L1    L2    L5    C1    P1    C2    P2    C5    S1# / TYPES OF OBSERV");
+        String typeLine1 = String.format("    %s    %s    %s    %s    %s    %s    %s    %s    %s    %s# / TYPES OF OBSERV",
+                                     "  ", "  ", "  ", "  ", "C1", "  ", "  " , "  ", "  ", "  "); // C/A Pseudorange only
+
+        //        txtContent.add("          S2    S5                                          # / TYPES OF OBSERV");
+        String typeLine2 = String.format("          %s    %s                                          # / TYPES OF OBSERV",
+                                        "  ", "  ");
+
+        txtContent.add(typeLine1);
         txtContent.add("\n");
-        txtContent.add("          S2    S5                                          # / TYPES OF OBSERV");// FIXME USAR String.form
+        txtContent.add(typeLine2);
         txtContent.add("\n");
         txtContent.add("    15.0000                                                 INTERVAL");// FIXME USAR String.form
         txtContent.add("\n");
-        txtContent.add("    18                                                      LEAP SECONDS");
+        txtContent.add("    18                                                      LEAP SECONDS");// FIXME USAR String.form
         txtContent.add("\n");
-        txtContent.add("Trabalho de Conclusao de Curso - FCT/UNESP                  COMMENT");
+        txtContent.add("Trabalho de Conclusao de Curso - FCT/UNESP - Computacao     COMMENT");
         txtContent.add("\n");
         txtContent.add("Autor: Rogerio Ramos Rodrigues do Carmo                     COMMENT");
         txtContent.add("\n");
-        txtContent.add("Arquivo gerado a partir de medicos de aparelho Android      COMMENT");
+        txtContent.add("Arquivo gerado a partir de medicoes de aparelho Android     COMMENT");
         txtContent.add("\n");
 
         //TODO AUTOMATIZAR ESSES NÚMEROS
