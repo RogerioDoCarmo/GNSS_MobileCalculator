@@ -34,7 +34,7 @@ public class Rinex2Writer {
         if (isExternalStorageWritable()){
             newFile = startNewLog();
             criarCabecalho();
-//            escrever_observacoes(); TODO
+            escrever_observacoes();
             try {
                 writeTextFile2External(newFile,
                                         txtContent.toArray(new String[txtContent.size()]));
@@ -95,16 +95,10 @@ public class Rinex2Writer {
         txtContent.add("\n");
 
         //        txtContent.add("    11    L1    L2    L5    C1    P1    C2    P2    C5    S1# / TYPES OF OBSERV");
-        String typeLine1 = String.format("    %s    %s    %s    %s    %s    %s    %s    %s    %s    %s# / TYPES OF OBSERV",
-                                     "  ", "  ", "  ", "  ", "C1", "  ", "  " , "  ", "  ", "  "); // C/A Pseudorange only
-
-        //        txtContent.add("          S2    S5                                          # / TYPES OF OBSERV");
-        String typeLine2 = String.format("          %s    %s                                          # / TYPES OF OBSERV",
-                                        "  ", "  ");
+        String typeLine1 = String.format("     1    %s                                                # / TYPES OF OBSERV",
+                                        "C1"); // C/A Pseudorange only
 
         txtContent.add(typeLine1);
-        txtContent.add("\n");
-        txtContent.add(typeLine2);
         txtContent.add("\n");
         txtContent.add("    15.0000                                                 INTERVAL");// FIXME USAR String.form
         txtContent.add("\n");
@@ -118,8 +112,9 @@ public class Rinex2Writer {
         txtContent.add("\n");
 
         //TODO AUTOMATIZAR ESSES NÚMEROS
-        String firstObs = String.format("  %d     %d     %d     %d     %d    0.0000000     GPS         TIME OF FIRST OBS",
-                2018, 6, 4,0,0, new DecimalFormat("#.####### ").format(0.0000000) );
+        // , new DecimalFormat("#.####### ").format(0.0000000)
+        String firstObs = String.format("  %d     %d    %d    %d     0.0000000     GPS         TIME OF FIRST OBS",
+                2018, 6, 4,0);
 
         txtContent.add(firstObs);
         txtContent.add("\n");
@@ -145,7 +140,44 @@ public class Rinex2Writer {
     }
 
     private void escrever_observacoes(){
-        throw new java.lang.UnsupportedOperationException("Not supported yet.");
+//        throw new java.lang.UnsupportedOperationException("Not supported yet.");
+
+        ArrayList<Integer> mockPrns = new ArrayList<>();
+        mockPrns.add(2);
+        mockPrns.add(4);
+        mockPrns.add(6);
+        mockPrns.add(8);
+        mockPrns.add(10);
+
+        ArrayList<Double> mockPsd = new ArrayList<>();
+        mockPsd.add(21535549.270);
+        mockPsd.add(23849823.430);
+        mockPsd.add(29309403.299);
+        mockPsd.add(22349833.222);
+        mockPsd.add(22323234.882);
+
+        StringBuilder listaSatEpch = new StringBuilder();
+
+        for (int i = 0; i < mockPrns.size(); i++) {
+           listaSatEpch.append("G"+mockPrns.get(i));
+        }
+
+        //  new DecimalFormat("#.####### ").format(0.0000000)
+        String epchHeaderLine = String.format(" %d  %d  %d  %d  %d  0.0000000 0 %d%s\n",
+                18, 6, 4, 0, 0, // data e hora
+                mockPrns.size(), listaSatEpch);
+
+        txtContent.add(epchHeaderLine);
+
+        String novaLinha;
+        for (int i = 0; i < mockPsd.size(); i++) {
+            novaLinha = String.format("  %s",
+                            new DecimalFormat("########.###").format(mockPsd.get(i)));
+            txtContent.add(novaLinha);
+            txtContent.add("\n");
+        }
+        // Observaveis:
+
     }
 
     public void send(){
