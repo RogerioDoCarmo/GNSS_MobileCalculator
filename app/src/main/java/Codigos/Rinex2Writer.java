@@ -113,8 +113,8 @@ public class Rinex2Writer {
 
         //TODO AUTOMATIZAR ESSES NÚMEROS
         // , new DecimalFormat("#.####### ").format(0.0000000)
-        String firstObs = String.format("  %d     %d    %d    %d     0.0000000     GPS         TIME OF FIRST OBS",
-                2018, 6, 4,0);
+        String firstObs = String.format("  %d     %d    %d    %d     %d    0.0000000     GPS         TIME OF FIRST OBS",
+                2018, 1, 15, 10,0);
 
         txtContent.add(firstObs);
         txtContent.add("\n");
@@ -159,12 +159,13 @@ public class Rinex2Writer {
         StringBuilder listaSatEpch = new StringBuilder();
 
         for (int i = 0; i < mockPrns.size(); i++) {
-           listaSatEpch.append("G"+mockPrns.get(i));
+           listaSatEpch.append("G" + String.format("%02d",mockPrns.get(i)));
         }
 
+
         //  new DecimalFormat("#.####### ").format(0.0000000)
-        String epchHeaderLine = String.format(" %d  %d  %d  %d  %d  0.0000000 0 %d%s\n",
-                18, 6, 4, 0, 0, // data e hora
+        String epchHeaderLine = String.format(" %d  %d %d %d  %d  0.0000000  0 %d%s\n",
+                18, 1, 15, 10, 0, // data e hora
                 mockPrns.size(), listaSatEpch);
 
         txtContent.add(epchHeaderLine);
