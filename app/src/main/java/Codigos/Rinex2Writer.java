@@ -1,5 +1,6 @@
 package Codigos;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -26,6 +27,7 @@ public class Rinex2Writer {
     private static final String RINEX_TYPE = "O"; // Observation File
     private static final String MARKER = "GNSS Mobile Calculator";
 
+    GNSSDate dataEpchAtual;
     private File newFile;
     private final Context mContext;
     private ArrayList<String> txtContent;
@@ -34,7 +36,7 @@ public class Rinex2Writer {
         if (isExternalStorageWritable()){
             newFile = startNewLog();
             criarCabecalho();
-            escrever_observacoes();
+            escrever_observacoes(42);
             try {
                 writeTextFile2External(newFile,
                                         txtContent.toArray(new String[txtContent.size()]));
@@ -113,8 +115,12 @@ public class Rinex2Writer {
 
         //TODO AUTOMATIZAR ESSES NÚMEROS
         // , new DecimalFormat("#.####### ").format(0.0000000)
-        String firstObs = String.format("  %d     %d    %d    %d     %d    0.0000000     GPS         TIME OF FIRST OBS",
-                2018, 1, 15, 10,0);
+        @SuppressLint("DefaultLocale") String firstObs = String.format("  %d     %d    %d    %d     %d    0.0000000     GPS         TIME OF FIRST OBS",
+                listaEpocas.get(0).getData_UTC().getYear() + 2000,
+                listaEpocas.get(0).getData_UTC().getMonth(),
+                listaEpocas.get(0).getData_UTC().getDay_Month(),
+                listaEpocas.get(0).getData_UTC().getHour(),
+                listaEpocas.get(0).getData_UTC().getMin());
 
         txtContent.add(firstObs);
         txtContent.add("\n");
@@ -139,16 +145,27 @@ public class Rinex2Writer {
             return baseDirectory;
     }
 
-    private void escrever_observacoes(){
-        int INDEX_EPCH = 0;
+    private void escrever_todas_observacoes(){
+        for (int i = 0; i < listaEpocas.size(); i++){
+            escrever_observacoes(i);
+        }
+    }
+
+    private void escrever_observacoes(int INDEX_EPCH){
+//        int INDEX_EPCH = 2648;
         StringBuilder listaSatEpch = new StringBuilder();
 
         for (int i = 0; i <listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(); i++) { // FIXME FAZER UM FOR PARA PERCORRER listaEpocas
            listaSatEpch.append("G" + String.format("%02d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().get(i))); //FIXME FAZER UM FOR PARA PERCORRER listaEpocas
         }
 
-        String epchHeaderLine = String.format(" %d  %d %d %d  %d  0.0000000  0 %d%s\n",
-                18, 1, 15, 10, 0, // data e hora
+        @SuppressLint("DefaultLocale") String epchHeaderLine = String.format(" %d  %d %d %d  %d  %s  0 %d%s\n",
+                listaEpocas.get(INDEX_EPCH).getData_UTC().getYear() % 2000,
+                listaEpocas.get(INDEX_EPCH).getData_UTC().getMonth(),
+                listaEpocas.get(INDEX_EPCH).getData_UTC().getDay_Month(),
+                listaEpocas.get(INDEX_EPCH).getData_UTC().getHour(),
+                listaEpocas.get(INDEX_EPCH).getData_UTC().getMin(),
+                new DecimalFormat("#.#######").format(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec()),
                 listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(), listaSatEpch);
 
         txtContent.add(epchHeaderLine);

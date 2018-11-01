@@ -926,7 +926,7 @@ public class ProcessamentoPPS {
 
     public static void processar_todas_epocas(){
 
-        for (int i = 0; i < 11; i++) {
+        for (int i = 25; i < 60; i++) {
             listaEfemeridesAtual = new ArrayList<>();
             listaMedicoesAtual = new ArrayList<>();
             //listaPRNs = new ArrayList<>(); // TODO REVER ONDE É ATRIBUÍDO
@@ -963,7 +963,7 @@ public class ProcessamentoPPS {
     public static ArrayList<EpocaObs> getObservacoes() {
         ArrayList<EpocaObs> listaObservacoes = new ArrayList<>();
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < listaEpocas.size(); i++) {
 
             GNSSDate utc = listaEpocas.get(i).getDateUTC();
             ArrayList<Double> obs = listaEpocas.get(i).getPseudorangesObs();
