@@ -7,6 +7,16 @@
     tools:context=".MainActivity">
 
     <Button
+        android:id="@+id/btnRINEX"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="RINEX"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@+id/idVisualizar"
+        tools:layout_editor_absoluteX="148dp" />
+
+    <Button
         android:id="@+id/idVisualizar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

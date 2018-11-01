@@ -959,6 +959,24 @@ public class ProcessamentoPPS {
 
         return listaResultados;
     }
+
+    public static ArrayList<EpocaObs> getObservacoes() {
+        ArrayList<EpocaObs> listaObservacoes = new ArrayList<>();
+
+        for (int i = 0; i < 1; i++) {
+
+            GNSSDate utc = listaEpocas.get(i).getDateUTC();
+            ArrayList<Double> obs = listaEpocas.get(i).getPseudorangesObs();
+            ArrayList<Integer> prns = listaEpocas.get(i).getListaPRNs();
+
+            EpocaObs newObserv = new EpocaObs(utc, prns, obs);
+            listaObservacoes.add(newObserv);
+        }
+
+        Log.i("OBSERVACOES", Arrays.deepToString(listaObservacoes.toArray()));
+        return listaObservacoes;
+    }
+
     /**
      * Calcula as <b>coordenadas X,Y,Z (WGS-84)</b> para cada satélite.
      * <p>Calcula o <b>erro do relógio</b> para cada satélite em segundos.

@@ -93,16 +93,5 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
                     }
                 });
         snackbar.show();
-
-        Rinex2Writer RINEX = new Rinex2Writer(getApplicationContext());
-
-        if (RINEX.gravarRINEX()){
-            Toast.makeText(this, "Arquivo RINEX gravado com sucesso!", Toast.LENGTH_SHORT).show();
-            RINEX.send();
-        }else{
-            Toast.makeText(this, "Erro na gravação do arquivo RINEX...", Toast.LENGTH_LONG).show();
-        }
-
-
     }
 }

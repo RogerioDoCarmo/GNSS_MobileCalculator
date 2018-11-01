@@ -19,7 +19,7 @@ import static Codigos.FileHelper.writeTextFile2External;
 public class Rinex2Writer {
 
 
-    private ArrayList<CoordenadaGPS> listaEpocas;
+    private ArrayList<EpocaObs> listaEpocas;
     private static final String FILE_PREFIX = "GNSS";
     private static final String PSEUDORANGE = "C"; // GPS C/A
     private static final String FREQ_GPS = "L1";
@@ -47,7 +47,7 @@ public class Rinex2Writer {
             return false;
     }
 
-    public Rinex2Writer(Context mContext, ArrayList<CoordenadaGPS> epocas) {
+    public Rinex2Writer(Context mContext, ArrayList<EpocaObs> epocas) {
         this.mContext = mContext;
         this.txtContent = new ArrayList<>();
         this.listaEpocas = epocas;
@@ -140,45 +140,27 @@ public class Rinex2Writer {
     }
 
     private void escrever_observacoes(){
-//        throw new java.lang.UnsupportedOperationException("Not supported yet.");
-
-        ArrayList<Integer> mockPrns = new ArrayList<>();
-        mockPrns.add(2);
-        mockPrns.add(4);
-        mockPrns.add(6);
-        mockPrns.add(8);
-        mockPrns.add(10);
-
-        ArrayList<Double> mockPsd = new ArrayList<>();
-        mockPsd.add(21535549.270);
-        mockPsd.add(23849823.430);
-        mockPsd.add(29309403.299);
-        mockPsd.add(22349833.222);
-        mockPsd.add(22323234.882);
-
+        int INDEX_EPCH = 0;
         StringBuilder listaSatEpch = new StringBuilder();
 
-        for (int i = 0; i < mockPrns.size(); i++) {
-           listaSatEpch.append("G" + String.format("%02d",mockPrns.get(i)));
+        for (int i = 0; i <listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(); i++) { // FIXME FAZER UM FOR PARA PERCORRER listaEpocas
+           listaSatEpch.append("G" + String.format("%02d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().get(i))); //FIXME FAZER UM FOR PARA PERCORRER listaEpocas
         }
 
-
-        //  new DecimalFormat("#.####### ").format(0.0000000)
         String epchHeaderLine = String.format(" %d  %d %d %d  %d  0.0000000  0 %d%s\n",
                 18, 1, 15, 10, 0, // data e hora
-                mockPrns.size(), listaSatEpch);
+                listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(), listaSatEpch);
 
         txtContent.add(epchHeaderLine);
 
-        String novaLinha;
-        for (int i = 0; i < mockPsd.size(); i++) {
-            novaLinha = String.format("  %s",
-                            new DecimalFormat("########.###").format(mockPsd.get(i)));
-            txtContent.add(novaLinha);
+        String newLine;
+        for (int i = 0; i < listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(); i++) {
+            newLine = String.format("  %s",
+                            new DecimalFormat("########.###").format(
+                                        listaEpocas.get(INDEX_EPCH).getLista_Pseudoranges().get(i)));
+            txtContent.add(newLine);
             txtContent.add("\n");
         }
-        // Observaveis:
-
     }
 
     public void send(){

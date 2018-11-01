@@ -12,9 +12,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import Codigos.CoordenadaGPS;
+import Codigos.EpocaGPS;
+import Codigos.EpocaObs;
 import Codigos.Rinex2Writer;
 
 import static Codigos.ProcessamentoPPS.calcPseudorange;
+import static Codigos.ProcessamentoPPS.getObservacoes;
 import static Codigos.ProcessamentoPPS.getResultadosGeodeticos;
 import static Codigos.ProcessamentoPPS.processar_todas_epocas;
 import static Codigos.ProcessamentoPPS.readLogger_RawAssets;
@@ -23,6 +26,7 @@ import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
 public class MainActivity extends AppCompatActivity {
 
     private Button btnVisualizar;
+    private Button btnRINEX;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,32 +34,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btnVisualizar = findViewById(R.id.idVisualizar);
+        btnRINEX = findViewById(R.id.btnRINEX);
 
         btnVisualizar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), Resultado.class);
 
-//                Ecef2LlaConverter.GeodeticLlaValues valores =
-//                Ecef2LlaConverter.convertECEFToLLACloseForm(
-//                            3687512.700731742,
-//                            -4620834.607939523,
-//                            -2387174.1063294816);
-
-
-
                 ArrayList<CoordenadaGPS> valores = getResultadosGeodeticos();
 
-                Log.i("teste",valores.toString());
-
                 intent.putParcelableArrayListExtra("Coord",valores);
-//                intent.putExtra("Coord",valores);
-
                 startActivity(intent);
+            }
+        });
+
+        btnRINEX.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("CLICK","CLICOU");
 
 
 
-                Log.i("THE_END","O PROGRAMA FOI FINALIZADO COM SUCESSO! xD");
+
+//                startActivity(intent);
+
+//
+                ArrayList<EpocaObs> observacoes = getObservacoes();//
+
+                Rinex2Writer RINEX = new Rinex2Writer(getApplicationContext(),observacoes);
+                RINEX.gravarRINEX();
+                RINEX.send();
+
+//                Intent intent = new Intent(getApplicationContext(), RINEX_Activity.class);
+//
+//                intent.putParcelableArrayListExtra("Obs",observacoes);
+//                startActivity(intent);
             }
         });
 
