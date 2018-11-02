@@ -36,7 +36,8 @@ public class Rinex2Writer {
         if (isExternalStorageWritable()){
             newFile = startNewLog();
             criarCabecalho();
-            escrever_observacoes(42);
+//            escrever_observacoes(2648);
+            escrever_todas_observacoes();
             try {
                 writeTextFile2External(newFile,
                                         txtContent.toArray(new String[txtContent.size()]));
@@ -151,22 +152,24 @@ public class Rinex2Writer {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private void escrever_observacoes(int INDEX_EPCH){
-//        int INDEX_EPCH = 2648;
         StringBuilder listaSatEpch = new StringBuilder();
 
         for (int i = 0; i <listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(); i++) { // FIXME FAZER UM FOR PARA PERCORRER listaEpocas
            listaSatEpch.append("G" + String.format("%02d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().get(i))); //FIXME FAZER UM FOR PARA PERCORRER listaEpocas
         }
 
-        @SuppressLint("DefaultLocale") String epchHeaderLine = String.format(" %d  %d %d %d  %d  %s  0 %d%s\n",
+        @SuppressWarnings("MalformedFormatString") @SuppressLint("DefaultLocale") String epchHeaderLine = String.format(" %d %s %s %s %s %s  0 %s%s\n",
                 listaEpocas.get(INDEX_EPCH).getData_UTC().getYear() % 2000,
-                listaEpocas.get(INDEX_EPCH).getData_UTC().getMonth(),
-                listaEpocas.get(INDEX_EPCH).getData_UTC().getDay_Month(),
-                listaEpocas.get(INDEX_EPCH).getData_UTC().getHour(),
-                listaEpocas.get(INDEX_EPCH).getData_UTC().getMin(),
-                new DecimalFormat("#.#######").format(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec()),
-                listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(), listaSatEpch);
+                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getMonth()),
+                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getDay_Month()),
+                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getHour()),
+                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getMin()),
+//                new DecimalFormat("#.#######").format(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec()),
+                String.format("%2d",Math.round(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec())) + ".0000000", // FIXME REVER
+                String.format("%2d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().size()),
+                listaSatEpch);
 
         txtContent.add(epchHeaderLine);
 
