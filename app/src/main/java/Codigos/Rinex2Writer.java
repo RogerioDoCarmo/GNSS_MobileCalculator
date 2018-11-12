@@ -121,9 +121,8 @@ public class Rinex2Writer {
         txtContent.add("Arquivo gerado a partir de medicoes de aparelho Android     COMMENT");
         txtContent.add("\n");
 
-        //TODO AUTOMATIZAR ESSES NÚMEROS
         // , new DecimalFormat("#.####### ").format(0.0000000)
-        @SuppressLint("DefaultLocale") String firstObs = String.format("  %d     %d    %d    %d     %d    0.0000000     GPS         TIME OF FIRST OBS",
+        @SuppressLint("DefaultLocale") String firstObs = String.format("  %d     %d    %d    %d     %d    0.0000000     GPS       TIME OF FIRST OBS",
                 listaEpocas.get(0).getData_UTC().getYear() + 2000,
                 listaEpocas.get(0).getData_UTC().getMonth(),
                 listaEpocas.get(0).getData_UTC().getDay_Month(),

@@ -320,7 +320,7 @@ public class ProcessamentoPPS {
      */
     public static int contEfemerides(Context context) throws IOException{
         int numLines = 0;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc159)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc31do10)));
 
         StringBuilder sb = new StringBuilder();
         /*PULANDO O CABEÇALHO DE 8 LINHAS*/
@@ -873,9 +873,16 @@ public class ProcessamentoPPS {
         /**
          * DEFINIÇÃO MANUAL DA DATA DO RINEX:
          */
+//        int YEAR = 18; // FIXME RINEX
+//        int MONTH = 6; // FIXME RINEX
+//        int DAY_MONTH = 4; // FIXME RINEX
+//        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+//        int HOUR_DAY = 20; // FIXME RINEX
+//        int MIN_HOUR = 0; // FIXME RINEX
+//        double SEC = 0.0; // FIXME RINEX
         int YEAR = 18; // FIXME RINEX
-        int MONTH = 6; // FIXME RINEX
-        int DAY_MONTH = 4; // FIXME RINEX
+        int MONTH = 10; // FIXME RINEX
+        int DAY_MONTH = 31; // FIXME RINEX
         //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
         int HOUR_DAY = 20; // FIXME RINEX
         int MIN_HOUR = 0; // FIXME RINEX
@@ -926,7 +933,7 @@ public class ProcessamentoPPS {
 
     public static void processar_todas_epocas(){
 
-        for (int i = 25; i < 60; i++) {
+        for (int i = 0; i < 25; i++) {
             listaEfemeridesAtual = new ArrayList<>();
             listaMedicoesAtual = new ArrayList<>();
             //listaPRNs = new ArrayList<>(); // TODO REVER ONDE É ATRIBUÍDO
