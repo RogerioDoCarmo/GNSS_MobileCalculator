@@ -6,9 +6,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import org.joda.time.DateTime;
+import org.joda.time.YearMonth;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 //import android.support.v4.BuildConfig;
@@ -16,6 +20,9 @@ import java.util.ArrayList;
 import static Codigos.FileHelper.getPrivateStorageDir;
 import static Codigos.FileHelper.isExternalStorageWritable;
 import static Codigos.FileHelper.writeTextFile2External;
+import static Codigos.GNSSConstants.EP_02_APP_X;
+import static Codigos.GNSSConstants.EP_02_APP_Y;
+import static Codigos.GNSSConstants.EP_02_APP_Z;
 
 public class Rinex2Writer {
 
@@ -62,25 +69,25 @@ public class Rinex2Writer {
     }
 
     private void criarCabecalho() {
-        txtContent.add("     2.11           OBSERVATION DATA    M (MIXED)           RINEX VERSION / TYPE"); // TODO SEPARAR EM 2 COLUNAS COM 2 APPENDS
+        txtContent.add("     2.11           OBSERVATION DATA    M (MIXED)           RINEX VERSION / TYPE");
         txtContent.add("\n");
-        txtContent.add("teqc  2018Mar15                         20180605 08:43:32UTCPGM / RUN BY / DATE");
+        txtContent.add("GNSS Calculator     FCT/UNESP               2018Mar15 UTC   PGM / RUN BY / DATE"); //FIXME REVER
         txtContent.add("\n");
-        txtContent.add("PPTE                                                        MARKER NAME");
+        txtContent.add("GNSS Mobile Calculator                                      MARKER NAME");
         txtContent.add("\n");
-        txtContent.add("41611M002                                                   MARKER NUMBER");
+        txtContent.add("41611M002                                                   MARKER NUMBER");//FIXME REVER!
         txtContent.add("\n");
-        txtContent.add("RBMC                IBGE/CGED                               OBSERVER / AGENCY");
+        txtContent.add("Android App         GNSS Calculator                         OBSERVER / AGENCY");
         txtContent.add("\n");
-        txtContent.add("5215K84090          TRIMBLE NETR9       5.33                REC # / TYPE / VERS");
+        txtContent.add("0040109624          motorola            moto x4             REC # / TYPE / VERS");
         txtContent.add("\n");
-        txtContent.add("4923353208          TRM59800.00     NONE                    ANT # / TYPE");
+        txtContent.add("0040109624          moto x4             NONE                ANT # / TYPE");
         txtContent.add("\n");
 
         //TODO AUTOMATIZAR
-        String Xaprx = new DecimalFormat("########.####").format(3687624.3674);
-        String Yaprx = new DecimalFormat("########.####").format(-4620818.6827);
-        String Zaprx = new DecimalFormat("########.####").format(-2386880.3805);
+        String Xaprx = new DecimalFormat("########.####").format(EP_02_APP_X);
+        String Yaprx = new DecimalFormat("########.####").format(EP_02_APP_Y);
+        String Zaprx = new DecimalFormat("########.####").format(EP_02_APP_Z);
 
         StringBuilder lineAprx = new StringBuilder();
 
@@ -92,18 +99,18 @@ public class Rinex2Writer {
         txtContent.add(lineAprx.toString());
         txtContent.add("\n");
 
-        txtContent.add("        0.0020        0.0000        0.0000                  ANTENNA: DELTA H/E/N");//fixme rever
+        txtContent.add("        0.0000        0.0000        0.0000                  ANTENNA: DELTA H/E/N");
         txtContent.add("\n");
         txtContent.add("     1     1                                                WAVELENGTH FACT L1/2");
         txtContent.add("\n");
 
         //        txtContent.add("    11    L1    L2    L5    C1    P1    C2    P2    C5    S1# / TYPES OF OBSERV");
         String typeLine1 = String.format("     1    %s                                                # / TYPES OF OBSERV",
-                                        "C1"); // C/A Pseudorange only
+                                                    "C1"); // C/A Pseudorange
 
         txtContent.add(typeLine1);
         txtContent.add("\n");
-        txtContent.add("    15.0000                                                 INTERVAL");// FIXME USAR String.form
+        txtContent.add("     1.0000                                                 INTERVAL");
         txtContent.add("\n");
         txtContent.add("    18                                                      LEAP SECONDS");// FIXME USAR String.form
         txtContent.add("\n");
@@ -133,7 +140,7 @@ public class Rinex2Writer {
             File baseDirectory = null;
             if ( isExternalStorageWritable() ) {
                 try {
-                    String fileName = String.format("%s_%s.18o", FILE_PREFIX, "Teste_01");
+                    String fileName = String.format("%s_%s.18o", FILE_PREFIX, "Teste_31-10");
                     baseDirectory = getPrivateStorageDir(mContext,fileName);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -156,8 +163,8 @@ public class Rinex2Writer {
     private void escrever_observacoes(int INDEX_EPCH){
         StringBuilder listaSatEpch = new StringBuilder();
 
-        for (int i = 0; i <listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(); i++) { // FIXME FAZER UM FOR PARA PERCORRER listaEpocas
-           listaSatEpch.append("G" + String.format("%02d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().get(i))); //FIXME FAZER UM FOR PARA PERCORRER listaEpocas
+        for (int i = 0; i <listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(); i++) {
+           listaSatEpch.append("G" + String.format("%02d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().get(i)));
         }
 
         @SuppressWarnings("MalformedFormatString") @SuppressLint("DefaultLocale") String epchHeaderLine = String.format(" %d %s %s %s %s %s  0 %s%s\n",
@@ -167,7 +174,7 @@ public class Rinex2Writer {
                 String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getHour()),
                 String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getMin()),
 //                new DecimalFormat("#.#######").format(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec()),
-                String.format("%2d",Math.round(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec())) + ".0000000", // FIXME REVER
+                String.format("%2d",Math.round(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec())) + ".0000000",
                 String.format("%2d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().size()),
                 listaSatEpch);
 

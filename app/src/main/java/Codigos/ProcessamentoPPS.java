@@ -63,7 +63,7 @@ public class ProcessamentoPPS {
         // TODO PPTE
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc159)));
         // TODO EP01
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc155)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc31do10)));
 
 //        int numEfemerides = contEfemerides(context);
 
@@ -89,7 +89,7 @@ public class ProcessamentoPPS {
 
 //first line - epoch of satellite clock (toc)
 //====================================================================
-            sub = mLine.substring(0, 2).trim();
+            sub = mLine.substring(0, 2).replaceAll("\\s", "");
             efemeride.setPRN(Integer.valueOf(sub));  // FIXME
 //            Log.i("PRN", sub);
 
@@ -358,7 +358,7 @@ public class ProcessamentoPPS {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log15901))); // FIXME DEIXAR DINAMICO
 
         //TODO EP01
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log15501))); // FIXME DEIXAR DINAMICO
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log31do10))); // FIXME DEIXAR DINAMICO
 
 
         // do reading, usually loop until end of file reading
