@@ -52,10 +52,6 @@ public class MainActivity extends AppCompatActivity {
         btnRINEX.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("CLICK","CLICOU");
-
-
-
 
 //                startActivity(intent);
 
@@ -101,10 +97,9 @@ public class MainActivity extends AppCompatActivity {
                 "Erro ao abrir o arquivo de efemérides: " + msg, Toast.LENGTH_LONG).show();
         }
 
-        //TODO PROCESSAMENTO DE TODAS AS EPOCAS
         try{
 //            processar_todas_epocas();
-            processar_epoca(239);
+            processar_epoca(76);
         } catch (Exception e){
             Log.e("ERR_coord","Execucao unica");
             e.printStackTrace();
@@ -113,8 +108,6 @@ public class MainActivity extends AppCompatActivity {
                 "Erro ao calcular as coordenadas do satélite: " + msg,
                 Toast.LENGTH_LONG).show();
         }
-
-
 
     }
 }

@@ -1201,7 +1201,6 @@ public class ProcessamentoPPS {
         double[] U = new double[4];
         double[] X = new double[4];
         double[] Xa = new double[4];
-        double erro = 0d;
 
         int MAX_ITERACOES = 8;
 
@@ -1313,7 +1312,7 @@ public class ProcessamentoPPS {
             precision[2] = Math.sqrt(MVCXa.getEntry(2,2)); // Coordenada Za
             precision[3] = Math.sqrt(MVCXa.getEntry(3,3)); // Coordenada dtr
 
-//            Log.i("Precisao", Arrays.deepToString(precision)); //FIXME POR NA CLASSE RESULTADO
+            Log.i("Precisao", Arrays.deepToString(precision)); //FIXME POR NA CLASSE RESULTADO
 
             // Discrepâncias em relação as coordenadas originais
             Double[] discrepanciesXYZ = new Double[3];
@@ -1334,7 +1333,6 @@ public class ProcessamentoPPS {
                 Log.i("FimERRO","Coordenada Yr: " + Xa[1]);
                 Log.i("FimERRO","Coordenada Zr: " + Xa[2]);
                 Log.i("FimERRO","Erro do relógio do receptor: " + Xa[3]);
-                Log.i("FimERRO","Erro das coordenadas: " + erro);
                 Log.i("FimERRO","============================================");
                 flag = true;
                 break;
@@ -1354,7 +1352,6 @@ public class ProcessamentoPPS {
             Log.i("FimFOOR","Coordenada Yr: " + Xa[1]);
             Log.i("FimFOOR","Coordenada Zr: " + Xa[2]);
             Log.i("FimFOOR","Erro do relógio do receptor: " + Xa[3]);
-            Log.i("FimFOOR","Erro das coordenadas: " + erro);
             Log.i("FimFOOR","============================================");
         }
 
