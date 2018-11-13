@@ -19,6 +19,7 @@ import Codigos.Rinex2Writer;
 import static Codigos.ProcessamentoPPS.calcPseudorange;
 import static Codigos.ProcessamentoPPS.getObservacoes;
 import static Codigos.ProcessamentoPPS.getResultadosGeodeticos;
+import static Codigos.ProcessamentoPPS.processar_epoca;
 import static Codigos.ProcessamentoPPS.processar_todas_epocas;
 import static Codigos.ProcessamentoPPS.readLogger_RawAssets;
 import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
@@ -102,13 +103,8 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO PROCESSAMENTO DE TODAS AS EPOCAS
         try{
-//            EpocaGPS epoca = escolherEpoca(0);
-//            calcCoordenadas(epoca);
-//            calcularMMQ(); // para a época atual
-            processar_todas_epocas();
-
-
-
+//            processar_todas_epocas();
+            processar_epoca(239);
         } catch (Exception e){
             Log.e("ERR_coord","Execucao unica");
             e.printStackTrace();

@@ -358,7 +358,7 @@ public class ProcessamentoPPS {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log15901))); // FIXME DEIXAR DINAMICO
 
         //TODO EP01
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log31do10))); // FIXME DEIXAR DINAMICO
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log31do10bbbbbbbb))); // FIXME DEIXAR DINAMICO
 
 
         // do reading, usually loop until end of file reading
@@ -932,7 +932,6 @@ public class ProcessamentoPPS {
     }
 
     public static void processar_todas_epocas(){
-
         for (int i = 0; i < listaEpocas.size(); i++) {
             listaEfemeridesAtual = new ArrayList<>();
             listaMedicoesAtual = new ArrayList<>();
@@ -941,6 +940,15 @@ public class ProcessamentoPPS {
             calcCoordenadas(epoca);
             calcularMMQ(); // para a época atual
         }
+    }
+
+    public static void processar_epoca(int INDEX_ANALISE){
+            listaEfemeridesAtual = new ArrayList<>();
+            listaMedicoesAtual = new ArrayList<>();
+            //listaPRNs = new ArrayList<>(); // TODO REVER ONDE É ATRIBUÍDO
+            EpocaGPS epoca = escolherEpoca(INDEX_ANALISE);
+            calcCoordenadas(epoca);
+            calcularMMQ(); // para a época atual
     }
 
     public static ArrayList<CoordenadaGPS> getResultadosGeodeticos() {
