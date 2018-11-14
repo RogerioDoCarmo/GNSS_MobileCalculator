@@ -1,10 +1,12 @@
 package Codigos;
 
-import android.util.Log;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class EpocaGPS {
+public class EpocaGPS{
 
     private Double FctSeconds;
     private Long mArrivalTimeSinceGpsEpochNs;
@@ -228,4 +230,21 @@ public class EpocaGPS {
     public void setmArrivalTimeSinceGpsEpochNs(Long mArrivalTimeSinceGpsEpochNs) {
         this.mArrivalTimeSinceGpsEpochNs = mArrivalTimeSinceGpsEpochNs;
     }
+
+    public ArrayList<Double> getPseudorangesObs(){
+        ArrayList<Double> lista = new ArrayList<>();
+
+        for (int i = 0; i < listaMedicoes.size(); i++){
+            lista.add( listaMedicoes.get(i).getPseudorangeMeters());
+        }
+
+        return lista;
+    }
+
+
+//    public EpocaObs getNewEpocaObs() {
+//        return new EpocaObs();
+//    }
+
+
 }

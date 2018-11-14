@@ -111,5 +111,4 @@ public class CoordenadaGPS implements Comparable<CoordenadaGPS>, Parcelable {
         }
     };
 
-
 }

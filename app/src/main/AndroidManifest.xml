@@ -39,7 +39,22 @@
 
         <activity
             android:name=".Resultado"
-            android:label="@string/title_activity_resultado"></activity>
+            android:label="@string/title_activity_resultado" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="android.support.v4.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_providers_paths" />
+        </provider>
+
+        <activity
+            android:name=".RINEX_Activity"
+            android:label="@string/title_activity_rinex_"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

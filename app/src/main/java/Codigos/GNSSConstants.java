@@ -31,4 +31,9 @@ public class GNSSConstants {
     public static final double GM = 3.9860044185E14;
     public static final double We = 7.2921151467E-5;
     public static final double c = 299792458;
+
+    /*Valores copiados do Geo++ RINEX Logger*/
+    public static final double EP_02_APP_X = 3687622.7392;
+    public static final double EP_02_APP_Y = -4620693.7459;
+    public static final double EP_02_APP_Z = -2387156.6329;
 }

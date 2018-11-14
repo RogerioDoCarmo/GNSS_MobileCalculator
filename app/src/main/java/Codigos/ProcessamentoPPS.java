@@ -63,7 +63,7 @@ public class ProcessamentoPPS {
         // TODO PPTE
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc159)));
         // TODO EP01
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc155)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc31do10)));
 
 //        int numEfemerides = contEfemerides(context);
 
@@ -89,7 +89,7 @@ public class ProcessamentoPPS {
 
 //first line - epoch of satellite clock (toc)
 //====================================================================
-            sub = mLine.substring(0, 2).trim();
+            sub = mLine.substring(0, 2).replaceAll("\\s", "");
             efemeride.setPRN(Integer.valueOf(sub));  // FIXME
 //            Log.i("PRN", sub);
 
@@ -320,7 +320,7 @@ public class ProcessamentoPPS {
      */
     public static int contEfemerides(Context context) throws IOException{
         int numLines = 0;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc159)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc31do10)));
 
         StringBuilder sb = new StringBuilder();
         /*PULANDO O CABEÇALHO DE 8 LINHAS*/
@@ -358,7 +358,7 @@ public class ProcessamentoPPS {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log15901))); // FIXME DEIXAR DINAMICO
 
         //TODO EP01
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log15501))); // FIXME DEIXAR DINAMICO
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.log31do10bbbbbbbb))); // FIXME DEIXAR DINAMICO
 
 
         // do reading, usually loop until end of file reading
@@ -873,9 +873,16 @@ public class ProcessamentoPPS {
         /**
          * DEFINIÇÃO MANUAL DA DATA DO RINEX:
          */
+//        int YEAR = 18; // FIXME RINEX
+//        int MONTH = 6; // FIXME RINEX
+//        int DAY_MONTH = 4; // FIXME RINEX
+//        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+//        int HOUR_DAY = 20; // FIXME RINEX
+//        int MIN_HOUR = 0; // FIXME RINEX
+//        double SEC = 0.0; // FIXME RINEX
         int YEAR = 18; // FIXME RINEX
-        int MONTH = 6; // FIXME RINEX
-        int DAY_MONTH = 4; // FIXME RINEX
+        int MONTH = 10; // FIXME RINEX
+        int DAY_MONTH = 31; // FIXME RINEX
         //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
         int HOUR_DAY = 20; // FIXME RINEX
         int MIN_HOUR = 0; // FIXME RINEX
@@ -925,8 +932,7 @@ public class ProcessamentoPPS {
     }
 
     public static void processar_todas_epocas(){
-
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < listaEpocas.size(); i++) {
             listaEfemeridesAtual = new ArrayList<>();
             listaMedicoesAtual = new ArrayList<>();
             //listaPRNs = new ArrayList<>(); // TODO REVER ONDE É ATRIBUÍDO
@@ -934,6 +940,15 @@ public class ProcessamentoPPS {
             calcCoordenadas(epoca);
             calcularMMQ(); // para a época atual
         }
+    }
+
+    public static void processar_epoca(int INDEX_ANALISE){
+            listaEfemeridesAtual = new ArrayList<>();
+            listaMedicoesAtual = new ArrayList<>();
+            //listaPRNs = new ArrayList<>(); // TODO REVER ONDE É ATRIBUÍDO
+            EpocaGPS epoca = escolherEpoca(INDEX_ANALISE);
+            calcCoordenadas(epoca);
+            calcularMMQ(); // para a época atual
     }
 
     public static ArrayList<CoordenadaGPS> getResultadosGeodeticos() {
@@ -959,6 +974,24 @@ public class ProcessamentoPPS {
 
         return listaResultados;
     }
+
+    public static ArrayList<EpocaObs> getObservacoes() {
+        ArrayList<EpocaObs> listaObservacoes = new ArrayList<>();
+
+        for (int i = 0; i < listaEpocas.size(); i++) {
+
+            GNSSDate utc = listaEpocas.get(i).getDateUTC();
+            ArrayList<Double> obs = listaEpocas.get(i).getPseudorangesObs();
+            ArrayList<Integer> prns = listaEpocas.get(i).getListaPRNs();
+
+            EpocaObs newObserv = new EpocaObs(utc, prns, obs);
+            listaObservacoes.add(newObserv);
+        }
+
+        Log.i("OBSERVACOES", Arrays.deepToString(listaObservacoes.toArray()));
+        return listaObservacoes;
+    }
+
     /**
      * Calcula as <b>coordenadas X,Y,Z (WGS-84)</b> para cada satélite.
      * <p>Calcula o <b>erro do relógio</b> para cada satélite em segundos.
@@ -1143,19 +1176,6 @@ public class ProcessamentoPPS {
             Lb[i] = listaMedicoesAtual.get(i).getPseudorangeMeters();
         }
 
-//      Lb[0]  = 0;
-//      Lb[1]  = 0;
-//      Lb[2]  = 0;
-//      Lb[3]  = 0;
-//      Lb[4]  = 0;
-//      Lb[5]  = 0;
-//      Lb[6]  = 0;
-//      Lb[7]  = 0;
-//      Lb[8]  = 0;
-//      Lb[9]  = 0;
-//      Lb[10] = 0;
-
-
 //      USANDO A PPTE - COORDENADAS APROXIMADAS:
 //      double Xe = 3687624.3673;
 //      double Ye = -4620818.6831;
@@ -1176,28 +1196,22 @@ public class ProcessamentoPPS {
         double Yok = -4620675.32588841;
         double Zok = -2387150.66678273;
 
-//        Log.i("Lb","Vetor Lb criado");
-
         double[] X0 = new double[]{Xe, Ye, Ze,0d};
         double[][] N = new double[4][4];
         double[] U = new double[4];
         double[] X = new double[4];
         double[] Xa = new double[4];
-        double erro = 0d;
 
         int MAX_ITERACOES = 8;
 
-        // Solucao iterativa pelo metodo parametrico
+        // Solucao iterativa pelo metodo parametrico (MONICO, 2008)
         for (int k = 0; k < MAX_ITERACOES; k++){
             // Vetor L0
-            for (int i = 0; i < qntSatProcessar; i++){ // PARA CADA SATÉLITE
-                // dx = coord(i,2)-X0(1);
+            for (int i = 0; i < qntSatProcessar; i++){
                 double dx = listaCoordAtual.get(i).getX() - X0[0];
                 double dy = listaCoordAtual.get(i).getY() - X0[1];
                 double dz = listaCoordAtual.get(i).getZ() - X0[2];
 
-                // L0(i,1) = sqrt(dx^2+dy^2+dz^2) + c*(0 - coord(i,5))
-//                L0[i] = Math.sqrt( (dx*dx) + (dy*dy) + (dz*dz) ) + c * (0 - listaCoordAtual.get(i).getDts());
                 double ro = Math.sqrt( (dx*dx) + (dy*dy) + (dz*dz) );
                 L0[i] = ro;
             }
@@ -1205,10 +1219,7 @@ public class ProcessamentoPPS {
             //Vetor delta_L:
             //L = Lb-L0;
             for (int i = 0; i < Lb.length; i++){
-//                L[i] = Lb[i] - L0[i];
-//                L[i] = Lb[i] - (L0[i] + c * (0 - listaCoordAtual.get(i).getDts())); //FIXME IGUAL O DO VANI
                 L[i] = Lb[i] - ( L0[i] + c * (X0[3] - listaCoordAtual.get(i).getDts()) ) ;
-
             }
 
             //MATRIZ A
@@ -1258,7 +1269,7 @@ public class ProcessamentoPPS {
             double[] X2 = X;
             X[3] = X[3] / c;
 
-            //Xa = X0+X; // FIXME FAZER UMA FUNÇÃO PARA ISSO
+            //Xa = X0+X;
             for (int j = 0; j < X0.length; j++){
                 Xa[j] = X0[j] + X[j];
             }
@@ -1276,14 +1287,13 @@ public class ProcessamentoPPS {
             // Fator de variância a posteriori:
             double S0post = VtPV.getEntry(0) / (double) (qntSatProcessar - 4);
 
-            Log.i("VetorRESÍDUOS", rVt.toString());
-
-            Log.i("VtPV","\n=================================================");
-            Log.i("VtPV","VtPV: " + VtPV.getEntry(0));
-            Log.i("Posteriori","SigmaP: " + S0post);
+//            Log.i("VetorRESÍDUOS", rVt.toString());
+//            Log.i("VtPV","\n=================================================");
+//            Log.i("VtPV","VtPV: " + VtPV.getEntry(0));
+//            Log.i("Posteriori","SigmaP: " + S0post); //FIXME POR NA CLASSE RESULTADO
 
             // MVC das coordenadas ajustadas
-            RealMatrix MVCXa = rInvN.scalarMultiply(S0post); // TODO TESTAR NO OCTAVE
+            RealMatrix MVCXa = rInvN.scalarMultiply(S0post);
 
             if (!MatrixUtils.isSymmetric(MVCXa,0.005)){
                 Log.e("MVCXa","Should be symmetric!");
@@ -1302,7 +1312,7 @@ public class ProcessamentoPPS {
             precision[2] = Math.sqrt(MVCXa.getEntry(2,2)); // Coordenada Za
             precision[3] = Math.sqrt(MVCXa.getEntry(3,3)); // Coordenada dtr
 
-            Log.i("Precisao", Arrays.deepToString(precision));
+            Log.i("Precisao", Arrays.deepToString(precision)); //FIXME POR NA CLASSE RESULTADO
 
             // Discrepâncias em relação as coordenadas originais
             Double[] discrepanciesXYZ = new Double[3];
@@ -1310,7 +1320,7 @@ public class ProcessamentoPPS {
             discrepanciesXYZ[1] = Ye - Xa[1];
             discrepanciesXYZ[2] = Ze - Xa[2];
 
-            Log.i("Discrepancias", Arrays.deepToString(discrepanciesXYZ));
+            //Log.i("Discrepancias", Arrays.deepToString(discrepanciesXYZ)); //FIXME POR NA CLASSE RESULTADO
 //            Log.i("Discrepancias", "--------------------------------");
 
             //Verificação da Tolerancia
@@ -1323,7 +1333,6 @@ public class ProcessamentoPPS {
                 Log.i("FimERRO","Coordenada Yr: " + Xa[1]);
                 Log.i("FimERRO","Coordenada Zr: " + Xa[2]);
                 Log.i("FimERRO","Erro do relógio do receptor: " + Xa[3]);
-                Log.i("FimERRO","Erro das coordenadas: " + erro);
                 Log.i("FimERRO","============================================");
                 flag = true;
                 break;
@@ -1337,14 +1346,13 @@ public class ProcessamentoPPS {
 
         if (!flag){
             int numIteracao = contIteracoes + 1;
-//            Log.i("FimFOOR","============================================");
-//            Log.i("FimFOOR","Nº de iterações: " + numIteracao);
-//            Log.i("FimFOOR","Coordenada Xr: " + Xa[0]);
-//            Log.i("FimFOOR","Coordenada Yr: " + Xa[1]);
-//            Log.i("FimFOOR","Coordenada Zr: " + Xa[2]);
-//            Log.i("FimFOOR","Erro do relógio do receptor: " + Xa[3]);
-//            Log.i("FimFOOR","Erro das coordenadas: " + erro);
-//            Log.i("FimFOOR","============================================");
+            Log.i("FimFOOR","============================================");
+            Log.i("FimFOOR","Nº de iterações: " + numIteracao);
+            Log.i("FimFOOR","Coordenada Xr: " + Xa[0]);
+            Log.i("FimFOOR","Coordenada Yr: " + Xa[1]);
+            Log.i("FimFOOR","Coordenada Zr: " + Xa[2]);
+            Log.i("FimFOOR","Erro do relógio do receptor: " + Xa[3]);
+            Log.i("FimFOOR","============================================");
         }
 
         // Distância Geométrica entre a solucão obtida e a solução final:
@@ -1357,7 +1365,7 @@ public class ProcessamentoPPS {
         double distGeo2D = Math.sqrt(( dx*dx) + (dy*dy) );
 
         Log.i("Distancia","Distancia Geometrica em relação às 3 coordenadas (X,Y,Z) originais: " + distGeo3D);
-        Log.i("Distancia","Distancia Geometrica em relação às 2 coordenadas (X,Y) originais: " + distGeo2D);
+//        Log.i("Distancia","Distancia Geometrica em relação às 2 coordenadas (X,Y) originais: " + distGeo2D);
 //        Log.i("Distancia","=============================================================================================");
 
         CoordenadaGPS resultadoEpoca = new CoordenadaGPS(-1, X0[0], X0[1], X0[2] ,X0[3]);

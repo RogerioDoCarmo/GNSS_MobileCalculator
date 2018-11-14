@@ -1,8 +1,10 @@
 package Codigos;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-public class GNSSDate implements Comparable<GNSSDate>{
+public class GNSSDate implements Comparable<GNSSDate>, Parcelable {
     private int year;
     private int month;
     private int day;
@@ -32,6 +34,15 @@ public class GNSSDate implements Comparable<GNSSDate>{
 
     public GNSSDate() {
 
+    }
+
+    public GNSSDate(Parcel in){ // fixme REVISAR intervalos dos campos
+        this.year = in.readInt();
+        this.month = in.readInt();
+        this.day = in.readInt();
+        this.hour = in.readInt();
+        this.min = in.readInt();
+        this.sec = in.readDouble();
     }
 
     public int getYear() {
@@ -83,4 +94,30 @@ public class GNSSDate implements Comparable<GNSSDate>{
     public void setDay_week(int day_week) {
         this.day_week = day_week;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(year);
+        dest.writeInt(month);
+        dest.writeInt(day);
+        dest.writeInt(day_week);
+        dest.writeInt(hour);
+        dest.writeInt(min);
+        dest.writeDouble(sec);
+    }
+
+    public static final Parcelable.Creator<GNSSDate> CREATOR = new Parcelable.Creator<GNSSDate>() {
+        public GNSSDate createFromParcel(Parcel in) {
+            return new GNSSDate(in);
+        }
+
+        public GNSSDate[] newArray(int size) {
+            return new GNSSDate[size];
+        }
+    };
 }
