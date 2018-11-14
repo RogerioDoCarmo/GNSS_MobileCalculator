@@ -241,10 +241,4 @@ public class EpocaGPS{
         return lista;
     }
 
-
-//    public EpocaObs getNewEpocaObs() {
-//        return new EpocaObs();
-//    }
-
-
 }

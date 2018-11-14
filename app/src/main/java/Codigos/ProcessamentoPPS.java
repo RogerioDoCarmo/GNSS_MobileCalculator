@@ -633,6 +633,7 @@ public class ProcessamentoPPS {
                         Long mArrivalTimeSinceGpsEpochNs = listaMedicoesOriginal.get(j).getAllRxNanos();
 
                         GpsTime gpsTime = new GpsTime(mArrivalTimeSinceGpsEpochNs);
+
                         long gpsWeekEpochNs = GpsTime.getGpsWeekEpochNano(gpsTime);
                         double mArrivalTimeSinceGPSWeekNs = mArrivalTimeSinceGpsEpochNs - gpsWeekEpochNs;//TODO REVER
                         int mGpsWeekNumber = gpsTime.getGpsWeekSecond().first;
@@ -644,11 +645,14 @@ public class ProcessamentoPPS {
                         int hour = gpsTime.getGpsDateTime().getHourOfDay();
                         int minute = gpsTime.getGpsDateTime().getMinuteOfHour();
                         double seconds = gpsTime.getGpsDateTime().getSecondOfMinute();
+                        double milliseconds = gpsTime.getGpsDateTime().getMillisOfSecond() * 1e-3;
+                        double secFinal = seconds + milliseconds;
 
-                        GpsTime TESTE = GpsTime.fromWeekTow(mGpsWeekNumber,
-                                (int)(listaMedicoesOriginal.get(j).getReceivedSvTimeNanos() * 1e-9));
+                        Log.i("Segundos", String.valueOf(seconds));
+                        Log.i("Milliseconds", String.valueOf(milliseconds));
+                        Log.i("FINAL",String.valueOf(secFinal) + "\n");
 
-                        GNSSDate dataAtual = new GNSSDate(year, month, day_month, hour, minute, seconds);
+                        GNSSDate dataAtual = new GNSSDate(year, month, day_month, hour, minute, secFinal);//FIXME MUDEI AQUI O SECFINAL!
                         dataAtual.setDay_week(day_week);
                         novaEpoca.setData(dataAtual);
                         novaEpoca.setId(listaEpocas.size());

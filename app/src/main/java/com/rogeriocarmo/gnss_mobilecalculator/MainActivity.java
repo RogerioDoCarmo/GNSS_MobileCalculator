@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         try{
 //            processar_todas_epocas();
-            processar_epoca(76);
+            processar_epoca(0); // 545
         } catch (Exception e){
             Log.e("ERR_coord","Execucao unica");
             e.printStackTrace();
