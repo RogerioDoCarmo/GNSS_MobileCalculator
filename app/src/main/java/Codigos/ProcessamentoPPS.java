@@ -622,13 +622,7 @@ public class ProcessamentoPPS {
 
             for (int j = 0; j < listaMedicoesOriginal.size(); j++) {
                 // A medição pertence à época
-                if (listaMedicoesOriginal.get(j).getAllRxNanos().equals
-                        (AllRxNanosAtual)){ // TODOO CONDIÇÃO DE MESMA EPOCA
-//
-//                Double timeTag = Math.abs(FctSecondsAtual * 1e3 -
-//                        listaMedicoesOriginal.get(i).getAllRxMilliseconds());
-//                if (timeTag < 1){
-//
+                if (listaMedicoesOriginal.get(j).getAllRxNanos().equals(AllRxNanosAtual)){ // TODOO CONDIÇÃO DE MESMA EPOCA
                     if (novaEpoca.getNumMedicoes() == 0){ // Primeira medição da época
                         Long mArrivalTimeSinceGpsEpochNs = listaMedicoesOriginal.get(j).getAllRxNanos();
 
@@ -648,10 +642,6 @@ public class ProcessamentoPPS {
                         double milliseconds = gpsTime.getGpsDateTime().getMillisOfSecond() * 1e-3;
                         double secFinal = seconds + milliseconds;
 
-                        Log.i("Segundos", String.valueOf(seconds));
-                        Log.i("Milliseconds", String.valueOf(milliseconds));
-                        Log.i("FINAL",String.valueOf(secFinal) + "\n");
-
                         GNSSDate dataAtual = new GNSSDate(year, month, day_month, hour, minute, secFinal);//FIXME MUDEI AQUI O SECFINAL!
                         dataAtual.setDay_week(day_week);
                         novaEpoca.setData(dataAtual);
@@ -670,7 +660,7 @@ public class ProcessamentoPPS {
         }
 
         for (int i = 0; i < listaEpocas.size(); i++){
-                Log.i("Epocas",listaEpocas.get(i).toString() + "\n--------------------------------");
+                Log.i("Epoca",listaEpocas.get(i).toString() + "\n--------------------------------");
         }
     }
 

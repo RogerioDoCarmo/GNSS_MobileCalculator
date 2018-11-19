@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 //import android.support.v4.BuildConfig;
 
@@ -156,36 +157,10 @@ public class Rinex2Writer {
                 secs
         );
 
-        // , new DecimalFormat("#.####### ").format(0.0000000)
-//        @SuppressLint("DefaultLocale") String firstObs = String.format("  %2d     %2d    %2d    %2d     %2d    %s    GPS       TIME OF FIRST OBS",
-//                listaEpocas.get(0).getData_UTC().getYear() + 2000,
-//                listaEpocas.get(0).getData_UTC().getMonth(),
-//                listaEpocas.get(0).getData_UTC().getDay_Month(),
-//                listaEpocas.get(0).getData_UTC().getHour(),
-//                listaEpocas.get(0).getData_UTC().getMin(),
-//                new DecimalFormat("##.#######").format(listaEpocas.get(0).getData_UTC().getSec()),10);
-
-//        Log.i("TESTE1", String.format("% f", Float.parseFloat(String.valueOf(8.449))));
-//        Log.i("TESTE2", String.format("% f", rightpad(String.valueOf(28.447),10)));
-//        Log.i("TESTE3", rightpad(String.valueOf(22.447),10));
-//        Log.i("TESTE4", rightpad(new DecimalFormat("##.#######").format(listaEpocas.get(0).getData_UTC().getSec()),10));
-
         txtContent.add(firstObs);
         txtContent.add("\n");
         txtContent.add("                                                            END OF HEADER");
         txtContent.add("\n");
-    }
-
-    public String fixedLengthString(String string, int length) {
-        return String.format("%1$"+length+ "s", string);
-    }
-
-    private String leftpad(String text, int length) {
-        return String.format("%" + length + "." + length + "s", text);
-    }
-
-    private String rightpad(String text, int length) {
-        return String.format("%-" + length + "." + length + "s", text);
     }
 
     public File startNewLog() {
@@ -239,9 +214,16 @@ public class Rinex2Writer {
             min = " " + min;
         }
 
-        String secs = listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() + "0000";
+        StringBuilder secs = new StringBuilder(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() + "0000");
         if (listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() < 10.0){
-            secs = " " + listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() + "0000";
+            secs = new StringBuilder(" " + listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() + "0000");
+        }
+
+        while (secs.length() < 10) {
+            secs.append("0");
+        }
+        while (secs.length() > 10) {
+            secs.deleteCharAt(secs.length() - 1);
         }
 
         String numPRNs = String.valueOf(listaEpocas.get(INDEX_EPCH).getLista_PRNs().size());
@@ -255,21 +237,9 @@ public class Rinex2Writer {
                 day_month,
                 hour,
                 min,
-                secs,
+                secs.toString(),
                 numPRNs,
                 listaSatEpch);
-
-//        @SuppressWarnings("MalformedFormatString") @SuppressLint("DefaultLocale") String epchHeaderLine = String.format(" %d %s %s %s %s   %s       0 %s%s\n",
-//                listaEpocas.get(INDEX_EPCH).getData_UTC().getYear() % 2000,
-//                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getMonth()),
-//                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getDay_Month()),
-//                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getHour()),
-//                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getMin()),
-////                new DecimalFormat("#.#######").format(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec()),
-//                new DecimalFormat("##.#######").format(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec()),
-////                String.format("%2d",Math.round(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec())) + ".0000000",
-//                String.format("%2d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().size()),
-//                listaSatEpch);
 
         txtContent.add(epchHeaderLine);
 

@@ -99,7 +99,14 @@ public class MainActivity extends AppCompatActivity {
 
         try{
 //            processar_todas_epocas();
-            processar_epoca(545); // 545 e 36
+            /*
+            *Epocas Boas
+            * ID = 313
+            * ID = 298 ==> A MELHOR!
+            * ID = 212
+            * ID = 227
+            * */
+            processar_epoca(227);
         } catch (Exception e){
             Log.e("ERR_coord","Execucao unica");
             e.printStackTrace();
