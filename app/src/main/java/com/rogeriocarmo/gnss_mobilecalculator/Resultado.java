@@ -32,11 +32,14 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
     private final double EP02_LAT = -22.122500;
     private final double EP02_LONG = -51.407778;
     LatLng coordEP02 = new LatLng(EP02_LAT, EP02_LONG);
+    ArrayList<CoordenadaGPS> resultados;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resultado);
+
+        resultados =  getIntent().getParcelableArrayListExtra("Coord");
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -60,43 +63,44 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
         googleMap.setMinZoomPreference(14.0f);
         googleMap.setMaxZoomPreference(24.0f);
 
-//        Ecef2LlaConverter.GeodeticLlaValues valores = (Ecef2LlaConverter.GeodeticLlaValues)
-//                getIntent().getSerializableExtra("Coord");
-
-        ArrayList<CoordenadaGPS> resultados =  getIntent().getParcelableArrayListExtra("Coord");
-
-        int limite = resultados.size() - 1;
-        for (int i = 0; i < limite ; i++){
-            Double latDegrees = resultados.get(i).getX();
-            Double longDegrees = resultados.get(i).getY();
-
-            LatLng coord = new LatLng(latDegrees,longDegrees);
-            mMap.addMarker(new MarkerOptions().position(coord).title(i + "a iteração"));
+        if (resultados.size() > 1) // TODO TRATAR CASO SEJA IGUAL A ZERO
+        {
+            marcar_todas_epocas();
+        }else{
+            marcar_epoca_unica();
         }
-
-        Double latFinal = resultados.get(resultados.size() - 1).getX();
-        Double longFinal = resultados.get(resultados.size() - 1).getY();
-        Double altFinal = resultados.get(resultados.size() - 1).getZ();
-
-        LatLng coordSolu = new LatLng(latFinal, longFinal);
 
         mMap.addMarker(new MarkerOptions().
                 position(coordEP02).
                 title("Marco EP02").
-                snippet("Coordenadas do IBGE"));
-        mMap.addMarker(new MarkerOptions().
-                alpha(0.8f).
-                position(coordSolu).
-                title("Solução Final").
-                snippet("Coordenadas Calculadas"));
+                snippet("Coordenadas do IBGE").rotation(-90f));
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordSolu,19));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordEP02,19));
+    }
+
+    private void marcar_epoca_unica() {
+        Double latFinal  = resultados.get(0).getX();
+        Double longFinal = resultados.get(0).getY();
+        Double altFinal  = resultados.get(0).getZ();
+
+        LatLng coordSolu = new LatLng(latFinal, longFinal);
+
+        float[] result = new float[1];
+        Location.distanceBetween(coordSolu.latitude,coordSolu.longitude,
+                coordEP02.latitude,coordEP02.longitude, result);
+
+        mMap.addMarker(new MarkerOptions().
+                        alpha(0.6f).
+                        position(coordSolu).
+                        title("Solução Final").
+                        snippet("Distância: " + new DecimalFormat("#.#### ").format(result[0]) + "m")
+        );
 
         Snackbar snackbar = Snackbar
                 .make(Objects.requireNonNull(mapFragment.getActivity()).findViewById(R.id.map),
-                         "Lat:  " +  new DecimalFormat("#.#### ").format(latFinal) +
-                              "Lon: " + new DecimalFormat("#.#### ").format(longFinal)  +
-                              "Alt: " + new DecimalFormat("#.### ").format(altFinal),
+                           "Lat: " +  new DecimalFormat("#.#### ").format(latFinal) +
+                                "Lon: " + new DecimalFormat("#.#### ").format(longFinal)  +
+                                "Alt: " + new DecimalFormat("#.### ").format(altFinal),
                         Snackbar.LENGTH_INDEFINITE)
                 .setAction("Voltar", new View.OnClickListener() {
                     @Override
@@ -107,10 +111,44 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
                 });
         snackbar.show();
 
-        float[] result = new float[1];
-        Location.distanceBetween(coordSolu.latitude,coordSolu.longitude,
-                                 coordEP02.latitude,coordEP02.longitude, result);
+        Toast.makeText(this,"Distância: " + new DecimalFormat("#.#### ").format(result[0]) + "m", Toast.LENGTH_LONG).show();
+    }
 
-        Toast.makeText(this,"Distância em metros: " + result[0], Toast.LENGTH_LONG).show();
+    private void marcar_todas_epocas(){
+        int numEpch = 1;
+        int limite = resultados.size();
+        for (int i = 0; i < limite ; i++){
+            Double latDegrees = resultados.get(i).getX();
+            Double longDegrees = resultados.get(i).getY();
+
+            LatLng coord = new LatLng(latDegrees,longDegrees);
+
+            float[] result = new float[1];
+            Location.distanceBetween(coord.latitude,coord.longitude,
+                    coordEP02.latitude,coordEP02.longitude, result);
+
+            mMap.addMarker(new MarkerOptions().
+                            position(coord).
+                            alpha(0.6f).
+                            title(numEpch + "a época").
+                            snippet("Distância: " + new DecimalFormat("#.#### ").format(result[0]) + "m")
+            );
+
+            numEpch++;
+        }
+        numEpch--;
+
+        Snackbar snackbar = Snackbar
+                .make(Objects.requireNonNull(mapFragment.getActivity()).findViewById(R.id.map),
+                        "Foram processadas " + numEpch + " épocas!",
+                        Snackbar.LENGTH_INDEFINITE)
+                .setAction("Voltar", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
+        snackbar.show();
     }
 }

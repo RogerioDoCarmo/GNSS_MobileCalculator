@@ -735,20 +735,16 @@ public class ProcessamentoPPS {
     }
 
     public static void processar_todas_epocas(){
-        for (int i = 0; i < listaEpocas.size(); i++) {
-            listaEfemeridesAtual = new ArrayList<>();
-            listaMedicoesAtual = new ArrayList<>();
-            //listaPRNs = new ArrayList<>(); // TODO REVER ONDE É ATRIBUÍDO
-            EpocaGPS epoca = escolherEpoca(i);
-            calcCoordenadas(epoca);
-            calcularMMQ(); // para a época atual
+        for (int i = 0; i < 15; i++) { // FIXME !!!!!!!!!!!!!!!!!!!!!!!
+            processar_epoca(i);
         }
     }
 
     public static void processar_epoca(int INDEX_ANALISE){
             listaEfemeridesAtual = new ArrayList<>();
             listaMedicoesAtual = new ArrayList<>();
-            //listaPRNs = new ArrayList<>(); // TODO REVER ONDE É ATRIBUÍDO
+            listaCoordAtual = new ArrayList<>();
+            listaPRNs = new ArrayList<>();
             EpocaGPS epoca = escolherEpoca(INDEX_ANALISE);
             calcCoordenadas(epoca);
             calcularMMQ(); // para a época atual

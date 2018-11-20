@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try{
-//            processar_todas_epocas();
+            processar_todas_epocas();
             /*
             *Epocas Boas
             * ID = 313
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             * ID = 212
             * ID = 227
             * */
-            processar_epoca(227);
+//            processar_epoca(298);
         } catch (Exception e){
             Log.e("ERR_coord","Execucao unica");
             e.printStackTrace();
