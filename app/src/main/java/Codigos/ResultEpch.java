@@ -8,8 +8,9 @@ public class ResultEpch {
     private double Xmeters;
     private double Ymeters;
     private double Zmeters;
+    private double DtrS;
 
-    private double latDegrees;
+    private double latiDegrees;
     private double longDegrees;
     private double altMeters;
 
@@ -26,11 +27,7 @@ public class ResultEpch {
     private double discYmeters;
     private double discZmeters;
 
-    public ResultEpch(){
-
-    }
-
-    public ResultEpch(int numEpch, GNSSDate data, double Xmeters, double Ymeters, double Zmeters, double latDegrees, double longDegrees, double altMeters,
+    public ResultEpch(int numEpch, GNSSDate data, double Xmeters, double Ymeters, double Zmeters, double DtrS, double latiDegrees, double longDegrees, double altMeters,
                       int numIterations, double sigmaXmeters, double sigmaYmeters, double sigmaZmeters, double sigmaDtrSecons, int numSat,
                       double discXmeters, double discYmeters, double discZmeters) {
         this.numEpch = numEpch;
@@ -38,7 +35,8 @@ public class ResultEpch {
         this.Xmeters = Xmeters;
         this.Ymeters = Ymeters;
         this.Zmeters = Zmeters;
-        this.latDegrees = latDegrees;
+        this.DtrS = DtrS;
+        this.latiDegrees = latiDegrees;
         this.longDegrees = longDegrees;
         this.altMeters = altMeters;
         this.numIterations = numIterations;
@@ -72,8 +70,12 @@ public class ResultEpch {
         return Zmeters;
     }
 
-    public double getLatDegrees() {
-        return latDegrees;
+    public double getDtrS() {
+        return DtrS;
+    }
+
+    public double getLatiDegrees() {
+        return latiDegrees;
     }
 
     public double getLongDegrees() {
@@ -118,5 +120,11 @@ public class ResultEpch {
 
     public double getDiscZmeters() {
         return discZmeters;
+    }
+
+    @Override
+    public String toString(){
+        return (data.toString() + "; " + numEpch + "; " + Xmeters + "; " + Ymeters) + "; " + Zmeters + "; " + DtrS + "; " + sigmaXmeters + "; " + sigmaYmeters + "; " + sigmaZmeters + "; " + sigmaDtrSecons
+                                + "; " + numSat;
     }
 }
