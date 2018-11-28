@@ -39,6 +39,7 @@ public class ProcessamentoPPS {
     public static ArrayList<ResultEpch> listaResultados = new ArrayList<>();
 
     public static EpocaGPS epocaAtual;
+    public static TextWritter writter;
 
     /**Quantidade de satélites disponíveis para processamento na época atual*/
     private static int qntSatEpchAtual;
@@ -664,13 +665,40 @@ public class ProcessamentoPPS {
     }
 
     public static String[] getListaEpocas(){
-        ArrayList<String> lista = new ArrayList();
+        ArrayList<String> lista = new ArrayList<>();
         for (int i = 0; i < listaEpocas.size(); i++){
             lista.add(listaEpocas.get(i).toString());
             lista.add("\n----------------------------------------------------------------\n");
 
         }
         return (Arrays.copyOf(lista.toArray(), lista.size(), String[].class));
+    }
+
+    public static String[] getListaResultados(){
+        ArrayList<String> lista = new ArrayList<>();
+        lista.add("# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat \n");
+        for (int i = 0; i < listaResultados.size(); i++){
+            lista.add(listaResultados.get(i).toString() + "\n");
+        }
+        return (Arrays.copyOf(lista.toArray(), lista.size(), String[].class));
+    }
+
+    public static int getNumResultados() {
+        return  listaResultados.size();
+    }
+
+    public static boolean gravar_epocas(Context context){
+        writter = new TextWritter(context); // FIXME
+        return writter.gravar_txtSD(getListaEpocas(),"ListEpchs.txt");
+    }
+
+    public static boolean gravar_resultados(Context context){
+        writter = new TextWritter(context); // FIXME
+        return writter.gravar_txtSD(getListaResultados(),"ListResults.txt");
+    }
+
+    public static void send_txt(){
+        writter.send();
     }
 
     /**
@@ -744,7 +772,7 @@ public class ProcessamentoPPS {
 //            Log.i("EPK",lista[i]);
 
         Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat");
-        for (int i = 0; i < 40; i++) { // FIXME !!!!!!!!!!!!!!!!!!!!!!!
+        for (int i = 0; i < 655; i++) { // FIXME !!!!!!!!!!!!!!!!!!!!!!!
             processar_epoca(i);
         }
 

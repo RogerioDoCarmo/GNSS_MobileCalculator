@@ -167,7 +167,7 @@ public class Rinex2Writer {
             File baseDirectory = null;
             if ( isExternalStorageWritable() ) {
                 try {
-                    String fileName = String.format("%s_%s.18o", FILE_PREFIX, "Teste_ATUALIZADO_31-10");
+                    String fileName = String.format("%s_%s.18o", FILE_PREFIX, "Teste_31-10");
                     baseDirectory = getPrivateStorageDir(mContext,fileName);
                 } catch (IOException e) {
                     e.printStackTrace();

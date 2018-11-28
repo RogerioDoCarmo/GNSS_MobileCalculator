@@ -109,13 +109,13 @@ public class EpocaGPS{
     public String toString() {
         if (this.UTC != null){
         String msg = "ID: " + this.id + "\n" +
-                     "UTC: Hora: " + getDateUTC().getHour() + " Minutos: " + getDateUTC().getMin() + " Segundos: " + getDateUTC().getSec() + " \n" +
-                     "Nº de satélites: " + getNumSatelites() + " \n" +
-                     "Lista de satélites: " + Arrays.toString(getListaPRNs().toArray());
+                     "Year: " + UTC.getYear() + " Month: " + UTC.getMonth() + " Day: " + UTC.getDay_Month() + " \n" +
+                     "Hour: " + getDateUTC().getHour() + " Minutes: " + getDateUTC().getMin() + " Seconds: " + getDateUTC().getSec() + " \n" +
+                     "Number of satellites: " + getNumSatelites() + " \n" +
+                     "List of satellites: " + Arrays.toString(getListaPRNs().toArray());
         return msg;
         }else{
-//            String msg = "ID: " + this.id + "\n";
-            return "EPOCA EM CONSTRUÇÃO!";
+            return "Under construction!!!";
         }
     }
 

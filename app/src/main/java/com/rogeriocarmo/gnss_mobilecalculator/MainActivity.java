@@ -19,23 +19,31 @@ import Codigos.Rinex2Writer;
 import static Codigos.ProcessamentoPPS.calcPseudorange;
 import static Codigos.ProcessamentoPPS.getObservacoes;
 import static Codigos.ProcessamentoPPS.getResultadosGeodeticos;
+import static Codigos.ProcessamentoPPS.gravar_epocas;
+import static Codigos.ProcessamentoPPS.gravar_resultados;
 import static Codigos.ProcessamentoPPS.processar_epoca;
 import static Codigos.ProcessamentoPPS.processar_todas_epocas;
 import static Codigos.ProcessamentoPPS.readLogger_RawAssets;
 import static Codigos.ProcessamentoPPS.readRINEX_RawAssets;
+import static Codigos.ProcessamentoPPS.send_txt;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button btnVisualizar;
     private Button btnRINEX;
+    private Button btnEpocas;
+    private Button btnResultados;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*Vinculação dos botões*/
         btnVisualizar = findViewById(R.id.idVisualizar);
         btnRINEX = findViewById(R.id.btnRINEX);
+        btnEpocas = findViewById(R.id.btnEpocas);
+        btnResultados = findViewById(R.id.btnResultados);
 
         btnVisualizar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,20 +60,42 @@ public class MainActivity extends AppCompatActivity {
         btnRINEX.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-//                startActivity(intent);
-
-//
-                ArrayList<EpocaObs> observacoes = getObservacoes();//
+                ArrayList<EpocaObs> observacoes = getObservacoes();
 
                 Rinex2Writer RINEX = new Rinex2Writer(getApplicationContext(),observacoes);
-                RINEX.gravarRINEX();
-                RINEX.send();
-
+                if (RINEX.gravarRINEX()){
+                    Toast.makeText(getApplicationContext(), "Arquivo gravado com sucesso!", Toast.LENGTH_LONG).show();
+                    RINEX.send();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
+                }
 //                Intent intent = new Intent(getApplicationContext(), RINEX_Activity.class);
-//
 //                intent.putParcelableArrayListExtra("Obs",observacoes);
 //                startActivity(intent);
+            }
+        });
+
+        btnEpocas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(gravar_epocas(getApplicationContext())) {
+                    Toast.makeText(getApplicationContext(), "Arquivo gravado com sucesso!", Toast.LENGTH_LONG).show();
+                    send_txt();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        btnResultados.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (gravar_resultados(getApplication())) {
+                    Toast.makeText(getApplicationContext(), "Arquivo gravado com sucesso!", Toast.LENGTH_LONG).show();
+                    send_txt();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -102,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             /*
             *Epocas Boas
             * ID = 313
-            * ID = 298 ==> A MELHOR!
+            * ID = 298 ==> A MELHOR!!!!
             * ID = 212
             * ID = 227
             * */
