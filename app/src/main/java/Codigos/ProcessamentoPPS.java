@@ -766,16 +766,10 @@ public class ProcessamentoPPS {
     }
 
     public static void processar_todas_epocas(){
-//        MOSTRANDO TODAS AS EPOCAS
-//        String[] lista = getListaEpocas();
-//        for (int i = 0; i < lista.length; i++)
-//            Log.i("EPK",lista[i]);
-
         Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat");
-        for (int i = 0; i < 655; i++) { // FIXME !!!!!!!!!!!!!!!!!!!!!!!
+        for (int i = 0; i < listaEpocas.size(); i++) {
             processar_epoca(i);
         }
-
     }
 
     public static CoordenadaGPS getCentroide(){

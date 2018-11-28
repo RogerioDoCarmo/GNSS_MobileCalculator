@@ -43,4 +43,13 @@
         app:layout_constraintTop_toBottomOf="@+id/btnEpocas"
         tools:layout_editor_absoluteX="136dp" />
 
+    <Button
+        android:id="@+id/intervalo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Button"
+        app:layout_constraintStart_toEndOf="@+id/btnResultados"
+        tools:layout_editor_absoluteY="417dp" />
+
 </android.support.constraint.ConstraintLayout>

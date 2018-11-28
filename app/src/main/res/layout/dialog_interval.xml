@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/interval_min"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:hint="ID da 1a epoca"
+        android:inputType="number"
+        android:scrollbars="vertical" />
+
+    <EditText
+        android:id="@+id/interval_max"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:hint="ID da ultima epoca"
+        android:inputType="number"
+        android:scrollbars="vertical" />
+
+</LinearLayout>
