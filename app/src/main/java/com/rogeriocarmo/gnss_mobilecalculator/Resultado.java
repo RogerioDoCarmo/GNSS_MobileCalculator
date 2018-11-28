@@ -5,7 +5,6 @@ import android.location.Location;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -13,6 +12,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -21,9 +21,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import Codigos.CoordenadaGPS;
-import Codigos.Ecef2LlaConverter;
-import Codigos.EpocaGPS;
-import Codigos.Rinex2Writer;
 
 public class Resultado extends FragmentActivity implements OnMapReadyCallback {
 
@@ -33,6 +30,13 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
     private final double EP02_LONG = -51.407778;
     LatLng coordEP02 = new LatLng(EP02_LAT, EP02_LONG);
     ArrayList<CoordenadaGPS> resultados;
+
+    float min_distance = Float.MAX_VALUE;
+    float max_distance = Float.MIN_VALUE;
+    LatLng coord_min;
+    LatLng coord_max;
+    int epch_min = 0;
+    int epch_max = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +64,8 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        googleMap.setMinZoomPreference(14.0f);
-        googleMap.setMaxZoomPreference(24.0f);
+//        googleMap.setMinZoomPreference(14.0f);
+//        googleMap.setMaxZoomPreference(24.0f);
 
         if (resultados.size() > 1) // TODO TRATAR CASO SEJA IGUAL A ZERO
         {
@@ -72,6 +76,7 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
 
         mMap.addMarker(new MarkerOptions().
                 position(coordEP02).
+                icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)).
                 title("Marco EP02").
                 snippet("Coordenadas do IBGE").rotation(-90f));
 
@@ -115,9 +120,10 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
     }
 
     private void marcar_todas_epocas(){
-        int numEpch = 1;
-        int limite = resultados.size();
+        int numEpch = 1; // FIXME ERRO QUANDO A ACTIVITY É REABERTA!
+        int limite = resultados.size() - 1;
         for (int i = 0; i < limite ; i++){
+
             Double latDegrees = resultados.get(i).getX();
             Double longDegrees = resultados.get(i).getY();
 
@@ -128,15 +134,30 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
                     coordEP02.latitude,coordEP02.longitude, result);
 
             mMap.addMarker(new MarkerOptions().
-                            position(coord).
-                            alpha(0.6f).
-                            title(numEpch + "a época").
-                            snippet("Distância: " + new DecimalFormat("#.#### ").format(result[0]) + "m")
+                    position(coord).
+                    icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)).
+                    alpha(0.5f).
+                    title(numEpch + "a época").
+                    snippet("Distância: " + new DecimalFormat("#.#### ").format(result[0]) + "m")
             );
-
             numEpch++;
+
+            if (result[0] < min_distance){
+                min_distance = result[0];
+                coord_min = coord;
+                epch_min = i + 1;
+            }else if (result[0] > max_distance){
+                max_distance = result[0];
+                coord_max = coord;
+                epch_max = i + 1;
+            }
+
         }
         numEpch--;
+
+        marcar_centroide();
+
+        marcar_min_max();
 
         Snackbar snackbar = Snackbar
                 .make(Objects.requireNonNull(mapFragment.getActivity()).findViewById(R.id.map),
@@ -150,5 +171,45 @@ public class Resultado extends FragmentActivity implements OnMapReadyCallback {
                     }
                 });
         snackbar.show();
+    }
+
+    private void marcar_min_max() {
+        mMap.addMarker(new MarkerOptions().
+                position(coord_min).
+                icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
+                title(epch_min + "a época").
+                snippet("Distância: " + new DecimalFormat("#.#### ").format(min_distance) + "m"
+                        + "\n Marcador mais próximo!")
+        );
+
+        mMap.addMarker(new MarkerOptions().
+                position(coord_max).
+                icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
+                title(epch_max + "a época").
+                snippet("Distância: " + new DecimalFormat("#.#### ").format(max_distance) + "m"
+                        + "\n Marcador mais distante!")
+        );
+    }
+
+    private void marcar_centroide(){
+        Double latDegrees = resultados.get(resultados.size() - 1).getX();
+        Double longDegrees = resultados.get(resultados.size() - 1).getY();
+
+        LatLng coord = new LatLng(latDegrees,longDegrees);
+
+        float[] result = new float[1];
+        Location.distanceBetween(coord.latitude,coord.longitude,
+                coordEP02.latitude,coordEP02.longitude, result);
+
+        mMap.addMarker(new MarkerOptions().
+                position(coord).
+                icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).
+                title("Centróide").
+                snippet("Distância: " + new DecimalFormat("#.#### ").format(result[0]) + "m")
+        );
+
+        Toast.makeText(this,"Centróide calculado: "
+                        + new DecimalFormat("#.#### ").format(result[0]) + "m",
+                        Toast.LENGTH_LONG).show();
     }
 }

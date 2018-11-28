@@ -36,6 +36,8 @@ public class ProcessamentoPPS {
     public static ArrayList<EpocaGPS> listaEpocas = new ArrayList<>();
     public static ArrayList<CoordenadaGPS> listaCoordReceptor = new ArrayList<>();
 
+    public static ArrayList<ResultEpch> listaResultados = new ArrayList<>();
+
     public static EpocaGPS epocaAtual;
 
     /**Quantidade de satélites disponíveis para processamento na época atual*/
@@ -742,13 +744,30 @@ public class ProcessamentoPPS {
 //            Log.i("EPK",lista[i]);
 
         Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat");
-        for (int i = 0; i < 20; i++) { // FIXME !!!!!!!!!!!!!!!!!!!!!!!
+        for (int i = 0; i < 40; i++) { // FIXME !!!!!!!!!!!!!!!!!!!!!!!
             processar_epoca(i);
         }
+
     }
 
-    public void getCentroide(){
-        
+    public static CoordenadaGPS getCentroide(){
+        double sumX = 0d;
+        double sumY = 0d;
+        double sumZ = 0d;
+
+        int qntResult = listaResultados.size();
+
+        for (int i = 0; i < qntResult; i++) {
+            sumX += listaResultados.get(i).getXmeters();
+            sumY += listaResultados.get(i).getYmeters();
+            sumZ += listaResultados.get(i).getZmeters();
+        }
+
+        double meanX = sumX / qntResult;
+        double meanY = sumY / qntResult;
+        double meanZ = sumZ / qntResult;
+
+        return new CoordenadaGPS(-1, meanX, meanY, meanZ, -1);
     }
 
     public static void processar_epoca(int INDEX_ANALISE){
@@ -758,31 +777,41 @@ public class ProcessamentoPPS {
             listaPRNs = new ArrayList<>();
             epocaAtual = escolherEpoca(INDEX_ANALISE);
             calcCoordenadas();
-            calcularMMQ(); // para a época atual
+            listaResultados.add(calcularMMQ()); // para a época atual
     }
 
     public static ArrayList<CoordenadaGPS> getResultadosGeodeticos() {
-        ArrayList<CoordenadaGPS> listaResultados = new ArrayList<>();
+        ArrayList<CoordenadaGPS> listaResulGeod= new ArrayList<>();
 
-        for (int i = 0; i < listaCoordReceptor.size(); i++) {
-            Ecef2LlaConverter.GeodeticLlaValues valores =
-                    Ecef2LlaConverter.convertECEFToLLACloseForm(
-                            listaCoordReceptor.get(i).getX(),
-                            listaCoordReceptor.get(i).getY(),
-                            listaCoordReceptor.get(i).getZ());
+        for (int i = 0; i < listaResultados.size(); i++) {
+            CoordenadaGPS resultadoEpoca = new CoordenadaGPS(i + 1,
+                    listaResultados.get(i).getLatiDegrees(),
+                    listaResultados.get(i).getLongDegrees(),
+                    listaResultados.get(i).getAltMeters(),
+                    -1);
 
-            CoordenadaGPS resultadoEpoca = new CoordenadaGPS(i,
-                    Math.toDegrees(valores.latitudeRadians),
-                    Math.toDegrees(valores.longitudeRadians),
-                    valores.altitudeMeters,
-                    listaCoordReceptor.get(i).getDts());
-
-            listaResultados.add(resultadoEpoca);
+            listaResulGeod.add(resultadoEpoca);
         }
+
+        CoordenadaGPS centroideXYZ = getCentroide();
+
+        Ecef2LlaConverter.GeodeticLlaValues valores = Ecef2LlaConverter.convertECEFToLLACloseForm(
+                centroideXYZ.getX(), centroideXYZ.getY(), centroideXYZ.getZ());
+
+        Double latiDegrees =  Math.toDegrees(valores.latitudeRadians);
+        Double longDegrees =  Math.toDegrees(valores.longitudeRadians);
+        Double altMeters   =  valores.altitudeMeters;
+        CoordenadaGPS resultCentroide = new CoordenadaGPS(listaResulGeod.size() + 1,
+                latiDegrees,
+                longDegrees,
+                altMeters,
+                -1);
+
+        listaResulGeod.add(resultCentroide);
 
         Log.i("RESULTADO_GEO",Arrays.deepToString(listaResultados.toArray()));
 
-        return listaResultados;
+        return listaResulGeod;
     }
 
     public static ArrayList<EpocaObs> getObservacoes() {
@@ -1066,8 +1095,8 @@ public class ProcessamentoPPS {
             numIteracao++;
         } // Fim do laço do ajustamento
 
-        CoordenadaGPS resultadoEpoca = new CoordenadaGPS(-1, X0[0], X0[1], X0[2] ,X0[3]); // FIXME CRIAR EM OUTRO LUGAR!!!!!!!!!!!!!!!!!
-        listaCoordReceptor.add(resultadoEpoca);
+//        CoordenadaGPS resultadoEpoca = new CoordenadaGPS(-1, X0[0], X0[1], X0[2] ,X0[3]); // FIXME CRIAR EM OUTRO LUGAR!!!!!!!!!!!!!!!!!
+//        listaCoordReceptor.add(resultadoEpoca);
 
         Ecef2LlaConverter.GeodeticLlaValues valores = Ecef2LlaConverter.convertECEFToLLACloseForm(
                 X0[0], X0[1], X0[2]);
