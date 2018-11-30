@@ -46,6 +46,16 @@ public class MainActivity extends AppCompatActivity {
     private int start_epch;
     private int final_epch;
 
+    private void mostrar_resultados(){
+        Intent intent = new Intent(getApplicationContext(), Resultado.class);
+        ArrayList<CoordenadaGPS> valores = getResultadosGeodeticos();
+
+        intent.putParcelableArrayListExtra("Coord",valores);
+        intent.putExtra("Inicial",start_epch);
+        intent.putExtra("Final",final_epch);
+        startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         btnRINEX = findViewById(R.id.btnRINEX);
         btnEpocas = findViewById(R.id.btnEpocas);
         btnResultados = findViewById(R.id.btnResultados);
-        intervalo = findViewById(R.id.intervalo);
 
         btnVisualizar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,14 +73,9 @@ public class MainActivity extends AppCompatActivity {
 
                 //TODO USANDO INFLATERRRRRRR
 
-                Intent intent = new Intent(getApplicationContext(), Resultado.class);
+//                definir_intervalo();
+                mostrar_resultados();
 
-                ArrayList<CoordenadaGPS> valores = getResultadosGeodeticos();
-
-                intent.putParcelableArrayListExtra("Coord",valores);
-                intent.putExtra("Inicial",start_epch);
-                intent.putExtra("Final",final_epch);
-                startActivity(intent);
             }
         });
 
@@ -114,13 +118,6 @@ public class MainActivity extends AppCompatActivity {
                 }else{
                     Toast.makeText(getApplicationContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
                 }
-            }
-        });
-
-        intervalo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                definir_intervalo();
             }
         });
 
@@ -170,54 +167,6 @@ public class MainActivity extends AppCompatActivity {
                 "Erro ao calcular as coordenadas do satélite: " + msg,
                 Toast.LENGTH_LONG).show();
         }
-
-    }
-
-    private void definir_intervalo() {
-        AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("Definição do interalo");
-        builder.setCancelable(true);
-//        builder.setMessage("MENSAGEM");
-// I'm using fragment here so I'm using getView() to provide ViewGroup
-// but you can provide here any other instance of ViewGroup from your Fragment / Activity
-        View viewInflated = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_interval,
-                findViewById(R.id.content), false);
-// Set up the input
-        final EditText input_min = (EditText) viewInflated.findViewById(R.id.interval_min);
-        final EditText input_max = (EditText) viewInflated.findViewById(R.id.interval_max);
-
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        builder.setView(viewInflated);
-
-
-// Set up the buttons
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                start_epch = Integer.valueOf(input_min.getText().toString());
-                final_epch = Integer.valueOf(input_max.getText().toString());
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-//        builder.show();
-
-        final AlertDialog alert = builder.create();
-        alert.show();
-
-        final Timer timer2 = new Timer();
-        timer2.schedule(new TimerTask() {
-            public void run() {
-                alert.dismiss();
-                timer2.cancel(); //this will cancel the timer of the system
-            }
-        }, 600000000); // the timer will count 5 seconds....
 
     }
 

@@ -676,7 +676,7 @@ public class ProcessamentoPPS {
 
     public static String[] getListaResultados(){
         ArrayList<String> lista = new ArrayList<>();
-        lista.add("# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat \n");
+        lista.add("# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);\n");
         for (int i = 0; i < listaResultados.size(); i++){
             lista.add(listaResultados.get(i).toString() + "\n");
         }
@@ -766,7 +766,7 @@ public class ProcessamentoPPS {
     }
 
     public static void processar_todas_epocas(){
-        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat");
+        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);");
         for (int i = 0; i < listaEpocas.size(); i++) {
             processar_epoca(i);
         }

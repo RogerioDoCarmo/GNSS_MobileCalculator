@@ -1,5 +1,7 @@
 package Codigos;
 
+import java.text.DecimalFormat;
+
 public class ResultEpch {
     private int numEpch;
 
@@ -122,9 +124,22 @@ public class ResultEpch {
         return discZmeters;
     }
 
+    public double getErrorClockMeters(){
+        return this.DtrS * GNSSConstants.LIGHTSPEED;
+    }
+
     @Override
     public String toString(){
-        return (data.toString() + "; " + numEpch + "; " + Xmeters + "; " + Ymeters) + "; " + Zmeters + "; " + DtrS + "; " + sigmaXmeters + "; " + sigmaYmeters + "; " + sigmaZmeters + "; " + sigmaDtrSecons
-                                + "; " + numSat;
+        return (data.toString() + "; " + numEpch + "; " +
+                String.format("%s", new DecimalFormat("###.###").format(Xmeters)) + "; " +
+                String.format("%s", new DecimalFormat("###.###").format(Ymeters))) + "; " +
+                String.format("%s", new DecimalFormat("###.###").format(Zmeters)) + "; " +
+                DtrS + "; " +
+                String.format("%s", new DecimalFormat("###.###").format(sigmaXmeters)) + "; " +
+                String.format("%s", new DecimalFormat("###.###").format(sigmaYmeters)) + "; " +
+                String.format("%s", new DecimalFormat("###.###").format(sigmaZmeters)) + "; " +
+                sigmaDtrSecons + "; " +
+                numSat + "; " +
+                String.format("%s", new DecimalFormat("###.###").format(getErrorClockMeters())) + ";";
     }
 }

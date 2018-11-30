@@ -11,7 +11,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="top"
-        android:hint="ID da 1a epoca"
+        android:hint="Nº da primeira época"
         android:inputType="number"
         android:scrollbars="vertical" />
 
@@ -20,7 +20,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="top"
-        android:hint="ID da ultima epoca"
+        android:hint="Nº da última época"
         android:inputType="number"
         android:scrollbars="vertical" />
 
