@@ -23,7 +23,7 @@ public class GNSSDate implements Comparable<GNSSDate>, Parcelable {
      * @param min UTC year (0~59)
      * @param sec UTC year (0.0~59.9)
      */
-    public GNSSDate(int year, int month, int day, int hour, int min, double sec){ // fixme REVISAR intervalos dos campos
+    public GNSSDate(int year, int month, int day, int hour, int min, double sec){ // fixme REVISAR intervalos do campo ANO
         this.year = year;
         this.month = month;
         this.day = day;
@@ -32,11 +32,7 @@ public class GNSSDate implements Comparable<GNSSDate>, Parcelable {
         this.sec = sec;
     }
 
-    public GNSSDate() {
-
-    }
-
-    public GNSSDate(Parcel in){ // fixme REVISAR intervalos dos campos
+    public GNSSDate(Parcel in){
         this.year = in.readInt();
         this.month = in.readInt();
         this.day = in.readInt();
@@ -69,6 +65,19 @@ public class GNSSDate implements Comparable<GNSSDate>, Parcelable {
         return sec;
     }
 
+    public int getDay_week() {
+        return day_week;
+    }
+
+    public void setDay_week(int day_week) {
+        this.day_week = day_week;
+    }
+
+    @Override
+    public String toString(){
+        return (year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec);
+    }
+
     /**
      *
      * @param another another UTC GNSS datestamp to compare.
@@ -85,14 +94,6 @@ public class GNSSDate implements Comparable<GNSSDate>, Parcelable {
                 return 0;
         else
             return -1;
-    }
-
-    public int getDay_week() {
-        return day_week;
-    }
-
-    public void setDay_week(int day_week) {
-        this.day_week = day_week;
     }
 
     @Override

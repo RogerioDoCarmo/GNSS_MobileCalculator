@@ -32,6 +32,8 @@ public class GNSSConstants {
     public static final double We = 7.2921151467E-5;
     public static final double c = 299792458;
 
+    public static final int MAX_ITERACOES = 8;
+
     /*Valores copiados do Geo++ RINEX Logger*/
     public static final double EP_02_APP_X = 3687622.7392;
     public static final double EP_02_APP_Y = -4620693.7459;

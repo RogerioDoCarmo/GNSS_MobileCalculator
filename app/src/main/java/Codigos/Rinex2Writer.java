@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 //import android.support.v4.BuildConfig;
 
@@ -84,16 +85,15 @@ public class Rinex2Writer {
         txtContent.add("0040109624          moto x4             NONE                ANT # / TYPE");
         txtContent.add("\n");
 
-        //TODO AUTOMATIZAR
-        String Xaprx = new DecimalFormat("########.####").format(EP_02_APP_X);
-        String Yaprx = new DecimalFormat("########.####").format(EP_02_APP_Y);
-        String Zaprx = new DecimalFormat("########.####").format(EP_02_APP_Z);
+        String Xapr = new DecimalFormat("########.####").format(EP_02_APP_X);
+        String Yapr = new DecimalFormat("########.####").format(EP_02_APP_Y);
+        String Zapr = new DecimalFormat("########.####").format(EP_02_APP_Z);
 
         StringBuilder lineAprx = new StringBuilder();
 
-        lineAprx.append("  " + Xaprx);
-        lineAprx.append(" "  + Yaprx);
-        lineAprx.append(" "  + Zaprx);
+        lineAprx.append("  " + Xapr);
+        lineAprx.append(" "  + Yapr);
+        lineAprx.append(" "  + Zapr);
 
         lineAprx.append("                  APPROX POSITION XYZ");
         txtContent.add(lineAprx.toString());
@@ -110,7 +110,7 @@ public class Rinex2Writer {
 
         txtContent.add(typeLine1);
         txtContent.add("\n");
-        txtContent.add("     1.0000                                                 INTERVAL");
+        txtContent.add("     1.000                                                  INTERVAL");
         txtContent.add("\n");
         txtContent.add("    18                                                      LEAP SECONDS");// FIXME USAR String.form
         txtContent.add("\n");
@@ -121,13 +121,41 @@ public class Rinex2Writer {
         txtContent.add("Arquivo gerado a partir de medicoes de aparelho Android     COMMENT");
         txtContent.add("\n");
 
-        // , new DecimalFormat("#.####### ").format(0.0000000)
-        @SuppressLint("DefaultLocale") String firstObs = String.format("  %d     %d    %d    %d     %d    0.0000000     GPS       TIME OF FIRST OBS",
-                listaEpocas.get(0).getData_UTC().getYear() + 2000,
-                listaEpocas.get(0).getData_UTC().getMonth(),
-                listaEpocas.get(0).getData_UTC().getDay_Month(),
-                listaEpocas.get(0).getData_UTC().getHour(),
-                listaEpocas.get(0).getData_UTC().getMin());
+        int INDEX_EPCH = 0;
+
+        String month = String.valueOf(listaEpocas.get(INDEX_EPCH).getData_UTC().getMonth());
+        if (listaEpocas.get(INDEX_EPCH).getData_UTC().getMonth() < 10){
+            month = " " + month;
+        }
+
+        String day_month = String.valueOf(listaEpocas.get(INDEX_EPCH).getData_UTC().getDay_Month());
+        if (listaEpocas.get(INDEX_EPCH).getData_UTC().getDay_Month() < 10){
+            day_month = " " + day_month;
+        }
+
+        String hour = String.valueOf(listaEpocas.get(INDEX_EPCH).getData_UTC().getHour());
+        if (listaEpocas.get(INDEX_EPCH).getData_UTC().getHour() < 10){
+            hour = " " + hour;
+        }
+
+        String min = String.valueOf(listaEpocas.get(INDEX_EPCH).getData_UTC().getMin());
+        if (listaEpocas.get(INDEX_EPCH).getData_UTC().getMin() < 10){
+            min = " " + min;
+        }
+
+        String secs = listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() + "0000";
+        if (listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() < 10.0){
+            secs = " " + listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() + "0000";
+        }
+
+        @SuppressWarnings("MalformedFormatString") @SuppressLint("DefaultLocale") String firstObs = String.format("  %2d    %s   %s    %s     %s   %s     GPS         TIME OF FIRST OBS",
+                listaEpocas.get(INDEX_EPCH).getData_UTC().getYear() + 2000,
+                month,
+                day_month,
+                hour,
+                min,
+                secs
+        );
 
         txtContent.add(firstObs);
         txtContent.add("\n");
@@ -139,7 +167,7 @@ public class Rinex2Writer {
             File baseDirectory = null;
             if ( isExternalStorageWritable() ) {
                 try {
-                    String fileName = String.format("%s_%s.18o", FILE_PREFIX, "Teste_31-10_PT02");
+                    String fileName = String.format("%s_%s.18o", FILE_PREFIX, "Teste_31-10");
                     baseDirectory = getPrivateStorageDir(mContext,fileName);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -159,22 +187,58 @@ public class Rinex2Writer {
     }
 
     @SuppressLint("DefaultLocale")
-    private void escrever_observacoes(int INDEX_EPCH){
+    private void escrever_observacoes(int INDEX_EPCH){ // TODO REFATORAR CONCATENAÇÃO DE STRINGS
         StringBuilder listaSatEpch = new StringBuilder();
 
         for (int i = 0; i <listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(); i++) {
-           listaSatEpch.append("G" + String.format("%02d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().get(i)));
+           listaSatEpch.append("G" + String.format("%02d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().get(i)));//FIXME TRATAR MEDIÇOES NÃO GPS
+        }
+
+        String month = String.valueOf(listaEpocas.get(INDEX_EPCH).getData_UTC().getMonth());
+        if (listaEpocas.get(INDEX_EPCH).getData_UTC().getMonth() < 10){
+            month = " " + month;
+        }
+
+        String day_month = String.valueOf(listaEpocas.get(INDEX_EPCH).getData_UTC().getDay_Month());
+        if (listaEpocas.get(INDEX_EPCH).getData_UTC().getDay_Month() < 10){
+            day_month = " " + day_month;
+        }
+
+        String hour = String.valueOf(listaEpocas.get(INDEX_EPCH).getData_UTC().getHour());
+        if (listaEpocas.get(INDEX_EPCH).getData_UTC().getHour() < 10){
+            hour = " " + hour;
+        }
+
+        String min = String.valueOf(listaEpocas.get(INDEX_EPCH).getData_UTC().getMin());
+        if (listaEpocas.get(INDEX_EPCH).getData_UTC().getMin() < 10){
+            min = " " + min;
+        }
+
+        StringBuilder secs = new StringBuilder(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() + "0000");
+        if (listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() < 10.0){
+            secs = new StringBuilder(" " + listaEpocas.get(INDEX_EPCH).getData_UTC().getSec() + "0000");
+        }
+
+        while (secs.length() < 10) {
+            secs.append("0");
+        }
+        while (secs.length() > 10) {
+            secs.deleteCharAt(secs.length() - 1);
+        }
+
+        String numPRNs = String.valueOf(listaEpocas.get(INDEX_EPCH).getLista_PRNs().size());
+        if (listaEpocas.get(INDEX_EPCH).getLista_PRNs().size() < 10){
+            numPRNs = " " + numPRNs;
         }
 
         @SuppressWarnings("MalformedFormatString") @SuppressLint("DefaultLocale") String epchHeaderLine = String.format(" %d %s %s %s %s %s  0 %s%s\n",
                 listaEpocas.get(INDEX_EPCH).getData_UTC().getYear() % 2000,
-                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getMonth()),
-                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getDay_Month()),
-                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getHour()),
-                String.format("%2d",listaEpocas.get(INDEX_EPCH).getData_UTC().getMin()),
-//                new DecimalFormat("#.#######").format(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec()),
-                String.format("%2d",Math.round(listaEpocas.get(INDEX_EPCH).getData_UTC().getSec())) + ".0000000",
-                String.format("%2d",listaEpocas.get(INDEX_EPCH).getLista_PRNs().size()),
+                month,
+                day_month,
+                hour,
+                min,
+                secs.toString(),
+                numPRNs,
                 listaSatEpch);
 
         txtContent.add(epchHeaderLine);

@@ -22,7 +22,25 @@
         android:layout_height="wrap_content"
         android:text="Visualizar"
         android:textAlignment="center"
-        tools:layout_editor_absoluteX="148dp"
+        tools:layout_editor_absoluteX="141dp"
         tools:layout_editor_absoluteY="241dp" />
+
+    <Button
+        android:id="@+id/btnEpocas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Epocas"
+        app:layout_constraintTop_toBottomOf="@+id/btnRINEX"
+        tools:layout_editor_absoluteX="147dp" />
+
+    <Button
+        android:id="@+id/btnResultados"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Resultados"
+        app:layout_constraintTop_toBottomOf="@+id/btnEpocas"
+        tools:layout_editor_absoluteX="136dp" />
 
 </android.support.constraint.ConstraintLayout>
