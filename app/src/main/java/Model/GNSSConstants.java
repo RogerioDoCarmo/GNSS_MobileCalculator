@@ -1,4 +1,4 @@
-package Codigos;
+package Model;
 
 import java.util.concurrent.TimeUnit;
 

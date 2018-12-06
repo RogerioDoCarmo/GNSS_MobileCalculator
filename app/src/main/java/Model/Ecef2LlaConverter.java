@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package Codigos;
+package Model;
 
 import java.io.Serializable;
 

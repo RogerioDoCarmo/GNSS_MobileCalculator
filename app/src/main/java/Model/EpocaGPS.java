@@ -1,7 +1,4 @@
-package Codigos;
-
-import android.os.Parcel;
-import android.os.Parcelable;
+package Model;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package Codigos;
+package Model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

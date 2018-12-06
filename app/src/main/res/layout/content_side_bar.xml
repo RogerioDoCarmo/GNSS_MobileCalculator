@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".RINEX_Activity"
-    tools:showIn="@layout/activity_rinex_">
+    tools:context="View.SideBar"
+    tools:showIn="@layout/app_bar_side_bar">
 
 </android.support.constraint.ConstraintLayout>

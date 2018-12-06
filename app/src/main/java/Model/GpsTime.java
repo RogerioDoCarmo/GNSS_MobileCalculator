@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package Codigos;
+package Model;
 
 import android.util.Pair;
 import com.google.common.base.Preconditions;

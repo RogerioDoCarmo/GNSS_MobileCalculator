@@ -38,7 +38,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".Resultado"
+            android:name="View.Fragment_GoogleMaps"
             android:label="@string/title_activity_resultado" />
 
         <provider
@@ -52,9 +52,9 @@
         </provider>
 
         <activity
-            android:name=".RINEX_Activity"
-            android:label="@string/title_activity_rinex_"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:name="View.SideBar"
+            android:label="@string/title_activity_side_bar"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

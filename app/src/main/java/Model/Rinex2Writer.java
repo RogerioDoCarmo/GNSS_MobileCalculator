@@ -1,4 +1,4 @@
-package Codigos;
+package Model;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -6,36 +6,31 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-import org.joda.time.DateTime;
-import org.joda.time.YearMonth;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 //import android.support.v4.BuildConfig;
 
-import static Codigos.FileHelper.getPrivateStorageDir;
-import static Codigos.FileHelper.isExternalStorageWritable;
-import static Codigos.FileHelper.writeTextFile2External;
-import static Codigos.GNSSConstants.EP_02_APP_X;
-import static Codigos.GNSSConstants.EP_02_APP_Y;
-import static Codigos.GNSSConstants.EP_02_APP_Z;
+import static Model.FileHelper.getPrivateStorageDir;
+import static Model.FileHelper.isExternalStorageWritable;
+import static Model.FileHelper.writeTextFile2External;
+import static Model.GNSSConstants.EP_02_APP_X;
+import static Model.GNSSConstants.EP_02_APP_Y;
+import static Model.GNSSConstants.EP_02_APP_Z;
 
 public class Rinex2Writer {
 
 
-    private ArrayList<EpocaObs> listaEpocas;
+    private ArrayList<Model.EpocaObs> listaEpocas;
     private static final String FILE_PREFIX = "GNSS";
     private static final String PSEUDORANGE = "C"; // GPS C/A
     private static final String FREQ_GPS = "L1";
     private static final String RINEX_TYPE = "O"; // Observation File
     private static final String MARKER = "GNSS Mobile Calculator";
 
-    GNSSDate dataEpchAtual;
+    Model.GNSSDate dataEpchAtual;
     private File newFile;
     private final Context mContext;
     private ArrayList<String> txtContent;

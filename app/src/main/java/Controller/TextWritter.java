@@ -1,4 +1,4 @@
-package Codigos;
+package Controller;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,9 +8,9 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 
-import static Codigos.FileHelper.getPrivateStorageDir;
-import static Codigos.FileHelper.isExternalStorageWritable;
-import static Codigos.FileHelper.writeTextFile2External;
+import static Model.FileHelper.getPrivateStorageDir;
+import static Model.FileHelper.isExternalStorageWritable;
+import static Model.FileHelper.writeTextFile2External;
 
 public class TextWritter {
 

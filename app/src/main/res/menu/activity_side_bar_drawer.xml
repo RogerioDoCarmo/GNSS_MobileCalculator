@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/ic_menu_file"
+            android:title="Import" />
+        <item
+            android:id="@+id/save_txt"
+            android:icon="@drawable/ic_menu_download"
+            android:title="Salvar Resultados" />
+        <item
+            android:id="@+id/show_maps"
+            android:icon="@drawable/ic_menu_location"
+            android:title="Resultados no Google Maps" />
+        <item
+            android:id="@+id/save_rinex"
+            android:icon="@drawable/ic_menu_text"
+            android:title="Gravação de RINEX" />
+    </group>
+
+    <item android:title="Mais informações">
+        <menu>
+            <item
+                android:id="@+id/show_about"
+                android:icon="@drawable/ic_menu_info"
+                android:title="Sobre" />
+        </menu>
+    </item>
+
+</menu>

@@ -1,4 +1,4 @@
-package Codigos;
+package Controller;
 
 import android.content.Context;
 import android.util.Log;
@@ -16,12 +16,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static Codigos.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
-import static Codigos.GNSSConstants.MAX_ITERACOES;
-import static Codigos.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
-import static Codigos.GNSSConstants.GM;
-import static Codigos.GNSSConstants.We;
-import static Codigos.GNSSConstants.c;
+import Model.CoordenadaGPS;
+import Model.Ecef2LlaConverter;
+import Model.EpocaGPS;
+import Model.EpocaObs;
+import Model.GNSSConstants;
+import Model.GNSSDate;
+import Model.GNSSMeasurement;
+import Model.GNSSNavMsg;
+import Model.GpsTime;
+import Model.ResultEpch;
+
+import static Model.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
+import static Model.GNSSConstants.MAX_ITERACOES;
+import static Model.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
+import static Model.GNSSConstants.GM;
+import static Model.GNSSConstants.We;
+import static Model.GNSSConstants.c;
 
 public class ProcessamentoPPS {
     // ORIGINAIS
