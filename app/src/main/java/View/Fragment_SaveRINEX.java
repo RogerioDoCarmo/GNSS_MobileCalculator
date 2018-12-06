@@ -14,11 +14,9 @@ import com.rogeriocarmo.gnss_mobilecalculator.R;
 
 import java.util.ArrayList;
 
+import Controller.SingletronController;
 import Model.EpocaObs;
 import Model.Rinex2Writer;
-
-import static Controller.ProcessamentoPPS.getObservacoes;
-
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,6 +27,8 @@ import static Controller.ProcessamentoPPS.getObservacoes;
  * create an instance of this fragment.
  */
 public class Fragment_SaveRINEX extends Fragment {
+
+    SingletronController controller;
 
     private OnFragmentInteractionListener mListener;
 
@@ -58,6 +58,7 @@ public class Fragment_SaveRINEX extends Fragment {
         if (getArguments() != null) {
 
         }
+        controller = SingletronController.getInstance();
     }
 
     @Override
@@ -68,7 +69,7 @@ public class Fragment_SaveRINEX extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<EpocaObs> observacoes = getObservacoes();
+                ArrayList<EpocaObs> observacoes = controller.getObservacoes();
 
                 Rinex2Writer RINEX = new Rinex2Writer(getContext(),observacoes);
                 if (RINEX.gravarRINEX()){

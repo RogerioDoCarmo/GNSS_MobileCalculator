@@ -31,7 +31,7 @@ import com.rogeriocarmo.gnss_mobilecalculator.R;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import Model.CoordenadaGPS;
+import Model.CoordenadaGeodesica;
 
 public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback {
 
@@ -43,23 +43,26 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
     private final double EP02_LONG = -51.407778;
 
     LatLng coordEP02 = new LatLng(EP02_LAT, EP02_LONG);
-    ArrayList<CoordenadaGPS> resultados;
+    ArrayList<CoordenadaGeodesica> resultGeoid;
 
     float min_distance = Float.MAX_VALUE;
     float max_distance = Float.MIN_VALUE;
     float centroide_distance = 0;
-    LatLng coord_min;
-    LatLng coord_max;
+    LatLng coord_min = null;
+    LatLng coord_max = null;
     int epch_min = 0;
     int epch_max = 0;
     int first_epch = -1;
     int last_epch = -1;
 
-    private void definir_intervalo() {
+    private void Dialog_interval() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
+        int limite_epch = resultGeoid.size();
+        if (limite_epch > 1) limite_epch = limite_epch - 1;
+
         builder.setTitle("Definição do intervalo de épocas:");
-        builder.setMessage("Escolha entre o intervalo [1," + resultados.size() + "]");
+        builder.setMessage("Escolha entre o intervalo [1," + limite_epch + "]");
         builder.setCancelable(true);
 
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_interval,
@@ -82,12 +85,12 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
 
                 String last = (input_max.getText().toString());
                 if (last.isEmpty()) {
-                    last_epch = resultados.size();
+                    last_epch = resultGeoid.size();
                 } else {
                     last_epch = Integer.valueOf(input_max.getText().toString());
                 }
 
-                if (resultados.size() > 1) {
+                if (resultGeoid.size() > 1) {
                     marcar_todas_epocas();
                 } else {
                     marcar_epoca_unica();
@@ -137,9 +140,9 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            resultados = getArguments().getParcelableArrayList("Coord");
+            resultGeoid = getArguments().getParcelableArrayList("Coord");
 
-            definir_intervalo(); //TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            Dialog_interval();
         }
     }
 
@@ -238,9 +241,9 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
     }
 
     private void marcar_epoca_unica() {
-        Double latFinal  = resultados.get(0).getX();
-        Double longFinal = resultados.get(0).getY();
-        Double altFinal  = resultados.get(0).getZ();
+        Double latFinal  = resultGeoid.get(0).getLatDegrees();
+        Double longFinal = resultGeoid.get(0).getLonDegrees();
+        Double altFinal  = resultGeoid.get(0).getAltMeters();
 
         LatLng coordSolu = new LatLng(latFinal, longFinal);
 
@@ -279,8 +282,8 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         int limite = last_epch;
         for (int i = inicio; i < limite ; i++){
 
-            Double latDegrees = resultados.get(i).getX();
-            Double longDegrees = resultados.get(i).getY();
+            Double latDegrees = resultGeoid.get(i).getLatDegrees();
+            Double longDegrees = resultGeoid.get(i).getLonDegrees();
 
             LatLng coord = new LatLng(latDegrees,longDegrees);
 
@@ -351,8 +354,8 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
     }
 
     private void marcar_centroide(){
-        Double latDegrees = resultados.get(resultados.size() - 1).getX();
-        Double longDegrees = resultados.get(resultados.size() - 1).getY();
+        Double latDegrees = resultGeoid.get(resultGeoid.size() - 1).getLatDegrees();
+        Double longDegrees = resultGeoid.get(resultGeoid.size() - 1).getLonDegrees();
 
         LatLng coord = new LatLng(latDegrees,longDegrees);
 

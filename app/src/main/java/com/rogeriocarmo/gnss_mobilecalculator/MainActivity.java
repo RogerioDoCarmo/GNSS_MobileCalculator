@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import Controller.SingletronController;
 import View.SideBar;
 
 import static Controller.ProcessamentoPPS.calcPseudorange;
@@ -22,11 +23,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SingletronController controller = SingletronController.getInstance();
+
         Intent intent = new Intent (getApplicationContext(), SideBar.class);
         startActivity(intent);
 
         try {
-            readLogger_RawAssets(MainActivity.this);
+            controller.readLogger_RawAssets(MainActivity.this);
         } catch (IOException e) {
             Log.e("ERR_log","Erro ao abrir o arquivo de Log");
             String msg = e.getMessage();
@@ -35,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try{
-            calcPseudorange();
+            controller.calcPseudorange();
         } catch (Exception e){
             Log.e("ERR_pr","Erro ao calcular pseudodistâncias");
             String msg = e.getMessage();
@@ -45,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            readRINEX_RawAssets(MainActivity.this);
+            controller.readRINEX_RawAssets(MainActivity.this);
         } catch (IOException e) {
             Log.e("ERR_ef","Erro ao abrir o RINEX");
             String msg = e.getMessage();
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try{
-            processar_todas_epocas();
+            controller.processar_todas_epocas();
             /*
             *Epocas Boas
             * ID = 313

@@ -40,7 +40,7 @@ public class GNSSMeasurement implements Comparable<GNSSMeasurement>{
     private int State;
     private int Svid;
     private int MultipathIndicator;
-    private double PseudorangeRateMetersPerSecond; // PSEUDODISTANCIA EM METROS
+    private double PseudorangeRateMetersPerSecond;
     private double PseudorangeRateUncertaintyMetersPerSecond;
     private Long ReceivedSvTimeNanos;
     private double ReceivedSvTimeUncertaintyNanos;

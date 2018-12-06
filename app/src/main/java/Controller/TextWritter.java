@@ -8,9 +8,9 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 
-import static Model.FileHelper.getPrivateStorageDir;
-import static Model.FileHelper.isExternalStorageWritable;
-import static Model.FileHelper.writeTextFile2External;
+import static Controller.FileHelper.getPrivateStorageDir;
+import static Controller.FileHelper.isExternalStorageWritable;
+import static Controller.FileHelper.writeTextFile2External;
 
 public class TextWritter {
 

@@ -12,9 +12,7 @@ import android.widget.Toast;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
-import static Controller.ProcessamentoPPS.gravar_epocas;
-import static Controller.ProcessamentoPPS.gravar_resultados;
-import static Controller.ProcessamentoPPS.send_txt;
+import Controller.SingletronController;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +23,8 @@ import static Controller.ProcessamentoPPS.send_txt;
  * create an instance of this fragment.
  */
 public class Fragment_SaveTXT extends Fragment {
+
+    SingletronController controller;
 
     private OnFragmentInteractionListener mListener;
 
@@ -54,6 +54,7 @@ public class Fragment_SaveTXT extends Fragment {
         if (getArguments() != null) {
 
         }
+        controller = SingletronController.getInstance();
     }
 
     @Override
@@ -65,9 +66,9 @@ public class Fragment_SaveTXT extends Fragment {
         buttonEpch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(gravar_epocas(getContext())) {
+                if(controller.gravar_epocas(getContext())) {
                     Toast.makeText(getContext(), "Arquivo de épocas gravado com sucesso!", Toast.LENGTH_LONG).show();
-                    send_txt();
+                    controller.send_txt();
                 }else{
                     Toast.makeText(getContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
                 }
@@ -78,9 +79,9 @@ public class Fragment_SaveTXT extends Fragment {
         buttonResult.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (gravar_resultados(getContext())) {
+                if (controller.gravar_resultados(getContext())) {
                     Toast.makeText(getContext(), "Arquivo de resultados gravado com sucesso!", Toast.LENGTH_LONG).show();
-                    send_txt();
+                    controller.send_txt();
                 }else{
                     Toast.makeText(getContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
                 }

@@ -18,9 +18,8 @@ import com.rogeriocarmo.gnss_mobilecalculator.R;
 
 import java.util.ArrayList;
 
-import Model.CoordenadaGPS;
-
-import static Controller.ProcessamentoPPS.getResultadosGeodeticos;
+import Controller.SingletronController;
+import Model.CoordenadaGeodesica;
 
 public class SideBar extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -31,23 +30,27 @@ public class SideBar extends AppCompatActivity
             Fragment_GoogleMaps.OnFragmentInteractionListener,
             Fragment_About.OnFragmentInteractionListener{
 
+    SingletronController controller;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_side_bar);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         definir_fragment_inicial();
+
+        controller =  SingletronController.getInstance();
     }
 
     private void definir_fragment_inicial() {
@@ -116,13 +119,7 @@ public class SideBar extends AppCompatActivity
         } else if (id == R.id.show_maps) {
             fragmentClass = Fragment_GoogleMaps.class;
 
-            ArrayList<CoordenadaGPS> valores = getResultadosGeodeticos();
-
-//            valores.add(new CoordenadaGPS(1,-22.122500,-51.407878,9999,0.5));
-//            valores.add(new CoordenadaGPS(2,-22.122600,-51.407778,8888,0.7));
-//            valores.add(new CoordenadaGPS(2,-22.122700,-51.407978,8888,0.7));
-//            valores.add(new CoordenadaGPS(2,-22.122800,-51.407888,8888,0.7));
-//            valores.add(new CoordenadaGPS(2,-22.122690,-51.407575,8888,0.7));
+            ArrayList<CoordenadaGeodesica> valores =  controller.getResultadosGeodeticos();
 
             bundle.putParcelableArrayList("Coord", valores);
 
