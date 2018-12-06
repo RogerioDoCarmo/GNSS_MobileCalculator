@@ -1,0 +1,53 @@
+
+    /**
+     * Exemplo do livro
+     */
+    private static void setarExemplo(){
+        qntSatProcessar = 7;
+        listaCoordAtual = null;
+        listaCoordAtual = new ArrayList<>();
+        Lb = new double[qntSatProcessar];
+
+        /*Exemplo do livro do Galera pg 292-299*/
+        Xe = 3687627.3634;
+        Ye = -4620821.5137;
+        Ze = -2386884.4153;
+
+        Lb[0] = 48100232.525;
+        Lb[1] = 47574517.142;
+        Lb[2] = 50223295.501;
+        Lb[3] = 47847868.400;
+        Lb[4] = 51708803.181;
+        Lb[5] = 49370715.900;
+        Lb[6] = 49337431.587;
+
+        CoordenadaGPS novaCoord1 = new CoordenadaGPS(2,13191926.036,-9634277.149,-20330138.156,
+                                -8.93963614364e-5); // Microsecs: -89.3963614364
+        listaCoordAtual.add(novaCoord1);
+
+        CoordenadaGPS novaCoord2 = new CoordenadaGPS(7,21244105.748,-15360752.012,-2877135.125,
+                0.00057038458904959996); // Microsecs: 570.3845890496
+        listaCoordAtual.add(novaCoord2);
+
+        CoordenadaGPS novaCoord3 = new CoordenadaGPS(10,-135122.979,-25794393.804,5954578.737,
+                3.88125012807e-5); // Microsecs: 38.8125012807
+        listaCoordAtual.add(novaCoord3);
+
+        CoordenadaGPS novaCoord4 = new CoordenadaGPS(13,19720605.766,-17653994.853,-1657890.383,
+                -4.76228094177e-5); // Microsecs: -47.6228094177
+        listaCoordAtual.add(novaCoord4);
+
+        CoordenadaGPS novaCoord5 = new CoordenadaGPS(19,25910284.743,5823456.939,-2525126.594,
+                1.64975089736e-5); // Microsecs: 16.4975089736
+        listaCoordAtual.add(novaCoord5);
+
+        CoordenadaGPS novaCoord6 = new CoordenadaGPS(26,-1932297.136,-16733519.796,-20382553.367,
+                0.00065557612181870004); // Microsecs: 655.5761218187
+        listaCoordAtual.add(novaCoord6);
+
+        CoordenadaGPS novaCoord7 = new CoordenadaGPS(27,22374396.828,-3351761.100,-14280051.988,
+                2.691733116672e-5); // Microsecs: 26.91733116672
+        listaCoordAtual.add(novaCoord7);
+
+        Log.i("Exemplo","Exemplo configurado...");
+    }

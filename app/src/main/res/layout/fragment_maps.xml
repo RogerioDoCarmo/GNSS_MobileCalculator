@@ -5,12 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="@dimen/maps_fragment_vertical_spacing"
-    tools:context="View.Fragment_GoogleMaps">
+    tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_GoogleMaps">
 
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapa"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="49dp"
     />
 
 </FrameLayout>
