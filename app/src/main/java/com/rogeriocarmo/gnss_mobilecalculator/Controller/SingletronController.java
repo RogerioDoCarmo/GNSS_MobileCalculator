@@ -30,10 +30,10 @@ import com.rogeriocarmo.gnss_mobilecalculator.Model.ResultEpch;
 
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.GM;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.LIGHTSPEED;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.MAX_ITERACOES;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.We;
-import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.c;
 
 public class SingletronController {
     private static SingletronController INSTANCE = null;
@@ -544,9 +544,9 @@ public class SingletronController {
                 }
             }
 
-            double pseudorange = prSeconds*GNSSConstants.LIGHTSPEED;
+            double pseudorange = prSeconds * LIGHTSPEED;
             double pseudorangeUncertaintyMeters = (double)(listaMedicoesOriginal.get(i).getReceivedSvTimeUncertaintyNanos())
-                    *1e-9* GNSSConstants.LIGHTSPEED;
+                    *1e-9 * LIGHTSPEED;
             /*Cálculo da pseudodistância*/
 
             listaMedicoesOriginal.get(i).setPseudorangeMeters(pseudorange);
@@ -641,10 +641,10 @@ public class SingletronController {
             /*Tempo de transmisao do sinal*/
             double dtr = 0d; // ERRO DO RELÓGIO DO RECEPTOR
             double tr = calc_Tr(dataObservacao);
-            double tgps = tr - (listaMedicoesAtual.get(i).getPseudorangeMeters() / c);
+            double tgps = tr - (listaMedicoesAtual.get(i).getPseudorangeMeters() / LIGHTSPEED);
 
             double dts = a0 + a1 * (tgps - toe) + a2 * (Math.pow(tgps - toe,2.0)); // ERRO DO SATÉLITE fixme É O TOC
-            double tpropag = listaMedicoesAtual.get(i).getPseudorangeMeters()/c - dtr + dts;
+            double tpropag = listaMedicoesAtual.get(i).getPseudorangeMeters() / LIGHTSPEED - dtr + dts;
 
             tgps = tr - dtr- tpropag + dts; // melhoria no tempo de transmissao
             double delta_tk = tgps - toe;
@@ -853,7 +853,7 @@ public class SingletronController {
 
             //Vetor delta_L => L = Lb-L0;
             for (int i = 0; i < Lb.length; i++){
-                L[i] = Lb[i] - ( L0[i] + c * (X0[3] - listaCoordAtual.get(i).getDts()) ) ;
+                L[i] = Lb[i] - ( L0[i] + LIGHTSPEED * (X0[3] - listaCoordAtual.get(i).getDts()) ) ;
             }
 
             //MATRIZ A
@@ -892,7 +892,7 @@ public class SingletronController {
 
             X = rX.toArray();
             double[] X2 = X;
-            X[3] = X[3] / c;
+            X[3] = X[3] / LIGHTSPEED;
 
             //Xa = X0+X;
             for (int j = 0; j < X0.length; j++){
@@ -911,7 +911,7 @@ public class SingletronController {
             // Fator de variância a posteriori:
             S0post = VtPV.getEntry(0) / (double) (qntSatEpchAtual - 4);
 
-            // MVC das coordenadas ajustadas
+            // MVC das coordenadas ajustadas // TODO VER ORDEM DA MULTIPLICACAO
             RealMatrix MVCXa = rInvN.scalarMultiply(S0post);
 
             if (!MatrixUtils.isSymmetric(MVCXa,0.005)){
