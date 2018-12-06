@@ -11,9 +11,8 @@ import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
 
-import View.SideBar;
+import com.rogeriocarmo.gnss_mobilecalculator.View.Activity_Main;
 
-import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 //import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.ComponentNameMatchers.hasShortClassName;
@@ -34,8 +33,8 @@ import static org.junit.Assert.*;
 public class ExampleInstrumentedTest {
 
     @Rule
-    public IntentsTestRule<SideBar> mActivityRule =
-            new IntentsTestRule<>(SideBar.class);
+    public IntentsTestRule<Activity_Main> mActivityRule =
+            new IntentsTestRule<>(Activity_Main.class);
 
     @Test
     public void useAppContext() {

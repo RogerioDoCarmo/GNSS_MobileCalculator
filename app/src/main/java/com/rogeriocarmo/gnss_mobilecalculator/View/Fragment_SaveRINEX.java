@@ -1,4 +1,4 @@
-package View;
+package com.rogeriocarmo.gnss_mobilecalculator.View;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,23 +7,32 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
+import java.util.ArrayList;
+
+import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.EpocaObs;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.Rinex2Writer;
 
 /**
  * A simple {@link Fragment} subclass.
- * Activities that Fragment_Import this fragment must implement the
- * {@link Fragment_SaveTXT.OnFragmentInteractionListener} interface
+ * Activities that contain this fragment must implement the
+ * {@link Fragment_SaveRINEX.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link Fragment_Import#newInstance} factory method to
+ * Use the {@link Fragment_SaveRINEX#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Fragment_Import extends Fragment {
+public class Fragment_SaveRINEX extends Fragment {
+
+    SingletronController controller;
 
     private OnFragmentInteractionListener mListener;
 
-    public Fragment_Import() {
+    public Fragment_SaveRINEX() {
         // Required empty public constructor
     }
 
@@ -36,8 +45,8 @@ public class Fragment_Import extends Fragment {
      * @return A new instance of fragment Fragment_SaveTXT.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment_Import newInstance(String param1, String param2) {
-        Fragment_Import fragment = new Fragment_Import();
+    public static Fragment_SaveRINEX newInstance(String param1, String param2) {
+        Fragment_SaveRINEX fragment = new Fragment_SaveRINEX();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -49,13 +58,30 @@ public class Fragment_Import extends Fragment {
         if (getArguments() != null) {
 
         }
+        controller = SingletronController.getInstance();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_import, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_save_rinex, container, false);
+
+        Button button = view.findViewById(R.id.btnSalvarRINEX2);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<EpocaObs> observacoes = controller.getObservacoes();
+
+                Rinex2Writer RINEX = new Rinex2Writer(getContext(),observacoes);
+                if (RINEX.gravarRINEX()){
+                    Toast.makeText(getContext(), "Arquivo RINEX gravado com sucesso!", Toast.LENGTH_LONG).show();
+                    RINEX.send();
+                }else{
+                    Toast.makeText(getContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

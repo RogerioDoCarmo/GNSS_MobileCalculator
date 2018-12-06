@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="View.Fragment_SaveTXT">
+    tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_SaveTXT">
 
     <Button
         android:id="@+id/btnEpch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="120dp"
+        android:layout_marginStart="126dp"
         android:layout_marginTop="100dp"
         android:text="Salvar Épocas" />
 
@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="110dp"
         android:layout_marginTop="160dp"
-        android:text="Salvar Resultado" />
+        android:text="Salvar Resultados" />
 
 
 </FrameLayout>

@@ -1,4 +1,4 @@
-package Controller;
+package com.rogeriocarmo.gnss_mobilecalculator.Controller;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,9 +8,9 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 
-import static Controller.FileHelper.getPrivateStorageDir;
-import static Controller.FileHelper.isExternalStorageWritable;
-import static Controller.FileHelper.writeTextFile2External;
+import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.getPrivateStorageDir;
+import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.isExternalStorageWritable;
+import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.writeTextFile2External;
 
 public class TextWritter {
 

@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning"> <!-- Acrescentado para remover warnings !-->
-        <activity android:name="View.SideBar">
+        <activity android:name="com.rogeriocarmo.gnss_mobilecalculator.View.Activity_Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

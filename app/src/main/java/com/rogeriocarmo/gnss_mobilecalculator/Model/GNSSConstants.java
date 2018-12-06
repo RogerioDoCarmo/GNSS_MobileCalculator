@@ -1,4 +1,4 @@
-package Model;
+package com.rogeriocarmo.gnss_mobilecalculator.Model;
 
 import java.util.concurrent.TimeUnit;
 

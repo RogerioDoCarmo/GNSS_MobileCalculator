@@ -1,4 +1,4 @@
-package Model;
+package com.rogeriocarmo.gnss_mobilecalculator.Model;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,24 +13,24 @@ import java.util.ArrayList;
 
 //import android.support.v4.BuildConfig;
 
-import static Controller.FileHelper.getPrivateStorageDir;
-import static Controller.FileHelper.isExternalStorageWritable;
-import static Controller.FileHelper.writeTextFile2External;
-import static Model.GNSSConstants.EP_02_APP_X;
-import static Model.GNSSConstants.EP_02_APP_Y;
-import static Model.GNSSConstants.EP_02_APP_Z;
+import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.getPrivateStorageDir;
+import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.isExternalStorageWritable;
+import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.writeTextFile2External;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.EP_02_APP_X;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.EP_02_APP_Y;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.EP_02_APP_Z;
 
 public class Rinex2Writer {
 
 
-    private ArrayList<Model.EpocaObs> listaEpocas;
+    private ArrayList<com.rogeriocarmo.gnss_mobilecalculator.Model.EpocaObs> listaEpocas;
     private static final String FILE_PREFIX = "GNSS";
     private static final String PSEUDORANGE = "C"; // GPS C/A
     private static final String FREQ_GPS = "L1";
     private static final String RINEX_TYPE = "O"; // Observation File
     private static final String MARKER = "GNSS Mobile Calculator";
 
-    Model.GNSSDate dataEpchAtual;
+    com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSDate dataEpchAtual;
     private File newFile;
     private final Context mContext;
     private ArrayList<String> txtContent;

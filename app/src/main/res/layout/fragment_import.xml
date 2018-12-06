@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="View.Fragment_Import">
+    tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_Import">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView

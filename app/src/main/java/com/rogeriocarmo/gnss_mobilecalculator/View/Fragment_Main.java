@@ -1,4 +1,4 @@
-package View;
+package com.rogeriocarmo.gnss_mobilecalculator.View;
 
 import android.content.Context;
 import android.net.Uri;

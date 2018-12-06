@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package Model;
+package com.rogeriocarmo.gnss_mobilecalculator.Model;
 
 import android.util.Pair;
 import com.google.common.base.Preconditions;

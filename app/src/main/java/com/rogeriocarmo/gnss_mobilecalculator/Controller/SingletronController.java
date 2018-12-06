@@ -1,4 +1,4 @@
-package Controller;
+package com.rogeriocarmo.gnss_mobilecalculator.Controller;
 
 import android.content.Context;
 import android.util.Log;
@@ -16,24 +16,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import Model.CoordenadaGPS;
-import Model.CoordenadaGeodesica;
-import Model.Ecef2LlaConverter;
-import Model.EpocaGPS;
-import Model.EpocaObs;
-import Model.GNSSConstants;
-import Model.GNSSDate;
-import Model.GNSSMeasurement;
-import Model.GNSSNavMsg;
-import Model.GpsTime;
-import Model.ResultEpch;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaGPS;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaGeodesica;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.Ecef2LlaConverter;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.EpocaGPS;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.EpocaObs;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSDate;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSMeasurement;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSNavMsg;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.GpsTime;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.ResultEpch;
 
-import static Model.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
-import static Model.GNSSConstants.GM;
-import static Model.GNSSConstants.MAX_ITERACOES;
-import static Model.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
-import static Model.GNSSConstants.We;
-import static Model.GNSSConstants.c;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.GM;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.MAX_ITERACOES;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.We;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.c;
 
 public class SingletronController {
     private static SingletronController INSTANCE = null;

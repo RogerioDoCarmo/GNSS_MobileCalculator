@@ -1,4 +1,4 @@
-package View;
+package com.rogeriocarmo.gnss_mobilecalculator.View;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,28 +7,23 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
-import Controller.SingletronController;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link Fragment_SaveTXT.OnFragmentInteractionListener} interface
+ * {@link Fragment_About.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link Fragment_SaveTXT#newInstance} factory method to
+ * Use the {@link Fragment_About#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Fragment_SaveTXT extends Fragment {
-
-    SingletronController controller;
+public class Fragment_About extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public Fragment_SaveTXT() {
+    public Fragment_About() {
         // Required empty public constructor
     }
 
@@ -38,11 +33,11 @@ public class Fragment_SaveTXT extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment Fragment_SaveTXT.
+     * @return A new instance of fragment Fragment_About.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment_SaveTXT newInstance(String param1, String param2) {
-        Fragment_SaveTXT fragment = new Fragment_SaveTXT();
+    public static Fragment_About newInstance(String param1, String param2) {
+        Fragment_About fragment = new Fragment_About();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -54,41 +49,13 @@ public class Fragment_SaveTXT extends Fragment {
         if (getArguments() != null) {
 
         }
-        controller = SingletronController.getInstance();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_save_txt, container, false);
-
-        Button buttonEpch = view.findViewById(R.id.btnEpch);
-        buttonEpch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(controller.gravar_epocas(getContext())) {
-                    Toast.makeText(getContext(), "Arquivo de épocas gravado com sucesso!", Toast.LENGTH_LONG).show();
-                    controller.send_txt();
-                }else{
-                    Toast.makeText(getContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        Button buttonResult = view.findViewById(R.id.btnResult);
-        buttonResult.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (controller.gravar_resultados(getContext())) {
-                    Toast.makeText(getContext(), "Arquivo de resultados gravado com sucesso!", Toast.LENGTH_LONG).show();
-                    controller.send_txt();
-                }else{
-                    Toast.makeText(getContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        return view;
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_about, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

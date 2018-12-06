@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="View.Fragment_Main">
+    tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_Main">
 
     <ImageView
         android:id="@+id/photo"

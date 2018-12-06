@@ -1,4 +1,4 @@
-package Model;
+package com.rogeriocarmo.gnss_mobilecalculator.Model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

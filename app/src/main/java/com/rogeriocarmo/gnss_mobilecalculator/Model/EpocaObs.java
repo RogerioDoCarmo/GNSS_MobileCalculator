@@ -1,4 +1,4 @@
-package Model;
+package com.rogeriocarmo.gnss_mobilecalculator.Model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class EpocaObs  implements Parcelable {
     //        private GNSSDate UTC = null;
-    private static final String type = "G";
+    private static final String type = "G"; //FIXME CONSIDERAR OUTRAS CONSTELAÇÕES
     private GNSSDate Data_UTC ;
     private ArrayList<Integer> lista_PRNs;
     private ArrayList<Double>  lista_Pseudoranges;

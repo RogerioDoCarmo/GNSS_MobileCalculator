@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package Model;
+package com.rogeriocarmo.gnss_mobilecalculator.Model;
 
 import java.io.Serializable;
 

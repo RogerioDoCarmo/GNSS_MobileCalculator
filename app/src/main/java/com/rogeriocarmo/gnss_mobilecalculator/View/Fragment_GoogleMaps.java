@@ -1,4 +1,4 @@
-package View;
+package com.rogeriocarmo.gnss_mobilecalculator.View;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,7 +30,7 @@ import com.rogeriocarmo.gnss_mobilecalculator.R;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import Model.CoordenadaGeodesica;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaGeodesica;
 
 public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback {
 
@@ -266,7 +266,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                 .setAction("Voltar", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(getContext(), SideBar.class);
+                        Intent intent = new Intent(getContext(), Activity_Main.class);
                         startActivity(intent);
                     }
                 });
@@ -326,7 +326,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                     .setAction("Voltar", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent intent = new Intent(getContext(), SideBar.class);
+                            Intent intent = new Intent(getContext(), Activity_Main.class);
                             startActivity(intent);
                         }
                     });

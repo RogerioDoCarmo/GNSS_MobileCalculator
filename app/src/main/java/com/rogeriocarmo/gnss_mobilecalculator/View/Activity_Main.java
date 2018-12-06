@@ -1,4 +1,4 @@
-package View;
+package com.rogeriocarmo.gnss_mobilecalculator.View;
 
 import android.support.v4.app.FragmentManager;
 import android.net.Uri;
@@ -18,10 +18,10 @@ import com.rogeriocarmo.gnss_mobilecalculator.R;
 
 import java.util.ArrayList;
 
-import Controller.SingletronController;
-import Model.CoordenadaGeodesica;
+import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaGeodesica;
 
-public class SideBar extends AppCompatActivity
+public class Activity_Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
             Fragment_Main.OnFragmentInteractionListener,
             Fragment_Import.OnFragmentInteractionListener,
