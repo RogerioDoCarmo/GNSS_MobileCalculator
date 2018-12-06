@@ -325,8 +325,8 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                             Snackbar.LENGTH_INDEFINITE)
                     .setAction("Voltar", new View.OnClickListener() {
                         @Override
-                        public void onClick(View view) {
-                            Intent intent = new Intent(getContext(), Activity_Main.class);
+                        public void onClick(View view) { // FIXME SNACKBAR COM ERRO AO CLICAR EM OUTRAS ACTIVITIY
+                            Intent intent = new Intent(getActivity().getBaseContext(), Activity_Main.class);
                             startActivity(intent);
                         }
                     });

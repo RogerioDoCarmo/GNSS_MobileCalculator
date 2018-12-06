@@ -19,7 +19,7 @@ public class EpocaObs  implements Parcelable {
 
     }
 
-    public EpocaObs(Parcel in){
+    public EpocaObs(Parcel in){ //TODO VERIFICAR OPERAÇÃO INSEGURA
         Data_UTC = (GNSSDate) in.readParcelable(GNSSDate.class.getClassLoader());
         lista_PRNs = in.readArrayList(Integer.class.getClassLoader());
         lista_Pseudoranges = in.readArrayList(Double.class.getClassLoader());
