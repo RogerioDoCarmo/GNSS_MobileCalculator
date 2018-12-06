@@ -77,6 +77,18 @@ public class SingletronController {
         throw new CloneNotSupportedException("Clone is not allowed.");
     }
 
+    public void processamento_completo(Context mContext){
+        try {
+            readLogger_RawAssets(mContext);
+            calcPseudorange();
+            readRINEX_RawAssets(mContext);
+            processar_todas_epocas();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public String readLogger_RawAssets(Context context) throws  IOException{
         int qntMedicoesDescartadas = 0;
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.logdia05hora15))); // FIXME DEIXAR DINAMICO
@@ -725,7 +737,7 @@ public class SingletronController {
      * </p>
      *@return A data para a época considerada no ajustamento.
      */
-    private EpocaGPS escolherEpoca(int INDEX_ANALISE){
+    private EpocaGPS escolherEpoca(int INDEX_ANALISE){ //FIXME ARRUMAR DATA!!!
         /**
          * DEFINIÇÃO MANUAL DA DATA DO RINEX:
          */
@@ -781,8 +793,15 @@ public class SingletronController {
     }
 
     public void processar_todas_epocas(){
-        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);");
+//        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);");
         for (int i = 0; i < listaEpocas.size(); i++) {
+            processar_epoca(i);
+        }
+    }
+
+    public void processar_n_epocas(int lastEpch){
+//        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);");
+        for (int i = 0; i < lastEpch; i++) {
             processar_epoca(i);
         }
     }
