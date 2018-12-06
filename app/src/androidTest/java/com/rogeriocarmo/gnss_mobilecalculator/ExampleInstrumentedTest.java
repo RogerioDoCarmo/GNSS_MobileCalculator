@@ -11,6 +11,8 @@ import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
 
+import View.SideBar;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 //import static android.support.test.espresso.intent.Intents.intended;
@@ -32,9 +34,8 @@ import static org.junit.Assert.*;
 public class ExampleInstrumentedTest {
 
     @Rule
-    public IntentsTestRule<MainActivity> mActivityRule =
-            new IntentsTestRule<>(MainActivity.class);
-
+    public IntentsTestRule<SideBar> mActivityRule =
+            new IntentsTestRule<>(SideBar.class);
 
     @Test
     public void useAppContext() {
@@ -46,16 +47,5 @@ public class ExampleInstrumentedTest {
 
     @Test
     public void abrirActivityResultado() {
-        onView(withId(R.id.idVisualizar))
-                .perform(click());
-
-        // Verifies that the DisplayMessageActivity received an intent
-        // with the correct package name and message.
-//        Intents.intended(allOf(
-//                hasComponent(hasShortClassName(".Resultado")),
-//                toPackage(PACKAGE_NAME),
-//                hasExtra("Coord", Ecef2LlaConverter.GeodeticLlaValues.class.getName())));
-//
-//  Intents.intended(hasComponent(MainActivity.class.getName()));
     }
 }

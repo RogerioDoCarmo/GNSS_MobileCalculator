@@ -25,7 +25,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.rogeriocarmo.gnss_mobilecalculator.MainActivity;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
 import java.text.DecimalFormat;
@@ -263,11 +262,11 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                         "Lat: " +  new DecimalFormat("#.#### ").format(latFinal) +
                                 "Lon: " + new DecimalFormat("#.#### ").format(longFinal)  +
                                 "Alt: " + new DecimalFormat("#.### ").format(altFinal),
-                        Snackbar.LENGTH_LONG)
+                        Snackbar.LENGTH_INDEFINITE)
                 .setAction("Voltar", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(getContext(), MainActivity.class);
+                        Intent intent = new Intent(getContext(), SideBar.class);
                         startActivity(intent);
                     }
                 });
@@ -323,7 +322,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
             Snackbar snackbar = Snackbar
                     .make(getActivity().findViewById(android.R.id.content),
                             "Foram processadas " + numEpch + " épocas!",
-                            Snackbar.LENGTH_LONG)
+                            Snackbar.LENGTH_INDEFINITE)
                     .setAction("Voltar", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {

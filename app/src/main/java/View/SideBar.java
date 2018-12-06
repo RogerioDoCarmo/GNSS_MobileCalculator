@@ -50,7 +50,15 @@ public class SideBar extends AppCompatActivity
 
         definir_fragment_inicial();
 
-        controller =  SingletronController.getInstance();
+        /*
+         *Epocas Boas
+         * ID = 313
+         * ID = 298 ==> A MELHOR!!!!
+         * ID = 212
+         * ID = 227
+         * */
+        controller = SingletronController.getInstance();
+        controller.processamento_completo(getApplicationContext());
     }
 
     private void definir_fragment_inicial() {
