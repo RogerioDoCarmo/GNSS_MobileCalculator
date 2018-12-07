@@ -10,6 +10,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -118,6 +120,48 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         alert.show();
     }
 
+    private void Dialog_distance() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final Float[] distance = new Float[1];
+
+        builder.setTitle("Distância do marco referencial:");
+        builder.setCancelable(true);
+
+        View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_distance,
+                getActivity().findViewById(R.id.content), false);
+
+        final EditText input_distance = viewInflated.findViewById(R.id.input_distance);
+
+        builder.setView(viewInflated);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String value = (input_distance.getText().toString());
+                if (!value.isEmpty()) {
+                    distance[0] = Float.valueOf(value); //TODO Review
+
+                    if (distance[0] <= 0.0f) dialog.cancel(); //FIXME
+
+                    mMap.clear();
+                    erase_circles();
+                    marcar_EP02();
+                    marcar_epocas_distancia(distance[0]);
+                }
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     private Fragment_GoogleMaps.OnFragmentInteractionListener mListener;
 
     public Fragment_GoogleMaps() {
@@ -169,10 +213,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mMap.clear();
-                erase_circles();
-                marcar_EP02();
-                marcar_epocas_distancia(8.000f); //TODO CAPTURAR O VALOR COM UM DIALOG
+                 Dialog_distance();
             }
         });
 
@@ -221,6 +262,23 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         mMap.animateCamera(CameraUpdateFactory.zoomTo(20));
 
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    }
+
+    private void voltar_fragment_inicial() {
+        Fragment fragment = null;
+        Class fragmentClass = Fragment_Main.class;
+
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (java.lang.InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.flContent, fragment);
+//        fragmentTransaction.addToBackStack(null); TODO
+        fragmentTransaction.commit();
     }
 
     private void marcar_EP02(){
@@ -297,8 +355,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                 .setAction("Voltar", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(getContext(), Activity_Main.class);
-                        startActivity(intent);
+                        voltar_fragment_inicial();
                     }
                 });
         snackbar.show();
@@ -357,8 +414,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                     .setAction("Voltar", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) { // FIXME SNACKBAR COM ERRO AO CLICAR EM OUTRAS ACTIVITIY
-                            Intent intent = new Intent(getActivity().getBaseContext(), Activity_Main.class);
-                            startActivity(intent);
+                            voltar_fragment_inicial();
                         }
                     });
             snackbar.show();
@@ -417,17 +473,15 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
 
             snackbar = Snackbar
                     .make(getActivity().findViewById(android.R.id.content),
-                            "Menor distância na " + epch_min + "ª época: " + new DecimalFormat("###.###").format(min_distance) + "m",
+                            "Foram encontradas " + numEpch + " épocas!",
                             Snackbar.LENGTH_INDEFINITE)
                     .setAction("Voltar", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) { // FIXME SNACKBAR COM ERRO AO CLICAR EM OUTRAS ACTIVITIY
-                            Intent intent = new Intent(getActivity().getBaseContext(), Activity_Main.class);
-                            startActivity(intent);
+                            voltar_fragment_inicial();
                         }
                     });
             snackbar.show();
-            Toast.makeText(getContext(),"Foram processadas " + numEpch + " épocas!",Toast.LENGTH_SHORT).show();
         }
     }
 
