@@ -1,5 +1,6 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -74,17 +75,30 @@ public class Activity_Main extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.flContent, fragment);
+//        fragmentTransaction.addToBackStack(null); TODO
         fragmentTransaction.commit();
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    public void onBackPressed() { // TODO REVISAR PARA FUNCIONAR CORRETAMETE
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
+
+//        if (getFragmentManager().getBackStackEntryCount() == 0) {
+//            this.finish();
+//        } else {
+//            getFragmentManager().popBackStack();
+//        }
+
+//        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+//            getSupportFragmentManager().popBackStack();
+//        } else {
+//            finish();
+//        }
     }
 
     @Override
@@ -112,7 +126,7 @@ public class Activity_Main extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         Fragment fragment = null;
         Class fragmentClass = null;

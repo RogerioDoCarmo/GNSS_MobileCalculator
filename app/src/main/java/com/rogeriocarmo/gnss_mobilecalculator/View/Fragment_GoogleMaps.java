@@ -54,6 +54,8 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
     int first_epch = -1;
     int last_epch = -1;
 
+    Snackbar snackbar = null;
+
     private void Dialog_interval() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
@@ -182,6 +184,8 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        if (snackbar != null)
+            snackbar.dismiss();
     }
 
     @Override
@@ -208,7 +212,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
     }
 
-    private void desenhar_circulos(){
+    private void draw_circles(){
         LatLng CENTER = new LatLng(EP02_LAT, EP02_LONG);
 
         CircleOptions circle_centroide = new CircleOptions();
@@ -239,7 +243,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         void onFragmentInteraction(Uri uri);
     }
 
-    private void marcar_epoca_unica() {
+    private void marcar_epoca_unica() { // TODO CONSIDERAR EXCLUIR
         Double latFinal  = resultGeoid.get(0).getLatDegrees();
         Double longFinal = resultGeoid.get(0).getLonDegrees();
         Double altFinal  = resultGeoid.get(0).getAltMeters();
@@ -317,9 +321,9 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
 
             marcar_min_max();
 
-            desenhar_circulos();
+            draw_circles();
 
-            Snackbar snackbar = Snackbar
+            snackbar = Snackbar
                     .make(getActivity().findViewById(android.R.id.content),
                             "Foram processadas " + numEpch + " épocas!",
                             Snackbar.LENGTH_INDEFINITE)

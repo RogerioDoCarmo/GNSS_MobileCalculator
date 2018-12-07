@@ -891,7 +891,9 @@ public class SingletronController {
             }
 
             X = rX.toArray();
-            double[] X2 = X;
+//            double[] X2 = X;
+            double[] X2 = new double[X.length];
+            System.arraycopy(X,0,X2,0,X.length);
             X[3] = X[3] / LIGHTSPEED;
 
             //Xa = X0+X;
@@ -911,7 +913,7 @@ public class SingletronController {
             // Fator de variância a posteriori:
             S0post = VtPV.getEntry(0) / (double) (qntSatEpchAtual - 4);
 
-            // MVC das coordenadas ajustadas // TODO VER ORDEM DA MULTIPLICACAO
+            // MVC das coordenadas ajustadas
             RealMatrix MVCXa = rInvN.scalarMultiply(S0post);
 
             if (!MatrixUtils.isSymmetric(MVCXa,0.005)){
