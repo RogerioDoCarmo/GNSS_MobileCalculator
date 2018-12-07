@@ -826,12 +826,12 @@ public class SingletronController {
 //      double Ze = 0d;
 
 //      USANDO O MARCO EP2:
-        double Xe = 3687623.9881914;
-        double Ye = -4620693.11583979;
-        double Ze = -2387150.62016113;
+        double Xe = 3687622.7392;
+        double Ye = -4620693.7459;
+        double Ze = -2387156.6329;
 
         double[] X0 = new double[]{Xe, Ye, Ze,0d};
-        double[] X = new double[4];
+//        double[] X = new double[4];
         double[] Xa = new double[4];
 
         double S0post;
@@ -890,7 +890,7 @@ public class SingletronController {
                 return null;
             }
 
-            X = rX.toArray();
+            double[] X = rX.toArray();
 //            double[] X2 = X;
             double[] X2 = new double[X.length];
             System.arraycopy(X,0,X2,0,X.length);
@@ -944,7 +944,7 @@ public class SingletronController {
         } // Fim do laço do ajustamento
 
         Ecef2LlaConverter.GeodeticLlaValues valores = Ecef2LlaConverter.convertECEFToLLACloseForm(
-                X0[0], X0[1], X0[2]);
+                Xa[0], Xa[1], Xa[2]);
 
         Double latiDegrees =  Math.toDegrees(valores.latitudeRadians);
         Double longDegrees =  Math.toDegrees(valores.longitudeRadians);

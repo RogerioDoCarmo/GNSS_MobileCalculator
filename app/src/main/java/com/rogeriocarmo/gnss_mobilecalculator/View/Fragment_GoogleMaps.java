@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -55,6 +57,9 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
     int last_epch = -1;
 
     Snackbar snackbar = null;
+    Circle circleMin = null;
+    Circle circleMax = null;
+    Circle circleCentroide = null;
 
     private void Dialog_interval() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -94,7 +99,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                 if (resultGeoid.size() > 1) {
                     marcar_todas_epocas();
                 } else {
-                    marcar_epoca_unica();
+                    marcar_epoca_unica(); //FIXME
                 }
 
                 dialog.dismiss();
@@ -158,8 +163,20 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_maps, container, false);
+        View view = inflater.inflate(R.layout.fragment_maps, container, false);
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMap.clear();
+                erase_circles();
+                marcar_EP02();
+                marcar_epocas_distancia(8.000f); //TODO CAPTURAR O VALOR COM UM DIALOG
+            }
+        });
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -192,13 +209,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        mMap.addMarker(new MarkerOptions().
-                position(coordEP02).
-                icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)).
-                title("Marco EP02").
-                snippet("Coordenadas do IBGE").rotation(-90f));
-
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coordEP02, 18));
+        marcar_EP02();
 
         mMap.getUiSettings().setScrollGesturesEnabled(true);
 
@@ -212,20 +223,36 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
     }
 
+    private void marcar_EP02(){
+        mMap.addMarker(new MarkerOptions().
+                position(coordEP02).
+                icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)).
+                title("Marco EP02").
+                snippet("Coordenadas do IBGE").rotation(90f));
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coordEP02, 18));
+    }
+
     private void draw_circles(){
         LatLng CENTER = new LatLng(EP02_LAT, EP02_LONG);
 
         CircleOptions circle_centroide = new CircleOptions();
         circle_centroide.center(CENTER).fillColor(Color.TRANSPARENT).strokeColor(Color.BLUE).strokeWidth(4).radius(centroide_distance);
-        mMap.addCircle(circle_centroide);
+        circleCentroide = mMap.addCircle(circle_centroide);
 
         CircleOptions circle_min = new CircleOptions();
         circle_min.center(CENTER).fillColor(Color.TRANSPARENT).strokeColor(Color.GREEN).strokeWidth(4).radius(min_distance).clickable(true);
-        mMap.addCircle(circle_min);
+        circleMin = mMap.addCircle(circle_min);
 
         CircleOptions circle_max = new CircleOptions();
         circle_max.center(CENTER).fillColor(Color.TRANSPARENT).strokeColor(Color.RED).strokeWidth(4).radius(max_distance).clickable(true);
-        mMap.addCircle(circle_max);
+        circleMax = mMap.addCircle(circle_max);
+    }
+
+    private void erase_circles(){
+        if (circleCentroide != null) circleCentroide.remove();
+        if (circleMin != null) circleMin.remove();
+        if (circleMax != null) circleMax.remove();
     }
 
     /**
@@ -297,8 +324,8 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
             mMap.addMarker(new MarkerOptions().
                     position(coord).
                     icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)).
-                    alpha(0.8f).
-                    title(numEpch + "a época").
+                    alpha(0.6f).
+                    title(resultGeoid.get(i).getNumEpch() + "ª época").
                     snippet("Distância: " + String.format("%s", new DecimalFormat("###.###").format(result[0])) + "m")
             );
             numEpch++;
@@ -325,7 +352,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
 
             snackbar = Snackbar
                     .make(getActivity().findViewById(android.R.id.content),
-                            "Foram processadas " + numEpch + " épocas!",
+                            "Menor distância na " + epch_min + "ª época: " + new DecimalFormat("###.###").format(min_distance) + "m",
                             Snackbar.LENGTH_INDEFINITE)
                     .setAction("Voltar", new View.OnClickListener() {
                         @Override
@@ -335,6 +362,72 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                         }
                     });
             snackbar.show();
+            Toast.makeText(getContext(),"Foram processadas " + numEpch + " épocas!",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void marcar_epocas_distancia(float distancia) {
+        int numEpch = 1; // FIXME ERRO QUANDO A ACTIVITY É REABERTA!
+        int limite = resultGeoid.size() - 1;
+        min_distance = Float.MAX_VALUE;
+        max_distance = Float.MIN_VALUE;
+
+        for (int i = 0; i < limite; i++){
+
+            Double latDegrees = resultGeoid.get(i).getLatDegrees();
+            Double longDegrees = resultGeoid.get(i).getLonDegrees();
+
+            LatLng coord = new LatLng(latDegrees,longDegrees);
+
+            float[] result = new float[1];
+            Location.distanceBetween(coord.latitude,coord.longitude,
+                    coordEP02.latitude,coordEP02.longitude, result);
+
+            if (result[0] <= distancia) {
+                mMap.addMarker(new MarkerOptions().
+                        position(coord).
+                        icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)).
+                        alpha(0.6f).
+                        title(resultGeoid.get(i).getNumEpch() + "ª época").
+                        snippet("Distância: " + String.format("%s", new DecimalFormat("###.###").format(result[0])) + "m")
+                );
+                numEpch++;
+
+                if (result[0] < min_distance){
+                    min_distance = result[0];
+                    coord_min = coord;
+                    epch_min = i + 1;
+                }else if (result[0] > max_distance && result[0] < distancia){
+                    max_distance = result[0];
+                    coord_max = coord;
+                    epch_max = i + 1;
+                }
+            }
+        }
+        numEpch--;
+
+        if (last_epch > 1) {
+            marcar_centroide();
+
+            marcar_min_max();
+
+            draw_circles();
+
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coordEP02, 22));
+
+            snackbar = Snackbar
+                    .make(getActivity().findViewById(android.R.id.content),
+                            "Menor distância na " + epch_min + "ª época: " + new DecimalFormat("###.###").format(min_distance) + "m",
+                            Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Voltar", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) { // FIXME SNACKBAR COM ERRO AO CLICAR EM OUTRAS ACTIVITIY
+                            Intent intent = new Intent(getActivity().getBaseContext(), Activity_Main.class);
+                            startActivity(intent);
+                        }
+                    });
+            snackbar.show();
+            Toast.makeText(getContext(),"Foram processadas " + numEpch + " épocas!",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -342,17 +435,19 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         mMap.addMarker(new MarkerOptions().
                 position(coord_min).
                 icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).
-                title(epch_min + "a época").
+                title(epch_min + "ª época").
                 snippet("Distância: " + new DecimalFormat("#.#### ").format(min_distance) + "m"
-                        + "\n Marcador mais próximo!")
+                        + "\n Marcador mais próximo!").
+                rotation(-90f)
         );
 
         mMap.addMarker(new MarkerOptions().
                 position(coord_max).
                 icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).
-                title(epch_max + "a época").
+                title(epch_max + "ª época").
                 snippet("Distância: " + new DecimalFormat("#.#### ").format(max_distance) + "m"
-                        + "\n Marcador mais distante!")
+                        + "\n Marcador mais distante!").
+                rotation(-90f)
         );
     }
 
@@ -373,12 +468,9 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                 position(coord).
                 icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).
                 title("Centróide").
-                snippet("Distância: " + new DecimalFormat("#.#### ").format(result[0]) + "m")
+                snippet("Distância: " + new DecimalFormat("#.#### ").format(result[0]) + "m").
+                rotation(-90f)
         );
-
-        Toast.makeText(getContext(),"Centróide calculado: "
-                        + new DecimalFormat("#.#### ").format(result[0]) + "m",
-                Toast.LENGTH_LONG).show();
     }
 
 }
