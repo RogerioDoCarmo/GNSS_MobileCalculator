@@ -6,6 +6,6 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Activity_Main"
-    tools:showIn="@layout/app_bar_side_bar">
+    tools:showIn="@layout/side_bar_app_bar">
 
 </android.support.constraint.ConstraintLayout>

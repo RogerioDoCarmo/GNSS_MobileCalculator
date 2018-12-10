@@ -963,8 +963,8 @@ public class SingletronController {
         ArrayList<String> lista = new ArrayList<>();
         for (int i = 0; i < listaEpocas.size(); i++){
             lista.add(listaEpocas.get(i).toString());
-            lista.add("\n----------------------------------------------------------------\n");
-
+//            lista.add("\n----------------------------------------------------------------\n");
+//            lista.add("\n");
         }
         return (Arrays.copyOf(lista.toArray(), lista.size(), String[].class));
     }

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
 import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaGeodesica;
+import com.rogeriocarmo.gnss_mobilecalculator.View.dummy.DummyContent;
 
 public class Activity_Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -29,14 +30,16 @@ public class Activity_Main extends AppCompatActivity
             Fragment_SaveTXT.OnFragmentInteractionListener,
             Fragment_SaveRINEX.OnFragmentInteractionListener,
             Fragment_GoogleMaps.OnFragmentInteractionListener,
-            Fragment_About.OnFragmentInteractionListener{
+            Fragment_About.OnFragmentInteractionListener,
+            ItemFragment.OnListFragmentInteractionListener
+        {
 
     SingletronController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_side_bar);
+        setContentView(R.layout.side_bar_activity);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -135,7 +138,8 @@ public class Activity_Main extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) { // TODO: USAR UM SWITCH
-            fragmentClass = Fragment_Import.class;
+//            fragmentClass = Fragment_Import.class;
+            fragmentClass = ItemFragment.class;
         } else if (id == R.id.save_txt) {
             fragmentClass = Fragment_SaveTXT.class;
         } else if (id == R.id.show_maps) {
@@ -180,4 +184,9 @@ public class Activity_Main extends AppCompatActivity
     public void onFragmentInteraction(Uri uri){
         //you can leave it empty
     }
-}
+
+            @Override
+            public void onListFragmentInteraction(DummyContent.DummyItem item) {
+
+            }
+        }
