@@ -1,4 +1,4 @@
-package com.rogeriocarmo.gnss_mobilecalculator.View;
+package com.rogeriocarmo.gnss_mobilecalculator.Controller;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,30 +6,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
-import com.rogeriocarmo.gnss_mobilecalculator.View.ItemFragment.OnListFragmentInteractionListener;
-import com.rogeriocarmo.gnss_mobilecalculator.View.dummy.DummyContent.DummyItem;
+import com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_RecyclerView_Epchs.OnListFragmentInteractionListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display an item and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class RecyclerViewAdapter_Epchs extends RecyclerView.Adapter<RecyclerViewAdapter_Epchs.ViewHolder> {
 
     private final List<String> mValues;
     private final OnListFragmentInteractionListener mListener;
     private SingletronController controller;
 
 
-    public MyItemRecyclerViewAdapter(OnListFragmentInteractionListener listener) {
+    public RecyclerViewAdapter_Epchs(OnListFragmentInteractionListener listener) {
         controller = SingletronController.getInstance();
         mValues = load_data();
+
         mListener = listener;
     }
 
@@ -40,14 +38,14 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_item, parent, false);
+                .inflate(R.layout.recycler_view_epch_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
 //        holder.mItem = mValues.get(position);
-//        holder.mIdView.setText(mValues.get(position));
+        holder.mIdView.setText(String.valueOf(position + 1));
         holder.mContentView.setText(mValues.get(position));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -56,7 +54,8 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+//                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListFragmentInteraction();
                 }
             }
         });
@@ -69,14 +68,13 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-//        public final TextView mIdView;
+        public final TextView mIdView;
         public final TextView mContentView;
-        public DummyItem mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-//            mIdView = (TextView) view.findViewById(R.id.item_number);
+            mIdView = (TextView) view.findViewById(R.id.item_number);
             mContentView = (TextView) view.findViewById(R.id.content);
         }
 

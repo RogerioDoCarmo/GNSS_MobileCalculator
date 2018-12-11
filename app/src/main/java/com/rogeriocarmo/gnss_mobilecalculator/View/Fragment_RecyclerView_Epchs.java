@@ -10,11 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.rogeriocarmo.gnss_mobilecalculator.Controller.RecyclerViewAdapter_Epchs;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
-import com.rogeriocarmo.gnss_mobilecalculator.View.dummy.DummyContent;
-import com.rogeriocarmo.gnss_mobilecalculator.View.dummy.DummyContent.DummyItem;
-
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -22,7 +19,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ItemFragment extends Fragment {
+public class Fragment_RecyclerView_Epchs extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -34,13 +31,13 @@ public class ItemFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ItemFragment() {
+    public Fragment_RecyclerView_Epchs() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ItemFragment newInstance(int columnCount) {
-        ItemFragment fragment = new ItemFragment();
+    public static Fragment_RecyclerView_Epchs newInstance(int columnCount) {
+        Fragment_RecyclerView_Epchs fragment = new Fragment_RecyclerView_Epchs();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -59,7 +56,7 @@ public class ItemFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
+        View view = inflater.inflate(R.layout.recycler_view_epchs, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -70,7 +67,7 @@ public class ItemFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(mListener));
+            recyclerView.setAdapter(new RecyclerViewAdapter_Epchs(mListener));
         }
         return view;
     }
@@ -105,6 +102,6 @@ public class ItemFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction();
     }
 }

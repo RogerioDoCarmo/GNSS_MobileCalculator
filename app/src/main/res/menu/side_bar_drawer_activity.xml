@@ -5,13 +5,19 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/import_files"
             android:icon="@drawable/ic_menu_file"
             android:title="Import" />
         <item
             android:id="@+id/save_txt"
             android:icon="@drawable/ic_menu_download"
             android:title="Salvar Resultados" />
+
+        <item
+            android:id="@+id/list_epchs"
+            android:icon="@drawable/ic_menu_list"
+            android:title="Lista de Épocas" />
+
         <item
             android:id="@+id/show_maps"
             android:icon="@drawable/ic_menu_location"

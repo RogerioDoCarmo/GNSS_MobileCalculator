@@ -2,7 +2,6 @@ package com.rogeriocarmo.gnss_mobilecalculator.View;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
@@ -162,6 +161,44 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         alert.show();
     }
 
+    private void Dialog_add_marker() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final Float[] distance = new Float[1];
+
+        builder.setTitle("Novo marcador:");
+        builder.setCancelable(true);
+
+        View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_new_marker,
+                getActivity().findViewById(R.id.content), false);
+
+        final EditText input_lat = viewInflated.findViewById(R.id.input_new_lat);
+        final EditText input_long = viewInflated.findViewById(R.id.input_new_long);
+
+        builder.setView(viewInflated);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String latitude = (input_lat.getText().toString());
+                String longitude = (input_long.getText().toString());
+
+                if (!latitude.isEmpty() && !longitude.isEmpty()) {
+                    adicionar_marcador(Float.valueOf(latitude), Float.valueOf(longitude));
+                }
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
     private Fragment_GoogleMaps.OnFragmentInteractionListener mListener;
 
     public Fragment_GoogleMaps() {
@@ -209,11 +246,19 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
-        FloatingActionButton fab = view.findViewById(R.id.fab);
+        FloatingActionButton fab = view.findViewById(R.id.fab_filter);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                  Dialog_distance();
+            }
+        });
+
+        FloatingActionButton fab_add = view.findViewById(R.id.fab_add);
+        fab_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dialog_add_marker();
             }
         });
 
@@ -279,6 +324,22 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         fragmentTransaction.replace(R.id.flContent, fragment);
 //        fragmentTransaction.addToBackStack(null); TODO
         fragmentTransaction.commit();
+    }
+
+    private void adicionar_marcador(Float latitude, Float longitude) {
+        LatLng coord = new LatLng((latitude), (longitude));
+
+        float[] result = new float[1];
+        Location.distanceBetween(coord.latitude,coord.longitude,
+                coordEP02.latitude,coordEP02.longitude, result);
+
+        mMap.addMarker(new MarkerOptions().
+                position(coord).
+                icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)).
+                title("Novo marcador").
+                snippet("Distância: " + String.format("%s", new DecimalFormat("###.###").format(result[0])) + "m"));
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coord, 20));
     }
 
     private void marcar_EP02(){

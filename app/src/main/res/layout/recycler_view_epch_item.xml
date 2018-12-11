@@ -5,7 +5,6 @@
     android:orientation="horizontal"
     android:id="@+id/fragment_item">
 
-
     <TextView
         android:id="@+id/item_number"
         android:layout_width="wrap_content"

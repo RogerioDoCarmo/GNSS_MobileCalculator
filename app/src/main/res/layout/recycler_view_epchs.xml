@@ -8,7 +8,10 @@
     android:layout_height="match_parent"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
-    android:paddingTop="@dimen/maps_fragment_vertical_spacing"
+    android:animateLayoutChanges="false"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingTop="70dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".View.ItemFragment"
-    tools:listitem="@layout/fragment_item" />
+    tools:context=".View.Fragment_RecyclerView_Epchs"
+    tools:listitem="@layout/recycler_view_epch_item" />
