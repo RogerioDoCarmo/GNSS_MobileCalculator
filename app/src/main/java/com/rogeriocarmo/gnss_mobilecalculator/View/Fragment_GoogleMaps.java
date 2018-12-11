@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TabHost;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -73,7 +74,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         builder.setCancelable(true);
 
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_interval,
-                getActivity().findViewById(R.id.content), false);
+                getActivity().findViewById(R.id.id_content), false);
 
         final EditText input_min = viewInflated.findViewById(R.id.interval_min);
         final EditText input_max = viewInflated.findViewById(R.id.interval_max);
@@ -127,7 +128,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         builder.setCancelable(true);
 
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_distance,
-                getActivity().findViewById(R.id.content), false);
+                getActivity().findViewById(R.id.id_content), false);
 
         final EditText input_distance = viewInflated.findViewById(R.id.input_distance);
 
@@ -169,7 +170,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         builder.setCancelable(true);
 
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_new_marker,
-                getActivity().findViewById(R.id.content), false);
+                getActivity().findViewById(R.id.id_content), false);
 
         final EditText input_lat = viewInflated.findViewById(R.id.input_new_lat);
         final EditText input_long = viewInflated.findViewById(R.id.input_new_long);
@@ -311,25 +312,8 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
     }
 
     private void teste_tabbed_dialog() {
-        Fragment fragment = null;
-        Class    fragmentClass = Tab_Dialog.class;
-
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (java.lang.InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.flContent, fragment);
-//        fragmentTransaction.addToBackStack(null); TODO
-        fragmentTransaction.commit();
-    }
-
-    private void voltar_fragment_inicial() {
 //        Fragment fragment = null;
-//        Class fragmentClass = Fragment_Main.class;
+//        Class    fragmentClass = Tab_Dialog.class;
 //
 //        try {
 //            fragment = (Fragment) fragmentClass.newInstance();
@@ -343,19 +327,90 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
 ////        fragmentTransaction.addToBackStack(null); TODO
 //        fragmentTransaction.commit();
 
-        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
-        if (prev != null) {
-            ft.remove(prev);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final Float[] distance = new Float[1];
+
+        builder.setTitle("Novo marcador:");
+        builder.setCancelable(true);
+
+        View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.tab_testes,
+                getActivity().findViewById(R.id.id_content), false);
+
+        TabHost tabs = (TabHost) viewInflated.findViewById(R.id.tabhost);
+
+        tabs.setup();
+
+        TabHost.TabSpec spec=tabs.newTabSpec("tag1");
+
+        spec.setContent(R.id.tab111);
+        spec.setIndicator("Lat/Long");
+        tabs.addTab(spec);
+
+        spec = tabs.newTabSpec("tag2");
+        spec.setContent(R.id.tab222);
+        spec.setIndicator("XYZ (WGS-84)");
+        tabs.addTab(spec);
+
+//        final EditText input_distance = viewInflated.findViewById(R.id.input_distance);
+
+        builder.setView(viewInflated);
+
+        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+//                String value = (input_distance.getText().toString());
+//                if (!value.isEmpty()) {
+//                    distance[0] = Float.valueOf(value); //TODO Review
+//
+//                    if (distance[0] <= 0.0f) dialog.cancel(); //FIXME
+//
+//                    mMap.clear();
+//                    erase_circles();
+//                    marcar_EP02();
+//                    marcar_epocas_distancia(distance[0]);
+//                }
+                dialog.dismiss();
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        final AlertDialog alert = builder.create();
+        alert.show();
+
+    }
+
+    private void voltar_fragment_inicial() {
+        Fragment fragment = null;
+        Class fragmentClass = Fragment_Main.class;
+
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (java.lang.InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
         }
-//        ft.addToBackStack(null);
 
-        // Create and show the dialog.
-        Tab_Dialog dialogFragment = new Tab_Dialog();
-        dialogFragment.setCancelable(true);
-        dialogFragment.show(ft,"dialog");
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.flContent, fragment);
+//        fragmentTransaction.addToBackStack(null); TODO
+        fragmentTransaction.commit();
 
-
+//        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+//        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
+//        if (prev != null) {
+//            ft.remove(prev);
+//        }
+////        ft.addToBackStack(null);
+//
+//        // Create and show the dialog.
+//        TabbedDialog2 dialogFragment = new TabbedDialog2();
+//        dialogFragment.setCancelable(true);
+//        dialogFragment.show(ft,"dialog");
     }
 
     private void adicionar_marcador(Float latitude, Float longitude) {
