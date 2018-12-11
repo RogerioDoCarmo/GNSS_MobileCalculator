@@ -246,8 +246,8 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
-        FloatingActionButton fab = view.findViewById(R.id.fab_filter);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab_filter = view.findViewById(R.id.fab_filter);
+        fab_filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                  Dialog_distance();
@@ -258,7 +258,8 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         fab_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Dialog_add_marker();
+//                Dialog_add_marker(); //TODO TESTANDO TabHost
+                teste_tabbed_dialog();
             }
         });
 
@@ -309,9 +310,9 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
     }
 
-    private void voltar_fragment_inicial() {
+    private void teste_tabbed_dialog() {
         Fragment fragment = null;
-        Class fragmentClass = Fragment_Main.class;
+        Class    fragmentClass = Tab_Dialog.class;
 
         try {
             fragment = (Fragment) fragmentClass.newInstance();
@@ -324,6 +325,37 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         fragmentTransaction.replace(R.id.flContent, fragment);
 //        fragmentTransaction.addToBackStack(null); TODO
         fragmentTransaction.commit();
+    }
+
+    private void voltar_fragment_inicial() {
+//        Fragment fragment = null;
+//        Class fragmentClass = Fragment_Main.class;
+//
+//        try {
+//            fragment = (Fragment) fragmentClass.newInstance();
+//        } catch (java.lang.InstantiationException | IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
+//
+//        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//        fragmentTransaction.replace(R.id.flContent, fragment);
+////        fragmentTransaction.addToBackStack(null); TODO
+//        fragmentTransaction.commit();
+
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+//        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        Tab_Dialog dialogFragment = new Tab_Dialog();
+        dialogFragment.setCancelable(true);
+        dialogFragment.show(ft,"dialog");
+
+
     }
 
     private void adicionar_marcador(Float latitude, Float longitude) {

@@ -1,6 +1,5 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.net.Uri;
@@ -140,6 +139,7 @@ public class Activity_Main extends AppCompatActivity
         switch (id) {
             case R.id.import_files:
                 fragmentClass = Fragment_Import.class;
+//                fragmentClass = Tab_Dialog.class;
                 break;
             case R.id.save_txt:
                 fragmentClass = Fragment_SaveTXT.class;
