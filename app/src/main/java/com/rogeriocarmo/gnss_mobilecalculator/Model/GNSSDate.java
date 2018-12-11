@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import java.text.DecimalFormat;
+
 public class GNSSDate implements Comparable<GNSSDate>, Parcelable {
     private int year;
     private int month;
@@ -75,7 +77,7 @@ public class GNSSDate implements Comparable<GNSSDate>, Parcelable {
 
     @Override
     public String toString(){
-        return (year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + sec);
+        return (year + "-" + month + "-" + day + " " + hour + ":" + min + ":" + String.format("%s", new DecimalFormat("###.###").format(sec)));
     }
 
     /**

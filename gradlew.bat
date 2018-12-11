@@ -56,7 +56,7 @@ set CMD_LINE_ARGS=
 set _SKIP=2
 
 :win9xME_args_slurp
-if "latDegrees%~1" == "latDegrees" goto execute
+if "xmeters%~1" == "xmeters" goto execute
 
 set CMD_LINE_ARGS=%*
 

@@ -1,5 +1,6 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.net.Uri;
@@ -148,7 +149,7 @@ public class Activity_Main extends AppCompatActivity
                 break;
             case R.id.show_maps:
                 fragmentClass = Fragment_GoogleMaps.class;
-                ArrayList<CoordenadaGeodesica> valores =  controller.getResultadosGeodeticos();
+                ArrayList<CoordenadaGeodesica> valores = controller.getResultadosGeodeticos();
                 bundle.putParcelableArrayList("Coord", valores);
                 break;
             case R.id.save_rinex:

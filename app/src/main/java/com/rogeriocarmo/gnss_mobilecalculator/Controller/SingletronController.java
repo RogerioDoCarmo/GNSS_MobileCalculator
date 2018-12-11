@@ -3,6 +3,7 @@ package com.rogeriocarmo.gnss_mobilecalculator.Controller;
 import android.content.Context;
 import android.util.Log;
 
+import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaCartesiana;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -50,7 +51,7 @@ public class SingletronController {
     public static ArrayList<ResultEpch> listaResultados = new ArrayList<>();
 
     public static EpocaGPS epocaAtual;
-    public static TextWritter writter; //FIXME REVER
+    public static TextWritter writter;
 
     private static int qntSatEpchAtual;
 
@@ -955,7 +956,6 @@ public class SingletronController {
                 discrepanciesXYZ[0], discrepanciesXYZ[1], discrepanciesXYZ[2]);
 
 //        Log.i("RESULTADO", resultado.toString());
-
         return resultado;
     }
 
@@ -1037,7 +1037,6 @@ public class SingletronController {
         ArrayList<CoordenadaGeodesica> listaResulGeod= new ArrayList<>();
 
         for (int i = 0; i < listaResultados.size(); i++) {
-
             CoordenadaGeodesica resultadoEpoca = new CoordenadaGeodesica(i + 1,
                     listaResultados.get(i).getLatiDegrees(),
                     listaResultados.get(i).getLongDegrees(),
@@ -1064,8 +1063,52 @@ public class SingletronController {
 
         listaResulGeod.add(resultCentroide);
 
-//        Log.i("RESULTADO_GEO",Arrays.deepToString(listaResultados.toArray()));
+//        Log.i("RESULTADO_GEO",Arrays.deepToString(listaResulGeod.toArray()));
         return listaResulGeod;
+    }
+
+    public ArrayList<CoordenadaCartesiana> getResultadosCartesianos() {
+        ArrayList<CoordenadaCartesiana> listaResulCart = new ArrayList<>();
+
+        for (int i = 0; i < listaResultados.size(); i++) {
+            CoordenadaCartesiana resultadoEpoca = new CoordenadaCartesiana(i + 1,
+                    listaResultados.get(i).getXmeters(),
+                    listaResultados.get(i).getYmeters(),
+                    listaResultados.get(i).getZmeters()
+            );
+
+            listaResulCart.add(resultadoEpoca);
+        }
+
+        CoordenadaGPS centroideXYZ = getCentroide();
+
+        CoordenadaCartesiana resultCentroide = new CoordenadaCartesiana(listaResulCart.size() + 1,
+                centroideXYZ.getX(),
+                centroideXYZ.getY(),
+                centroideXYZ.getZ()
+        );
+
+        listaResulCart.add(resultCentroide);
+
+//        Log.i("RESULTADO_CART",Arrays.deepToString(listaResulCart.toArray()));
+        return listaResulCart;
+    }
+
+    public CoordenadaGeodesica convertXYZ_to_LatLongAlt(Float Xmeters, Float Ymeters, Float Zmeters){
+        Ecef2LlaConverter.GeodeticLlaValues valores = Ecef2LlaConverter.convertECEFToLLACloseForm(
+                Xmeters, Ymeters, Zmeters);
+
+        Double latiDegrees =  Math.toDegrees(valores.latitudeRadians);
+        Double longDegrees =  Math.toDegrees(valores.longitudeRadians);
+        Double altMeters   =  valores.altitudeMeters;
+
+        CoordenadaGeodesica result = new CoordenadaGeodesica(-1,
+                latiDegrees,
+                longDegrees,
+                altMeters
+        );
+
+        return result;
     }
 
 }

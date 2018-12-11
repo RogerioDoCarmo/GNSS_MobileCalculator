@@ -11,7 +11,7 @@
     android:animateLayoutChanges="false"
     android:clickable="true"
     android:focusable="true"
-    android:paddingTop="70dp"
+    android:layout_marginTop="70dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".View.Fragment_RecyclerView_Epchs"
     tools:listitem="@layout/recycler_view_epch_item" />
