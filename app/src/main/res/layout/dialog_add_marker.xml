@@ -3,20 +3,23 @@
     android:id="@+id/tabhost"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <TabWidget android:id="@android:id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
+
         <FrameLayout android:id="@android:id/tabcontent"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/tab111"
+                android:id="@+id/add_maker_tab_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_horizontal"
@@ -26,26 +29,26 @@
                     android:id="@+id/input_new_lat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAlignment="center"
                     android:gravity="top"
                     android:hint="Latitude em graus    "
                     android:inputType="numberSigned|numberDecimal"
-                    android:scrollbars="vertical" />
+                    android:scrollbars="vertical"
+                    android:textAlignment="center" />
 
                 <EditText
                     android:id="@+id/input_new_long"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAlignment="center"
                     android:gravity="top"
                     android:hint="Longitude em graus"
                     android:inputType="numberSigned|numberDecimal"
-                    android:scrollbars="vertical" />
+                    android:scrollbars="vertical"
+                    android:textAlignment="center" />
 
             </LinearLayout>
 
             <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/tab222"
+                android:id="@+id/add_maker_tab_2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_horizontal"
@@ -82,6 +85,7 @@
                     android:scrollbars="vertical" />
 
             </LinearLayout>
+
         </FrameLayout>
     </LinearLayout>
 </TabHost>

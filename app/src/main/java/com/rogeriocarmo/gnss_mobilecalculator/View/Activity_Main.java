@@ -139,7 +139,6 @@ public class Activity_Main extends AppCompatActivity
         switch (id) {
             case R.id.import_files:
                 fragmentClass = Fragment_Import.class;
-//                fragmentClass = Tab_Dialog.class;
                 break;
             case R.id.save_txt:
                 fragmentClass = Fragment_SaveTXT.class;
