@@ -122,7 +122,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         alert.show();
     }
 
-    private void show_filterDistance_dialog() {
+    private void show_dialog_filterDistance() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         final Float[] distance = new Float[1];
 
@@ -164,117 +164,14 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         alert.show();
     }
 
-    public Fragment_GoogleMaps() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-
-     * @return A new instance of fragment Fragment_GoogleMaps.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static Fragment_GoogleMaps newInstance() {//String param1, String param2
-        return new Fragment_GoogleMaps();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            resultGeoid = getArguments().getParcelableArrayList("Coord"); //TODO obter aqui direto do controller
-
-            show_dialog_interval();
-        }
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        mapView = (MapView) view.findViewById(R.id.mapa);
-        mapView.onCreate(savedInstanceState);
-        mapView.onResume();
-        mapView.getMapAsync(this);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_maps, container, false);
-
-        FloatingActionButton fab_filter = view.findViewById(R.id.fab_filter);
-        fab_filter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                show_filterDistance_dialog();
-            }
-        });
-
-        FloatingActionButton fab_add = view.findViewById(R.id.fab_add);
-        fab_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                show_addMaker_dialog();
-            }
-        });
-
-        return view;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof Fragment_GoogleMaps.OnFragmentInteractionListener) {
-            mListener = (Fragment_GoogleMaps.OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-        if (snackbar != null)
-            snackbar.dismiss();
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        marcar_EP02();
-
-        mMap.getUiSettings().setScrollGesturesEnabled(true);
-
-        mMap.getUiSettings().setCompassEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.getMaxZoomLevel();
-        mMap.getMinZoomLevel();
-        mMap.getUiSettings();
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(20));
-
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-    }
-
-    private void show_addMaker_dialog() {
+    private void show_dialog_addMaker() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         builder.setTitle("Novo marcador:");
         builder.setCancelable(true);
 
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add_marker,
-                                    getActivity().findViewById(R.id.tabhost), false);
+                getActivity().findViewById(R.id.tabhost), false);
 
         TabHost myTabs = viewInflated.findViewById(R.id.tabhost);
 
@@ -340,6 +237,124 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         alert.show();
     }
 
+    public Fragment_GoogleMaps() {
+        // Required empty public constructor
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+
+     * @return A new instance of fragment Fragment_GoogleMaps.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static Fragment_GoogleMaps newInstance() {//String param1, String param2
+        return new Fragment_GoogleMaps();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            resultGeoid = getArguments().getParcelableArrayList("Coord"); //TODO obter aqui direto do controller
+
+            show_dialog_interval();
+        }
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        mapView = (MapView) view.findViewById(R.id.mapa);
+        mapView.onCreate(savedInstanceState);
+        mapView.onResume();
+        mapView.getMapAsync(this);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_maps, container, false);
+
+        FloatingActionButton fab_filter = view.findViewById(R.id.fab_filter);
+        fab_filter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                show_dialog_filterDistance();
+            }
+        });
+
+        FloatingActionButton fab_add = view.findViewById(R.id.fab_add);
+        fab_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                show_dialog_addMaker();
+            }
+        });
+
+        return view;
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof Fragment_GoogleMaps.OnFragmentInteractionListener) {
+            mListener = (Fragment_GoogleMaps.OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+        if (snackbar != null)
+            snackbar.dismiss();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        marcar_EP02();
+
+        mMap.getUiSettings().setScrollGesturesEnabled(true);
+
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getMaxZoomLevel();
+        mMap.getMinZoomLevel();
+        mMap.getUiSettings();
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(20));
+
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    }
+
     private void voltar_fragment_inicial() {
         Fragment fragment = null;
         Class fragmentClass = Fragment_Main.class;
@@ -403,21 +418,6 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         if (circleCentroide != null) circleCentroide.remove();
         if (circleMin != null) circleMin.remove();
         if (circleMax != null) circleMax.remove();
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 
     private void marcar_epoca_unica() { // TODO CONSIDERAR EXCLUIR
@@ -493,7 +493,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         numEpch--;
 
         if (last_epch > 1) {
-            marcar_centroide();
+            marcar_centroide_todasEpocas();
 
             marcar_min_max();
 
@@ -555,7 +555,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         numEpch--;
 
         if (last_epch > 1) {
-            marcar_centroide();
+            marcar_centroide_todasEpocas();
 
             marcar_min_max();
 
@@ -597,7 +597,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         );
     }
 
-    private void marcar_centroide(){
+    private void marcar_centroide_todasEpocas(){
         Double latDegrees = resultGeoid.get(resultGeoid.size() - 1).getLatDegrees();
         Double longDegrees = resultGeoid.get(resultGeoid.size() - 1).getLonDegrees();
 

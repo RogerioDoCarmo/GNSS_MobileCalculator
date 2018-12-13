@@ -22,5 +22,4 @@
 
     <include layout="@layout/side_bar_content" />
 
-
 </android.support.design.widget.CoordinatorLayout>
