@@ -1,5 +1,6 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.net.Uri;
@@ -12,11 +13,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
@@ -126,6 +130,54 @@ public class Activity_Main extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private void abrir_arquivo(){
+//        File mPath = new File(Environment.getExternalStorageDirectory() + "//DIR//");
+//        FileDialog fileDialog = new FileDialog(this, mPath, ".txt");
+//        fileDialog.addFileListener(new FileDialog.FileSelectedListener() {
+//            public void fileSelected(File file) {
+//                Log.d(getClass().getName(), "selected file " + file.toString());
+//            }
+//        });
+//        //fileDialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
+//        //  public void directorySelected(File directory) {
+//        //      Log.d(getClass().getName(), "selected dir " + directory.toString());
+//        //  }
+//        //});
+//        //fileDialog.setSelectDirectoryOption(false);
+//        fileDialog.showDialog();
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //Create FileOpenDialog and register a callback
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        final String copy;
+
+        SimpleFileDialog FileOpenDialog =  new SimpleFileDialog(Activity_Main.this, "FileOpen",
+                new SimpleFileDialog.SimpleFileDialogListener()
+                {
+                    @Override
+                    public void onChosenDir(String chosenDir)
+                    {
+                        // The code in this function will be executed when the dialog OK button is pushed
+                        String m_chosen = chosenDir;
+//                        copy = m_chosen;
+                        File newFile = new File(m_chosen);
+//                        fileCopy = newFile;
+                        Toast.makeText(getApplicationContext(), "Chosen FileOpenDialog File: " +
+                                m_chosen, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+        //You can change the default filename using the public variable "Default_File_Name"
+        FileOpenDialog.Default_File_Name = "";
+        FileOpenDialog.chooseFile_or_Dir();
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+        File selected = FileOpenDialog.getFileSelected();
+
+
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -138,7 +190,8 @@ public class Activity_Main extends AppCompatActivity
 
         switch (id) {
             case R.id.import_files:
-                fragmentClass = Fragment_Import.class;
+//                fragmentClass = Fragment_Import.class;
+                abrir_arquivo();
                 break;
             case R.id.save_txt:
                 fragmentClass = Fragment_SaveTXT.class;
