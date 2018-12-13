@@ -5,8 +5,6 @@
     android:layout_height="match_parent"
     tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_SaveRINEX">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <RadioButton
         android:id="@+id/btnRinex2"
         android:layout_width="wrap_content"
@@ -34,6 +32,5 @@
         android:layout_marginStart="30dp"
         android:layout_marginTop="115dp"
         android:text="Salvar" />
-
 
 </FrameLayout>

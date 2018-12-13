@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tabhost"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TabWidget android:id="@android:id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <FrameLayout android:id="@android:id/tabcontent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/add_maker_tab_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/input_new_lat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:hint="Latitude em graus    "
+                    android:inputType="numberSigned|numberDecimal"
+                    android:scrollbars="vertical"
+                    android:textAlignment="center" />
+
+                <EditText
+                    android:id="@+id/input_new_long"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:hint="Longitude em graus"
+                    android:inputType="numberSigned|numberDecimal"
+                    android:scrollbars="vertical"
+                    android:textAlignment="center" />
+
+            </LinearLayout>
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/add_maker_tab_2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/input_new_x"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:gravity="top"
+                    android:hint="Coordenada X(m)"
+                    android:inputType="numberSigned|numberDecimal"
+                    android:scrollbars="vertical" />
+
+                <EditText
+                    android:id="@+id/input_new_y"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:gravity="top"
+                    android:hint="Coordenada Y(m)"
+                    android:inputType="numberSigned|numberDecimal"
+                    android:scrollbars="vertical" />
+
+                <EditText
+                    android:id="@+id/input_new_z"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:gravity="top"
+                    android:hint="Coordenada Z(m)"
+                    android:inputType="numberSigned|numberDecimal"
+                    android:scrollbars="vertical" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+    </LinearLayout>
+</TabHost>

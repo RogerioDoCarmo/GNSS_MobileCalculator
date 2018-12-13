@@ -1,27 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/id_interval_content"
+    android:id="@+id/id_distance_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
     <EditText
-        android:id="@+id/interval_min"
+        android:id="@+id/input_distance"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="top"
-        android:hint="Nº da primeira época"
-        android:inputType="number"
-        android:scrollbars="vertical" />
-
-    <EditText
-        android:id="@+id/interval_max"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="top"
-        android:hint="Nº da última época"
-        android:inputType="number"
+        android:hint="Distância máxima em metros"
+        android:inputType="number|numberDecimal"
         android:scrollbars="vertical" />
 
 </LinearLayout>

@@ -1,5 +1,6 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,14 +29,16 @@ public class Activity_Main extends AppCompatActivity
             Fragment_SaveTXT.OnFragmentInteractionListener,
             Fragment_SaveRINEX.OnFragmentInteractionListener,
             Fragment_GoogleMaps.OnFragmentInteractionListener,
-            Fragment_About.OnFragmentInteractionListener{
+            Fragment_About.OnFragmentInteractionListener,
+            Fragment_RecyclerView_Epchs.OnListFragmentInteractionListener
+        {
 
     SingletronController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_side_bar);
+        setContentView(R.layout.side_bar_activity);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -74,17 +77,30 @@ public class Activity_Main extends AppCompatActivity
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.flContent, fragment);
+//        fragmentTransaction.addToBackStack(null); TODO
         fragmentTransaction.commit();
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    public void onBackPressed() { // TODO REVISAR PARA FUNCIONAR CORRETAMETE
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
+
+//        if (getFragmentManager().getBackStackEntryCount() == 0) {
+//            this.finish();
+//        } else {
+//            getFragmentManager().popBackStack();
+//        }
+
+//        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+//            getSupportFragmentManager().popBackStack();
+//        } else {
+//            finish();
+//        }
     }
 
     @Override
@@ -112,7 +128,7 @@ public class Activity_Main extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
         Fragment fragment = null;
         Class fragmentClass = null;
@@ -120,21 +136,29 @@ public class Activity_Main extends AppCompatActivity
 
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) { // TODO: USAR UM SWITCH
-            fragmentClass = Fragment_Import.class;
-        } else if (id == R.id.save_txt) {
-            fragmentClass = Fragment_SaveTXT.class;
-        } else if (id == R.id.show_maps) {
-            fragmentClass = Fragment_GoogleMaps.class;
-
-            ArrayList<CoordenadaGeodesica> valores =  controller.getResultadosGeodeticos();
-
-            bundle.putParcelableArrayList("Coord", valores);
-
-        } else if (id == R.id.save_rinex) {
-            fragmentClass = Fragment_SaveRINEX.class;
-        } else if (id == R.id.show_about) {
-            fragmentClass = Fragment_About.class;
+        switch (id) {
+            case R.id.import_files:
+                fragmentClass = Fragment_Import.class;
+                break;
+            case R.id.save_txt:
+                fragmentClass = Fragment_SaveTXT.class;
+                break;
+            case R.id.list_epchs:
+                fragmentClass = Fragment_RecyclerView_Epchs.class;
+                break;
+            case R.id.show_maps:
+                fragmentClass = Fragment_GoogleMaps.class;
+                ArrayList<CoordenadaGeodesica> valores = controller.getResultadosGeodeticos();
+                bundle.putParcelableArrayList("Coord", valores);
+                break;
+            case R.id.save_rinex:
+                fragmentClass = Fragment_SaveRINEX.class;
+                break;
+            case R.id.show_about:
+                fragmentClass = Fragment_About.class;
+                break;
+                default:
+                    definir_fragment_inicial();
         }
 
         if (fragmentClass != null) {
@@ -166,4 +190,10 @@ public class Activity_Main extends AppCompatActivity
     public void onFragmentInteraction(Uri uri){
         //you can leave it empty
     }
-}
+
+            // public void onListFragmentInteraction(DummyContent.DummyItem item)
+            @Override
+            public void onListFragmentInteraction() {
+
+            }
+        }

@@ -105,11 +105,11 @@ public class EpocaGPS{
     @Override
     public String toString() {
         if (this.UTC != null){
-        String msg = "ID: " + this.id + "\n" +
+        String msg = //"ID: " + this.id + "\n" +
                      "Year: " + UTC.getYear() + " Month: " + UTC.getMonth() + " Day: " + UTC.getDay_Month() + " \n" +
                      "Hour: " + getDateUTC().getHour() + " Minutes: " + getDateUTC().getMin() + " Seconds: " + getDateUTC().getSec() + " \n" +
                      "Number of satellites: " + getNumSatelites() + " \n" +
-                     "List of satellites: " + Arrays.toString(getListaPRNs().toArray());
+                     "Satellites: " + Arrays.toString(getListaPRNs().toArray());
         return msg;
         }else{
             return "Under construction!!!";

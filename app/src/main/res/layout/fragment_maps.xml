@@ -11,7 +11,24 @@
         android:id="@+id/mapa"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="49dp"
-    />
+        android:layout_marginBottom="49dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_filter"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="155dp"
+        android:layout_marginEnd="05dp"
+        android:layout_gravity="end|bottom"
+        android:src="@android:drawable/ic_menu_preferences" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="155dp"
+        android:layout_marginStart="05dp"
+        android:layout_gravity="start|bottom"
+        android:src="@android:drawable/ic_menu_add" />
 
 </FrameLayout>

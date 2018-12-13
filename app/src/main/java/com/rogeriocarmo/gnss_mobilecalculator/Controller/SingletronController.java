@@ -3,6 +3,7 @@ package com.rogeriocarmo.gnss_mobilecalculator.Controller;
 import android.content.Context;
 import android.util.Log;
 
+import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaCartesiana;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
 import org.apache.commons.math3.linear.MatrixUtils;
@@ -30,10 +31,10 @@ import com.rogeriocarmo.gnss_mobilecalculator.Model.ResultEpch;
 
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.C_TO_N0_THRESHOLD_DB_HZ;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.GM;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.LIGHTSPEED;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.MAX_ITERACOES;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.We;
-import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.c;
 
 public class SingletronController {
     private static SingletronController INSTANCE = null;
@@ -50,7 +51,7 @@ public class SingletronController {
     public static ArrayList<ResultEpch> listaResultados = new ArrayList<>();
 
     public static EpocaGPS epocaAtual;
-    public static TextWritter writter; //FIXME REVER
+    public static TextWritter writter;
 
     private static int qntSatEpchAtual;
 
@@ -544,9 +545,9 @@ public class SingletronController {
                 }
             }
 
-            double pseudorange = prSeconds*GNSSConstants.LIGHTSPEED;
+            double pseudorange = prSeconds * LIGHTSPEED;
             double pseudorangeUncertaintyMeters = (double)(listaMedicoesOriginal.get(i).getReceivedSvTimeUncertaintyNanos())
-                    *1e-9* GNSSConstants.LIGHTSPEED;
+                    *1e-9 * LIGHTSPEED;
             /*Cálculo da pseudodistância*/
 
             listaMedicoesOriginal.get(i).setPseudorangeMeters(pseudorange);
@@ -641,10 +642,10 @@ public class SingletronController {
             /*Tempo de transmisao do sinal*/
             double dtr = 0d; // ERRO DO RELÓGIO DO RECEPTOR
             double tr = calc_Tr(dataObservacao);
-            double tgps = tr - (listaMedicoesAtual.get(i).getPseudorangeMeters() / c);
+            double tgps = tr - (listaMedicoesAtual.get(i).getPseudorangeMeters() / LIGHTSPEED);
 
             double dts = a0 + a1 * (tgps - toe) + a2 * (Math.pow(tgps - toe,2.0)); // ERRO DO SATÉLITE fixme É O TOC
-            double tpropag = listaMedicoesAtual.get(i).getPseudorangeMeters()/c - dtr + dts;
+            double tpropag = listaMedicoesAtual.get(i).getPseudorangeMeters() / LIGHTSPEED - dtr + dts;
 
             tgps = tr - dtr- tpropag + dts; // melhoria no tempo de transmissao
             double delta_tk = tgps - toe;
@@ -826,12 +827,12 @@ public class SingletronController {
 //      double Ze = 0d;
 
 //      USANDO O MARCO EP2:
-        double Xe = 3687623.9881914;
-        double Ye = -4620693.11583979;
-        double Ze = -2387150.62016113;
+        double Xe = 3687622.7392;
+        double Ye = -4620693.7459;
+        double Ze = -2387156.6329;
 
         double[] X0 = new double[]{Xe, Ye, Ze,0d};
-        double[] X = new double[4];
+//        double[] X = new double[4];
         double[] Xa = new double[4];
 
         double S0post;
@@ -853,7 +854,7 @@ public class SingletronController {
 
             //Vetor delta_L => L = Lb-L0;
             for (int i = 0; i < Lb.length; i++){
-                L[i] = Lb[i] - ( L0[i] + c * (X0[3] - listaCoordAtual.get(i).getDts()) ) ;
+                L[i] = Lb[i] - ( L0[i] + LIGHTSPEED * (X0[3] - listaCoordAtual.get(i).getDts()) ) ;
             }
 
             //MATRIZ A
@@ -890,9 +891,11 @@ public class SingletronController {
                 return null;
             }
 
-            X = rX.toArray();
-            double[] X2 = X;
-            X[3] = X[3] / c;
+            double[] X = rX.toArray();
+//            double[] X2 = X;
+            double[] X2 = new double[X.length];
+            System.arraycopy(X,0,X2,0,X.length);
+            X[3] = X[3] / LIGHTSPEED;
 
             //Xa = X0+X;
             for (int j = 0; j < X0.length; j++){
@@ -942,7 +945,7 @@ public class SingletronController {
         } // Fim do laço do ajustamento
 
         Ecef2LlaConverter.GeodeticLlaValues valores = Ecef2LlaConverter.convertECEFToLLACloseForm(
-                X0[0], X0[1], X0[2]);
+                Xa[0], Xa[1], Xa[2]);
 
         Double latiDegrees =  Math.toDegrees(valores.latitudeRadians);
         Double longDegrees =  Math.toDegrees(valores.longitudeRadians);
@@ -953,7 +956,6 @@ public class SingletronController {
                 discrepanciesXYZ[0], discrepanciesXYZ[1], discrepanciesXYZ[2]);
 
 //        Log.i("RESULTADO", resultado.toString());
-
         return resultado;
     }
 
@@ -961,8 +963,8 @@ public class SingletronController {
         ArrayList<String> lista = new ArrayList<>();
         for (int i = 0; i < listaEpocas.size(); i++){
             lista.add(listaEpocas.get(i).toString());
-            lista.add("\n----------------------------------------------------------------\n");
-
+//            lista.add("\n----------------------------------------------------------------\n");
+//            lista.add("\n");
         }
         return (Arrays.copyOf(lista.toArray(), lista.size(), String[].class));
     }
@@ -1035,7 +1037,6 @@ public class SingletronController {
         ArrayList<CoordenadaGeodesica> listaResulGeod= new ArrayList<>();
 
         for (int i = 0; i < listaResultados.size(); i++) {
-
             CoordenadaGeodesica resultadoEpoca = new CoordenadaGeodesica(i + 1,
                     listaResultados.get(i).getLatiDegrees(),
                     listaResultados.get(i).getLongDegrees(),
@@ -1062,8 +1063,52 @@ public class SingletronController {
 
         listaResulGeod.add(resultCentroide);
 
-//        Log.i("RESULTADO_GEO",Arrays.deepToString(listaResultados.toArray()));
+//        Log.i("RESULTADO_GEO",Arrays.deepToString(listaResulGeod.toArray()));
         return listaResulGeod;
+    }
+
+    public ArrayList<CoordenadaCartesiana> getResultadosCartesianos() {
+        ArrayList<CoordenadaCartesiana> listaResulCart = new ArrayList<>();
+
+        for (int i = 0; i < listaResultados.size(); i++) {
+            CoordenadaCartesiana resultadoEpoca = new CoordenadaCartesiana(i + 1,
+                    listaResultados.get(i).getXmeters(),
+                    listaResultados.get(i).getYmeters(),
+                    listaResultados.get(i).getZmeters()
+            );
+
+            listaResulCart.add(resultadoEpoca);
+        }
+
+        CoordenadaGPS centroideXYZ = getCentroide();
+
+        CoordenadaCartesiana resultCentroide = new CoordenadaCartesiana(listaResulCart.size() + 1,
+                centroideXYZ.getX(),
+                centroideXYZ.getY(),
+                centroideXYZ.getZ()
+        );
+
+        listaResulCart.add(resultCentroide);
+
+//        Log.i("RESULTADO_CART",Arrays.deepToString(listaResulCart.toArray()));
+        return listaResulCart;
+    }
+
+    public CoordenadaGeodesica convertXYZ_to_LatLongAlt(Float Xmeters, Float Ymeters, Float Zmeters){
+        Ecef2LlaConverter.GeodeticLlaValues valores = Ecef2LlaConverter.convertECEFToLLACloseForm(
+                Xmeters, Ymeters, Zmeters);
+
+        Double latiDegrees =  Math.toDegrees(valores.latitudeRadians);
+        Double longDegrees =  Math.toDegrees(valores.longitudeRadians);
+        Double altMeters   =  valores.altitudeMeters;
+
+        CoordenadaGeodesica result = new CoordenadaGeodesica(-1,
+                latiDegrees,
+                longDegrees,
+                altMeters
+        );
+
+        return result;
     }
 
 }
