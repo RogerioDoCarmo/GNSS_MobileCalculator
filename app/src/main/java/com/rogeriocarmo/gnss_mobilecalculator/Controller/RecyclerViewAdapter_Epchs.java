@@ -75,7 +75,7 @@ public class RecyclerViewAdapter_Epchs extends RecyclerView.Adapter<RecyclerView
             super(view);
             mView = view;
             mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.id_content);
+            mContentView = (TextView) view.findViewById(R.id.item_content);
         }
 
         @Override

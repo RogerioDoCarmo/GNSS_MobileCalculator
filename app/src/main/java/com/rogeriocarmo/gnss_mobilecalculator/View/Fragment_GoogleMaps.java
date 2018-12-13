@@ -76,7 +76,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         builder.setCancelable(true);
 
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_interval,
-                getActivity().findViewById(R.id.id_content), false);
+                getActivity().findViewById(R.id.id_interval_content), false);
 
         final EditText input_min = viewInflated.findViewById(R.id.interval_min);
         final EditText input_max = viewInflated.findViewById(R.id.interval_max);
@@ -130,7 +130,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         builder.setCancelable(true);
 
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_distance,
-                getActivity().findViewById(R.id.id_content), false);
+                getActivity().findViewById(R.id.id_distance_content), false);
 
         final EditText input_distance = viewInflated.findViewById(R.id.input_distance);
 
@@ -274,7 +274,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         builder.setCancelable(true);
 
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add_marker,
-                                    getActivity().findViewById(R.id.id_content), false);
+                                    getActivity().findViewById(R.id.tabhost), false);
 
         TabHost myTabs = viewInflated.findViewById(R.id.tabhost);
 
