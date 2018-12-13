@@ -4,8 +4,10 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
@@ -23,7 +25,6 @@ public class FileHelper {
         return Environment.MEDIA_MOUNTED.equals(state) ||
                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
-
 
     public static File getPrivateStorageDir(Context context, String dirName) throws IOException {
         // Get the directory for the app's private pictures directory.
@@ -55,5 +56,34 @@ public class FileHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Reads a text file and return its content as a String
+     * @param fileName The file name with the extension
+     * @param directory The directory of the file on pohone
+     * @return The content of file as a String
+     */
+    public static String readTXTFile(String fileName, String directory) {
+        //Get the text file
+        File file = new File(directory, fileName);
+
+        //Read text from file
+        StringBuilder text = new StringBuilder();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+            br.close();
+        } catch (IOException e) {
+            //You'll need to add proper error handling here
+        }
+
+        return text.toString();
     }
 }

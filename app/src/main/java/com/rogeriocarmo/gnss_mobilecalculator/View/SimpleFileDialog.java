@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 //import android.content.DialogInterface.OnKeyListener;
-import android.os.Environment;
 import android.text.Editable;
 import android.view.Gravity;
 //import android.view.KeyEvent;
@@ -51,16 +50,23 @@ public class SimpleFileDialog
         return fileSelected;
     }
 
+    public String getSelected_File_Name() {
+        return Selected_File_Name;
+    }
+
+    public String getSelected_File_Directory() {
+        return m_dir;
+    }
+
     //////////////////////////////////////////////////////
     // Callback interface for selected directory
     //////////////////////////////////////////////////////
-    public interface SimpleFileDialogListener
-    {
+    public interface SimpleFileDialogListener {
         public void onChosenDir(String chosenDir);
     }
 
-    public SimpleFileDialog(Context context, String file_select_type, SimpleFileDialogListener SimpleFileDialogListener)
-    {
+    public SimpleFileDialog(Context context, String file_select_type, SimpleFileDialogListener SimpleFileDialogListener) {
+
         if (file_select_type.equals("FileOpen"))          Select_type = FileOpen;
         else if (file_select_type.equals("FileSave"))     Select_type = FileSave;
         else if (file_select_type.equals("FolderChoose")) Select_type = FolderChoose;
@@ -68,7 +74,7 @@ public class SimpleFileDialog
 
         m_context = context;
 //        m_sdcardDirectory = Environment.getExternalStorageDirectory().getAbsolutePath(); //FIXME
-        m_sdcardDirectory = context.getExternalFilesDir(null).getAbsolutePath();
+        m_sdcardDirectory = context.getExternalFilesDir(null).getAbsolutePath(); // FIXME ACRESCENTEI
         m_SimpleFileDialogListener = SimpleFileDialogListener;
 
         try
@@ -87,17 +93,17 @@ public class SimpleFileDialog
     public void chooseFile_or_Dir()
     {
         // Initial directory is sdcard directory
-        if (m_dir.equals(""))	chooseFile_or_Dir(m_sdcardDirectory);
-        else chooseFile_or_Dir(m_dir);
+        if (getSelected_File_Directory().equals(""))	chooseFile_or_Dir(m_sdcardDirectory);
+        else chooseFile_or_Dir(getSelected_File_Directory());
     }
 
     ////////////////////////////////////////////////////////////////////////////////
     // chooseFile_or_Dir(String dir) - load directory chooser dialog for initial
     // input 'dir' directory
     ////////////////////////////////////////////////////////////////////////////////
-    public void chooseFile_or_Dir(String dir)
-    {
+    public void chooseFile_or_Dir(String dir) {
         File dirFile = new File(dir);
+
         if (! dirFile.exists() || ! dirFile.isDirectory())
         {
             dir = m_sdcardDirectory;
@@ -115,30 +121,28 @@ public class SimpleFileDialog
         m_dir = dir;
         m_subdirs = getDirectories(dir);
 
-        class SimpleFileDialogOnClickListener implements DialogInterface.OnClickListener
-        {
+        class SimpleFileDialogOnClickListener implements DialogInterface.OnClickListener  {
             public void onClick(DialogInterface dialog, int item)
             {
-                String m_dir_old = m_dir;
+                String m_dir_old = getSelected_File_Directory();
                 String sel = "" + ((AlertDialog) dialog).getListView().getAdapter().getItem(item);
                 if (sel.charAt(sel.length()-1) == '/')	sel = sel.substring(0, sel.length()-1);
 
                 // Navigate into the sub-directory
-                if (sel.equals(".."))
-                {
-                    m_dir = m_dir.substring(0, m_dir.lastIndexOf("/"));
+                if (sel.equals("..")) {
+                    m_dir = getSelected_File_Directory().substring(0, getSelected_File_Directory().lastIndexOf("/"));
                 }
-                else
-                {
-                    m_dir += "/" + sel;
+                else {
+                    m_dir = getSelected_File_Directory() + "/" + sel;
                 }
+
                 Selected_File_Name = Default_File_Name;
 
-                if ((new File(m_dir).isFile())) // If the selection is a regular file
+                if ((new File(getSelected_File_Directory()).isFile())) // If the selection is a regular file
                 {
+                    fileSelected = new File(getSelected_File_Directory()); //FIXME
                     m_dir = m_dir_old;
                     Selected_File_Name = sel;
-                    fileSelected = new File(Selected_File_Name); //FIXME
                 }
 
                 updateDirectory();
@@ -148,23 +152,21 @@ public class SimpleFileDialog
         AlertDialog.Builder dialogBuilder = createDirectoryChooserDialog(dir, m_subdirs,
                 new SimpleFileDialogOnClickListener());
 
-        dialogBuilder.setPositiveButton("OK", new OnClickListener()
-        {
+        dialogBuilder.setPositiveButton("OK", new OnClickListener(){
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
                 // Current directory chosen
                 // Call registered listener supplied with the chosen directory
                 if (m_SimpleFileDialogListener != null){
                     {
                         if (Select_type == FileOpen || Select_type == FileSave) {
                             Selected_File_Name = input_text.getText() + "";
-                            m_SimpleFileDialogListener.onChosenDir(m_dir + "/" + Selected_File_Name);
-                            fileSelected = new File(Selected_File_Name); //FIXME
+                            m_SimpleFileDialogListener.onChosenDir(getSelected_File_Directory() + "/" + getSelected_File_Name());
+//                            fileSelected = new File(Selected_File_Name); //FIXME
                         }
                         else
                         {
-                            m_SimpleFileDialogListener.onChosenDir(m_dir);
+                            m_SimpleFileDialogListener.onChosenDir(getSelected_File_Directory());
                         }
                     }
                 }
@@ -192,7 +194,7 @@ public class SimpleFileDialog
             File dirFile = new File(dir);
 
             // if directory is not the base sd card directory add ".." for going up one directory
-            if (! m_dir.equals(m_sdcardDirectory) ) dirs.add("..");
+            if (! getSelected_File_Directory().equals(m_sdcardDirectory) ) dirs.add("..");
 
             if (! dirFile.exists() || ! dirFile.isDirectory())
             {
@@ -280,10 +282,10 @@ public class SimpleFileDialog
                                                             Editable newDir = input.getText();
                                                             String newDirName = newDir.toString();
                                                             // Create new directory
-                                                            if ( createSubDir(m_dir + "/" + newDirName) )
+                                                            if ( createSubDir(getSelected_File_Directory() + "/" + newDirName) )
                                                             {
                                                                 // Navigate into the new directory
-                                                                m_dir += "/" + newDirName;
+                                                                m_dir = getSelected_File_Directory() + "/" + newDirName;
                                                                 updateDirectory();
                                                             }
                                                             else
@@ -334,13 +336,13 @@ public class SimpleFileDialog
     private void updateDirectory()
     {
         m_subdirs.clear();
-        m_subdirs.addAll( getDirectories(m_dir) );
-        m_titleView.setText(m_dir);
+        m_subdirs.addAll( getDirectories(getSelected_File_Directory()) );
+        m_titleView.setText(getSelected_File_Directory());
         m_listAdapter.notifyDataSetChanged();
         //#scorch
         if (Select_type == FileSave || Select_type == FileOpen)
         {
-            input_text.setText(Selected_File_Name);
+            input_text.setText(getSelected_File_Name());
         }
     }
 

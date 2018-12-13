@@ -7,8 +7,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
+
+import java.io.File;
 
 
 /**
@@ -22,10 +28,63 @@ import com.rogeriocarmo.gnss_mobilecalculator.R;
 public class Fragment_Import extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    private String dirFile;
+    private String fileName;
+    SimpleFileDialog FileOpenDialog;
 
     public Fragment_Import() {
         // Required empty public constructor
     }
+
+    private void abrir_arquivo(){
+//        File mPath = new File(Environment.getExternalStorageDirectory() + "//DIR//");
+//        FileDialog fileDialog = new FileDialog(this, mPath, ".txt");
+//        fileDialog.addFileListener(new FileDialog.FileSelectedListener() {
+//            public void fileSelected(File file) {
+//                Log.d(getClass().getName(), "selected file " + file.toString());
+//            }
+//        });
+//        //fileDialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
+//        //  public void directorySelected(File directory) {
+//        //      Log.d(getClass().getName(), "selected dir " + directory.toString());
+//        //  }
+//        //});
+//        //fileDialog.setSelectDirectoryOption(false);
+//        fileDialog.showDialog();
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //Create FileOpenDialog and register a callback
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        final String copy;
+
+         FileOpenDialog =  new SimpleFileDialog(getContext(), "FileOpen",
+                new SimpleFileDialog.SimpleFileDialogListener() {
+                    @Override
+                    public void onChosenDir(String chosenDir)
+                    {
+                        // The code in this function will be executed when the dialog OK button is pushed
+                        String m_chosen = chosenDir;
+//                        copy = m_chosen;
+                        File newFile = new File(m_chosen);
+//                        fileCopy = newFile;
+                        Toast.makeText(getContext(), "Chosen FileOpenDialog File: " +
+                                m_chosen, Toast.LENGTH_LONG).show();
+
+                        fileName = FileOpenDialog.getSelected_File_Name();
+                        dirFile = FileOpenDialog.getSelected_File_Directory();
+                    }
+                });
+
+        //You can change the default filename using the public variable "Default_File_Name"
+        FileOpenDialog.Default_File_Name = "";
+        FileOpenDialog.chooseFile_or_Dir();
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    }
+
 
     /**
      * Use this factory method to create a new instance of
@@ -49,13 +108,32 @@ public class Fragment_Import extends Fragment {
         if (getArguments() != null) {
 
         }
+
+        abrir_arquivo();
+        Toast.makeText(getContext(), "LALALA", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_import, container, false);
+        View view = inflater.inflate(R.layout.fragment_import, container, false);
+
+        Button btn = view.findViewById(R.id.idBtn);
+        TextView txt = view.findViewById(R.id.txtImport);
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "FileNAMEEE: " + fileName, Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "FilePASTAA: " + dirFile, Toast.LENGTH_LONG).show();
+
+                String leitura = FileHelper.readTXTFile(fileName,dirFile);
+                txt.setText(leitura);
+
+            }
+        });
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

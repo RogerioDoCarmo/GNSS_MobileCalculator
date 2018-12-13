@@ -130,53 +130,6 @@ public class Activity_Main extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void abrir_arquivo(){
-//        File mPath = new File(Environment.getExternalStorageDirectory() + "//DIR//");
-//        FileDialog fileDialog = new FileDialog(this, mPath, ".txt");
-//        fileDialog.addFileListener(new FileDialog.FileSelectedListener() {
-//            public void fileSelected(File file) {
-//                Log.d(getClass().getName(), "selected file " + file.toString());
-//            }
-//        });
-//        //fileDialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
-//        //  public void directorySelected(File directory) {
-//        //      Log.d(getClass().getName(), "selected dir " + directory.toString());
-//        //  }
-//        //});
-//        //fileDialog.setSelectDirectoryOption(false);
-//        fileDialog.showDialog();
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-        //Create FileOpenDialog and register a callback
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-        final String copy;
-
-        SimpleFileDialog FileOpenDialog =  new SimpleFileDialog(Activity_Main.this, "FileOpen",
-                new SimpleFileDialog.SimpleFileDialogListener()
-                {
-                    @Override
-                    public void onChosenDir(String chosenDir)
-                    {
-                        // The code in this function will be executed when the dialog OK button is pushed
-                        String m_chosen = chosenDir;
-//                        copy = m_chosen;
-                        File newFile = new File(m_chosen);
-//                        fileCopy = newFile;
-                        Toast.makeText(getApplicationContext(), "Chosen FileOpenDialog File: " +
-                                m_chosen, Toast.LENGTH_LONG).show();
-                    }
-                });
-
-        //You can change the default filename using the public variable "Default_File_Name"
-        FileOpenDialog.Default_File_Name = "";
-        FileOpenDialog.chooseFile_or_Dir();
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-
-        File selected = FileOpenDialog.getFileSelected();
-
-
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -190,8 +143,7 @@ public class Activity_Main extends AppCompatActivity
 
         switch (id) {
             case R.id.import_files:
-//                fragmentClass = Fragment_Import.class;
-                abrir_arquivo();
+                fragmentClass = Fragment_Import.class;
                 break;
             case R.id.save_txt:
                 fragmentClass = Fragment_SaveTXT.class;
