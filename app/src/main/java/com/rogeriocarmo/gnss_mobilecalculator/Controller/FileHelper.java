@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 public class FileHelper {
     /* Checks if external storage is available for read and write */
@@ -56,6 +57,35 @@ public class FileHelper {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * Reads a text file and return its content as a String
+     * @param fileName The file name with the extension
+     * @param directory The directory of the file on pohone
+     * @return The content of file as a String
+     */
+    public static ArrayList<String>  readTXTFileArrayList(String fileName, String directory) {
+        //Get the text file
+        File file = new File(directory, fileName);
+
+        //Read text from file
+        ArrayList<String> text = new ArrayList<>();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                text.add(line + "\n");
+            }
+            br.close();
+        } catch (IOException e) {
+            //You'll need to add proper error handling here
+        }
+
+        return text;
     }
 
     /**

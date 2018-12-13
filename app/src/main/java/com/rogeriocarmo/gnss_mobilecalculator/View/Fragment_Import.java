@@ -36,55 +36,21 @@ public class Fragment_Import extends Fragment {
         // Required empty public constructor
     }
 
-    private void abrir_arquivo(){
-//        File mPath = new File(Environment.getExternalStorageDirectory() + "//DIR//");
-//        FileDialog fileDialog = new FileDialog(this, mPath, ".txt");
-//        fileDialog.addFileListener(new FileDialog.FileSelectedListener() {
-//            public void fileSelected(File file) {
-//                Log.d(getClass().getName(), "selected file " + file.toString());
-//            }
-//        });
-//        //fileDialog.addDirectoryListener(new FileDialog.DirectorySelectedListener() {
-//        //  public void directorySelected(File directory) {
-//        //      Log.d(getClass().getName(), "selected dir " + directory.toString());
-//        //  }
-//        //});
-//        //fileDialog.setSelectDirectoryOption(false);
-//        fileDialog.showDialog();
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-        //Create FileOpenDialog and register a callback
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-        final String copy;
-
-         FileOpenDialog =  new SimpleFileDialog(getContext(), "FileOpen",
+    private void abrir_arquivo() {
+        FileOpenDialog =  new SimpleFileDialog(getContext(), "FileOpen",
                 new SimpleFileDialog.SimpleFileDialogListener() {
                     @Override
-                    public void onChosenDir(String chosenDir)
-                    {
+                    public void onChosenDir(String chosenDir) {
                         // The code in this function will be executed when the dialog OK button is pushed
-                        String m_chosen = chosenDir;
-//                        copy = m_chosen;
-                        File newFile = new File(m_chosen);
-//                        fileCopy = newFile;
-                        Toast.makeText(getContext(), "Chosen FileOpenDialog File: " +
-                                m_chosen, Toast.LENGTH_LONG).show();
-
+//                        String m_chosen = chosenDir;
                         fileName = FileOpenDialog.getSelected_File_Name();
                         dirFile = FileOpenDialog.getSelected_File_Directory();
                     }
                 });
-
         //You can change the default filename using the public variable "Default_File_Name"
         FileOpenDialog.Default_File_Name = "";
         FileOpenDialog.chooseFile_or_Dir();
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
     }
-
 
     /**
      * Use this factory method to create a new instance of
@@ -108,9 +74,7 @@ public class Fragment_Import extends Fragment {
         if (getArguments() != null) {
 
         }
-
         abrir_arquivo();
-        Toast.makeText(getContext(), "LALALA", Toast.LENGTH_LONG).show();
     }
 
     @Override

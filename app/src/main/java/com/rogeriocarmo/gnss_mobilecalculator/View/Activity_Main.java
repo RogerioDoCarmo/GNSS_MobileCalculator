@@ -28,14 +28,14 @@ import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaGeodesica;
 
 public class Activity_Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-            Fragment_Main.OnFragmentInteractionListener,
-            Fragment_Import.OnFragmentInteractionListener,
-            Fragment_SaveTXT.OnFragmentInteractionListener,
-            Fragment_SaveRINEX.OnFragmentInteractionListener,
-            Fragment_GoogleMaps.OnFragmentInteractionListener,
-            Fragment_About.OnFragmentInteractionListener,
-            Fragment_RecyclerView_Epchs.OnListFragmentInteractionListener
-        {
+        Fragment_Main.OnFragmentInteractionListener,
+        Fragment_Import.OnFragmentInteractionListener,
+        Fragment_SaveTXT.OnFragmentInteractionListener,
+        Fragment_SaveRINEX.OnFragmentInteractionListener,
+        Fragment_GoogleMaps.OnFragmentInteractionListener,
+        Fragment_About.OnFragmentInteractionListener,
+        Fragment_RecyclerView_Epchs.OnListFragmentInteractionListener
+{
 
     SingletronController controller;
 
@@ -57,13 +57,6 @@ public class Activity_Main extends AppCompatActivity
 
         definir_fragment_inicial();
 
-        /*
-         *Epocas Boas
-         * ID = 313
-         * ID = 298 ==> A MELHOR!!!!
-         * ID = 212
-         * ID = 227
-         * */
         controller = SingletronController.getInstance();
         controller.processamento_completo(getApplicationContext());
     }
@@ -162,8 +155,8 @@ public class Activity_Main extends AppCompatActivity
             case R.id.show_about:
                 fragmentClass = Fragment_About.class;
                 break;
-                default:
-                    definir_fragment_inicial();
+            default:
+                definir_fragment_inicial();
         }
 
         if (fragmentClass != null) {
@@ -196,9 +189,9 @@ public class Activity_Main extends AppCompatActivity
         //you can leave it empty
     }
 
-            // public void onListFragmentInteraction(DummyContent.DummyItem item)
-            @Override
-            public void onListFragmentInteraction() {
+    // public void onListFragmentInteraction(DummyContent.DummyItem item)
+    @Override
+    public void onListFragmentInteraction() {
 
-            }
-        }
+    }
+}

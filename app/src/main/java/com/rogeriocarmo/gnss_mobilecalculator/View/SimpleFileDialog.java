@@ -25,8 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class SimpleFileDialog
-{
+public class SimpleFileDialog {
     private int FileOpen     = 0;
     private int FileSave     = 1;
     private int FolderChoose = 2;
@@ -45,10 +44,6 @@ public class SimpleFileDialog
     private List<String> m_subdirs = null;
     private SimpleFileDialogListener m_SimpleFileDialogListener = null;
     private ArrayAdapter<String> m_listAdapter = null;
-
-    public File getFileSelected() {
-        return fileSelected;
-    }
 
     public String getSelected_File_Name() {
         return Selected_File_Name;

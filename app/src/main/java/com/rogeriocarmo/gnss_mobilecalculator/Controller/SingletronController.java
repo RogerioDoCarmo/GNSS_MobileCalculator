@@ -90,6 +90,21 @@ public class SingletronController {
 
     }
 
+
+    public boolean carregar_loger(String fileName, String directory) {
+        ArrayList<String> txtLogger  = FileHelper.readTXTFileArrayList(fileName,directory);
+
+        String mLine;
+        for (int i = 0; i < txtLogger.size(); i++){ //TODO COPIAR LÓGICA DO readLogger_RawAssets
+            mLine = txtLogger.get(i);
+
+            //TODO Processar
+        }
+
+        return true;
+    }
+
+    //FIXME REMOVER
     public String readLogger_RawAssets(Context context) throws  IOException{
         int qntMedicoesDescartadas = 0;
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.logdia05hora15))); // FIXME DEIXAR DINAMICO
@@ -259,6 +274,7 @@ public class SingletronController {
         return sb.toString();
     }
 
+    //FIXME REMOVER
     public String readRINEX_RawAssets(Context context) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.brdc31do10)));
 
