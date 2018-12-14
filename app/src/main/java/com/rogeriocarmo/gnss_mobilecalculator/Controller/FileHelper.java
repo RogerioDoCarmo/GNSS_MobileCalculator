@@ -66,7 +66,7 @@ public class FileHelper {
      * @param directory The directory of the file on pohone
      * @return The content of file as a String
      */
-    public static ArrayList<String>  readTXTFileArrayList(String fileName, String directory) {
+    public static ArrayList<String> readTXTFileArrayList(String fileName, String directory) {
         //Get the text file
         File file = new File(directory, fileName);
 

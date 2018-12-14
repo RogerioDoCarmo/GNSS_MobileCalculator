@@ -1,6 +1,8 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,10 +13,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper;
+import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
-
-import java.io.File;
 
 
 /**
@@ -28,28 +28,59 @@ import java.io.File;
 public class Fragment_Import extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private String dirFile;
-    private String fileName;
-    SimpleFileDialog FileOpenDialog;
+    private String LOG_fileName;
+    private String LOG_directory;
+    private String RINEX_fileName;
+    private String RINEX_directory;
+    SimpleFileDialog FileOpenDialog_LOG;
+    SimpleFileDialog FileOpenDialog_RINEX;
+    SingletronController controller;
+
+    Button btnOpenLOG;
+    TextView txtOpenLOG;
+    Button btnOpenRINEX;
+    TextView txtOpenRINEX;
 
     public Fragment_Import() {
         // Required empty public constructor
     }
 
-    private void abrir_arquivo() {
-        FileOpenDialog =  new SimpleFileDialog(getContext(), "FileOpen",
+    private void open_logger() {
+        FileOpenDialog_LOG =  new SimpleFileDialog(getContext(), "FileOpen",
                 new SimpleFileDialog.SimpleFileDialogListener() {
                     @Override
                     public void onChosenDir(String chosenDir) {
                         // The code in this function will be executed when the dialog OK button is pushed
 //                        String m_chosen = chosenDir;
-                        fileName = FileOpenDialog.getSelected_File_Name();
-                        dirFile = FileOpenDialog.getSelected_File_Directory();
+                        LOG_fileName = FileOpenDialog_LOG.getSelected_File_Name();
+                        LOG_directory = FileOpenDialog_LOG.getSelected_File_Directory();
+
+                        txtOpenLOG.setText(LOG_fileName);
+                        txtOpenLOG.setTextColor(Color.GREEN);
                     }
                 });
         //You can change the default filename using the public variable "Default_File_Name"
-        FileOpenDialog.Default_File_Name = "";
-        FileOpenDialog.chooseFile_or_Dir();
+        FileOpenDialog_LOG.Default_File_Name = "";
+        FileOpenDialog_LOG.chooseFile_or_Dir();
+    }
+
+    private void open_RINEX() {
+        FileOpenDialog_RINEX =  new SimpleFileDialog(getContext(), "FileOpen",
+                new SimpleFileDialog.SimpleFileDialogListener() {
+                    @Override
+                    public void onChosenDir(String chosenDir) {
+                        // The code in this function will be executed when the dialog OK button is pushed
+//                        String m_chosen = chosenDir;
+                        RINEX_fileName = FileOpenDialog_RINEX.getSelected_File_Name();
+                        RINEX_directory = FileOpenDialog_RINEX.getSelected_File_Directory();
+
+                        txtOpenRINEX.setText(RINEX_fileName);
+                        txtOpenRINEX.setTextColor(Color.GREEN);
+                    }
+                });
+        //You can change the default filename using the public variable "Default_File_Name"
+        FileOpenDialog_RINEX.Default_File_Name = "";
+        FileOpenDialog_RINEX.chooseFile_or_Dir();
     }
 
     /**
@@ -74,26 +105,47 @@ public class Fragment_Import extends Fragment {
         if (getArguments() != null) {
 
         }
-        abrir_arquivo();
+
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_import, container, false);
 
-        Button btn = view.findViewById(R.id.idBtn);
-        TextView txt = view.findViewById(R.id.txtImport);
-
-        btn.setOnClickListener(new View.OnClickListener() {
+        txtOpenLOG = view.findViewById(R.id.txtLogName);
+        btnOpenLOG = view.findViewById(R.id.idBTN_OpenLOG);
+        btnOpenLOG.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "FileNAMEEE: " + fileName, Toast.LENGTH_LONG).show();
-                Toast.makeText(getContext(), "FilePASTAA: " + dirFile, Toast.LENGTH_LONG).show();
+                open_logger();
+            }
+        });
 
-                String leitura = FileHelper.readTXTFile(fileName,dirFile);
-                txt.setText(leitura);
+        txtOpenRINEX = view.findViewById(R.id.txtRINEXName);
+        btnOpenRINEX = view.findViewById(R.id.idBTN_OpenRINEX);
+        btnOpenRINEX.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                open_RINEX();
+            }
+        });
 
+        Button btnExecutar = view.findViewById(R.id.btnExecutar);
+        btnExecutar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                controller = SingletronController.getInstance();
+
+                controller.carregar_loger(LOG_fileName, LOG_directory);
+                controller.carregar_RINEX(RINEX_fileName, RINEX_directory);
+
+                // carregar rinex
+                if (controller.isLogOpen() && controller.isRINEXOpen()){
+                    Toast.makeText(getContext(), "Iniciando processamento...", Toast.LENGTH_LONG).show(); //todo por 1 progress bar
+                    controller.processamento_completo(getContext());
+                }
             }
         });
 

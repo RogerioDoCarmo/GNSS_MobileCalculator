@@ -33,6 +33,8 @@ import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.C_TO_N0
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.GM;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.LIGHTSPEED;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.MAX_ITERACOES;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.PSEUDORANGE_UNCERTAINTY_METERS_THRESHOLD;
+import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.RECEIVED_SVTIME_UNCERTAINTY_NANOS_THRESHOLD;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.TOW_DECODED_MEASUREMENT_STATE_BIT;
 import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.We;
 
@@ -54,6 +56,10 @@ public class SingletronController {
     public static TextWritter writter;
 
     private static int qntSatEpchAtual;
+    private int qntMedicoesDescartadas;
+
+    private boolean isLogOpen;
+    private boolean isRINEXOpen;
 
     private SingletronController() {
         listaEfemeridesOriginal = new ArrayList<>();
@@ -64,6 +70,8 @@ public class SingletronController {
         listaPRNsAtual = new ArrayList<>();
         listaEpocas = new ArrayList<>();
         listaResultados = new ArrayList<>();
+        isLogOpen = false;
+        isRINEXOpen = false;
     }
 
     public static SingletronController getInstance() {
@@ -80,27 +88,351 @@ public class SingletronController {
 
     public void processamento_completo(Context mContext){
         try {
-            readLogger_RawAssets(mContext);
-            calcPseudorange();
-            readRINEX_RawAssets(mContext);
-            processar_todas_epocas();
-        } catch (IOException e) {
+//            readLogger_RawAssets(mContext);
+            if (isLogOpen) {
+                calcPseudorange();
+//                readRINEX_RawAssets(mContext);
+                processar_todas_epocas();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-
     public boolean carregar_loger(String fileName, String directory) {
-        ArrayList<String> txtLogger  = FileHelper.readTXTFileArrayList(fileName,directory);
+        qntMedicoesDescartadas = 0;
+        ArrayList<String> txtLogger = FileHelper.readTXTFileArrayList(fileName,directory);
 
         String mLine;
-        for (int i = 0; i < txtLogger.size(); i++){ //TODO COPIAR LÓGICA DO readLogger_RawAssets
+        for (int i = 0; i < txtLogger.size(); i++) {
             mLine = txtLogger.get(i);
 
-            //TODO Processar
+            if (mLine == null || mLine.isEmpty()) continue;
+
+            if (mLine.startsWith("Raw")){
+                String[] linhaRaw = mLine.split(",");
+
+                if (!linhaRaw[28].equalsIgnoreCase(String.valueOf(GNSSConstants.CONSTELLATION_GPS))){
+                    qntMedicoesDescartadas++;
+                    continue;
+                }
+
+                GNSSMeasurement novaMedicao = new GNSSMeasurement();
+
+                novaMedicao.setElapsedRealtimeMillis(Integer.parseInt(linhaRaw[1]));
+                novaMedicao.setTimeNanos(Long.parseLong(linhaRaw[2]));
+
+                try{
+                    novaMedicao.setLeapSecond(Integer.parseInt(linhaRaw[3]));
+                }catch (NumberFormatException ignored){
+                }
+
+                try{
+                    novaMedicao.setTimeUncertaintyNanos(Double.parseDouble(linhaRaw[4]));
+                }catch (NumberFormatException ignored){
+                }
+
+                novaMedicao.setFullBiasNanos(Long.parseLong(linhaRaw[5]));
+
+                if (novaMedicao.getFullBiasNanos() > 0){
+                    Log.e("Raw","FullBiasNanos: Should de negative");
+                    novaMedicao.setFullBiasNanos(novaMedicao.getFullBiasNanos() * -1);
+                }
+
+                try{
+                    novaMedicao.setBiasNanos(Double.parseDouble(linhaRaw[6]));
+                }catch (Exception e){
+                    novaMedicao.setBiasNanos(0);
+                }
+
+                try{
+                    novaMedicao.setBiasUncertaintyNanos(Double.parseDouble(linhaRaw[7]));
+                }catch (Exception e){
+                    novaMedicao.setBiasUncertaintyNanos(0);
+                }
+
+                try{
+                    novaMedicao.setDriftNanosPerSecond(Double.parseDouble(linhaRaw[8]));
+                }catch (NumberFormatException ignored){
+                }
+
+                try{
+                    novaMedicao.setDriftUncertaintyNanosPerSecond(Double.parseDouble(linhaRaw[9]));
+                }catch (NumberFormatException ignored){
+                }
+
+                try{
+                    novaMedicao.setHardwareClockDiscontinuityCount(Integer.parseInt(linhaRaw[10]));
+                }catch (NumberFormatException ignored){
+                }
+
+                novaMedicao.setSvid(Integer.parseInt(linhaRaw[11]));
+                novaMedicao.setTimeOffsetNanos(Double.parseDouble(linhaRaw[12]));
+                novaMedicao.setState(Integer.parseInt(linhaRaw[13]));
+                novaMedicao.setReceivedSvTimeNanos(Long.parseLong(linhaRaw[14]));
+                novaMedicao.setReceivedSvTimeUncertaintyNanos(Double.parseDouble(linhaRaw[15]));
+
+                if (novaMedicao.getReceivedSvTimeUncertaintyNanos() > RECEIVED_SVTIME_UNCERTAINTY_NANOS_THRESHOLD) {
+                    qntMedicoesDescartadas++;
+                    continue;
+                }
+
+                novaMedicao.setCn0DbHz(Double.parseDouble(linhaRaw[16]));
+
+                if (!(novaMedicao.getCn0DbHz() >= C_TO_N0_THRESHOLD_DB_HZ)
+                        || (novaMedicao.getState() & (1L << TOW_DECODED_MEASUREMENT_STATE_BIT)) == 0) {
+                    qntMedicoesDescartadas++;
+                    continue;
+                }
+
+                novaMedicao.setPseudorangeRateMetersPerSecond(Double.parseDouble(linhaRaw[17]));
+                novaMedicao.setPseudorangeRateUncertaintyMetersPerSecond(Double.parseDouble(linhaRaw[18]));
+
+                if (novaMedicao.getPseudoRangeUncertaintyMeters() > PSEUDORANGE_UNCERTAINTY_METERS_THRESHOLD) {
+                    qntMedicoesDescartadas++;
+                    continue;
+                }
+
+                novaMedicao.setAccumulatedDeltaRangeState(Integer.parseInt(linhaRaw[19]));
+                novaMedicao.setAccumulatedDeltaRangeMeters(Double.parseDouble(linhaRaw[20]));
+                novaMedicao.setAccumulatedDeltaRangeUncertaintyMeters(Double.parseDouble(linhaRaw[21]));
+
+                try{
+                    novaMedicao.setCarrierFrequencyHz(Double.parseDouble(linhaRaw[22]));
+                    novaMedicao.setCarrierCycles(Integer.parseInt(linhaRaw[23]));
+                    novaMedicao.setCarrierPhase(Integer.parseInt(linhaRaw[24]));
+                    novaMedicao.setCarrierPhaseUncertainty(Double.parseDouble(linhaRaw[25]));
+                } catch (NumberFormatException ignored){
+                }
+
+                novaMedicao.setMultipathIndicator(Integer.parseInt(linhaRaw[26]));
+
+                if (novaMedicao.getMultipathIndicator() == 1){
+                    qntMedicoesDescartadas++;
+//                    Log.e("Raw","MultipathIndicator");
+                    continue;
+                }
+
+                try{
+                    novaMedicao.setSnrInDb(Double.parseDouble(linhaRaw[27]));
+                } catch (NumberFormatException err){
+//                    Log.e("err","SNR: " + err.getMessage());
+                }
+
+                novaMedicao.setConstellationType(Integer.parseInt(linhaRaw[28]));
+//                novaMedicao.setAgcDb(Double.parseDouble(linhaRaw[29]));
+//                novaMedicao.setCarrierFrequencyHz(Double.parseDouble(linhaRaw[30]));
+
+                // FIXME %compute full cycle time of measurement, in milliseonds
+                Long allRxMillis = Math.round((novaMedicao.getTimeNanos() - novaMedicao.getFullBiasNanos()) * 1e-6);
+                // FIXME %%llRxMillis is now accurate to one millisecond (because it's an integer)
+
+                novaMedicao.setAllRxMillis(allRxMillis);
+
+                listaMedicoesOriginal.add(novaMedicao);
+            }
+        }
+        isLogOpen = true;
+        return true;
+    }
+
+    private int contar_efemerides(ArrayList<String> rinex) {
+//        int numLines = 0;
+//
+//
+//        StringBuilder sb = new StringBuilder();
+        /*PULANDO O CABEÇALHO DE 8 LINHAS*/
+//        String mLine = reader.readLine();
+//        mLine = reader.readLine();
+//        mLine = reader.readLine();
+//        mLine = reader.readLine();
+//        mLine = reader.readLine();
+//        mLine = reader.readLine();
+//        mLine = reader.readLine();
+//        mLine = reader.readLine();
+
+//        while (mLine != null && !mLine.equals("")) {
+//            numLines++;
+//            mLine = reader.readLine();
+//        }
+//        reader.close();
+
+        return (rinex.size() - 8) / 8;
+    }
+
+    public boolean carregar_RINEX(String fileName, String directory) {
+        ArrayList<String> txtRINEX = FileHelper.readTXTFileArrayList(fileName,directory);
+        int qntEfemerides = contar_efemerides(txtRINEX);
+
+        String mLine;
+        String sub = "";
+        int cont_line = 8;
+        for (int i = 0; i < qntEfemerides; i++) { // Pulando o cabeçalho de 8 linhas!
+            GNSSNavMsg efemeride = new GNSSNavMsg();
+            mLine = txtRINEX.get(cont_line);
+            cont_line++;
+
+//first line - epoch of satellite clock (toc)
+//==================================================================================================
+            sub = mLine.substring(0, 2).replaceAll("\\s", "");
+            efemeride.setPRN(Integer.valueOf(sub));  // FIXME
+
+            try { // FIXME REVER
+                int year = Integer.valueOf(mLine.substring(3, 6).replaceAll("\\s", ""));
+                int month = Integer.valueOf(mLine.substring(6, 8).replaceAll("\\s", ""));
+                int day = Integer.valueOf(mLine.substring(9, 11).replaceAll("\\s", ""));
+                int hour = Integer.valueOf(mLine.substring(12, 14).replaceAll("\\s", ""));
+                int minute = Integer.valueOf(mLine.substring(15, 17).replaceAll("\\s", ""));
+                double seconds = Double.valueOf(mLine.substring(18, 22).replaceAll("\\s", ""));
+
+                GNSSDate data = new GNSSDate(year, month, day, hour, minute, seconds);
+                efemeride.setGNSSDate(data);
+
+            }catch (Exception err){
+                efemeride.setToc(0);
+                Log.e("TOC-ERR","Erro: " + err.getMessage());
+            }
+
+            double af0 = Double.valueOf(mLine.substring(22,41).replace('D','e')
+                    .replaceAll("\\s",""));
+
+            double af1 = Double.valueOf(mLine.substring(41,60).replace('D','e')
+                    .replaceAll("\\s",""));
+
+            double af2 = Double.valueOf(mLine.substring(60,79).replace('D','e')
+                    .replaceAll("\\s",""));
+
+            efemeride.setAf0(af0);
+            efemeride.setAf1(af1);
+            efemeride.setAf2(af2);
+//second line - broadcast orbit
+//==================================================================================================
+            mLine = txtRINEX.get(cont_line);
+            cont_line++;
+
+            sub = mLine.substring(3, 22).replace('D', 'e');
+            double iode = Double.parseDouble(sub.trim());
+            efemeride.setIODE(iode);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            efemeride.setCrs(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setDelta_n(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            efemeride.setM0(Double.parseDouble(sub.trim()));
+//third line - broadcast orbit (2)
+//==================================================================================================
+            mLine = txtRINEX.get(cont_line);
+            cont_line++;
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            double Cuc = Double.parseDouble(sub.trim());
+            efemeride.setCuc(Cuc);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            efemeride.setE(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setCus(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            efemeride.setAsqrt(Double.parseDouble(sub.trim()));
+//fourth line
+//==================================================================================================
+            mLine = txtRINEX.get(cont_line);
+            cont_line++;
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            double toe = Double.parseDouble(sub.trim());
+            efemeride.setToe(toe);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            efemeride.setCic(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setOmega_0(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            efemeride.setCis(Double.parseDouble(sub.trim()));
+//fifth line
+//==================================================================================================
+            mLine = txtRINEX.get(cont_line);
+            cont_line++;
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            efemeride.setI0(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            efemeride.setCrc(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setW(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            efemeride.setOmega_v(Double.parseDouble(sub.trim()));
+//sixth line
+//==================================================================================================
+            mLine = txtRINEX.get(cont_line);
+            cont_line++;
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            efemeride.setIDOT(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            double L2Code = Double.parseDouble(sub.trim());
+            efemeride.setCodeL2(L2Code);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            double week = Double.parseDouble(sub.trim());
+            efemeride.setGPS_Week((int) week);
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            double L2Flag = Double.parseDouble(sub.trim());
+            efemeride.setL2PdataFlag((int) L2Flag);
+//seventh line
+//==================================================================================================
+            mLine = txtRINEX.get(cont_line);
+            cont_line++;
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            double svAccur = Double.parseDouble(sub.trim());
+            efemeride.setAccuracy((int) svAccur);
+
+            sub = mLine.substring(22, 41).replace('D', 'e');
+            double svHealth = Double.parseDouble(sub.trim());
+            efemeride.setHealth((int) svHealth);
+
+            sub = mLine.substring(41, 60).replace('D', 'e');
+            efemeride.setTGD(Double.parseDouble(sub.trim()));
+
+            sub = mLine.substring(60, 79).replace('D', 'e');
+            double iodc = Double.parseDouble(sub.trim());
+            efemeride.setIODC((int) iodc);
+//eigth line
+//==================================================================================================
+            mLine = txtRINEX.get(cont_line);
+            cont_line++;
+
+            int len = mLine.length();
+
+            sub = mLine.substring(0, 22).replace('D', 'e');
+            efemeride.setTtx(Double.parseDouble(sub.trim()));
+
+            if (len > 22) {
+                sub = mLine.substring(22, 41).replace('D', 'e');
+                efemeride.setFit_interval(Double.parseDouble(sub.trim()));
+
+            } else {
+                efemeride.setFit_interval(0);
+            }
+
+            listaEfemeridesOriginal.add(efemeride);
         }
 
+        isRINEXOpen = true;
         return true;
     }
 
@@ -348,7 +680,6 @@ public class SingletronController {
             efemeride.setM0(Double.parseDouble(sub.trim()));
 //third line - broadcast orbit (2)
 //==================================================================================================
-
             mLine = reader.readLine();
 
             sub = mLine.substring(0, 22).replace('D', 'e');
@@ -414,7 +745,6 @@ public class SingletronController {
             efemeride.setL2PdataFlag((int) L2Flag);
 //seventh line
 //==================================================================================================
-
             mLine = reader.readLine();
 
             sub = mLine.substring(0, 22).replace('D', 'e');
@@ -994,8 +1324,20 @@ public class SingletronController {
         return (Arrays.copyOf(lista.toArray(), lista.size(), String[].class));
     }
 
-    public static int getNumResultados() {
+    public int getNumResultados() {
         return  listaResultados.size();
+    }
+
+    public int getQntMedicoesDescartadas() {
+        return qntMedicoesDescartadas;
+    }
+
+    public boolean isLogOpen() {
+        return isLogOpen;
+    }
+
+    public boolean isRINEXOpen() {
+        return isRINEXOpen;
     }
 
     public boolean gravar_epocas(Context context){
@@ -1050,7 +1392,7 @@ public class SingletronController {
     }
 
     public ArrayList<CoordenadaGeodesica> getResultadosGeodeticos() {
-        ArrayList<CoordenadaGeodesica> listaResulGeod= new ArrayList<>();
+        ArrayList<CoordenadaGeodesica> listaResulGeod = new ArrayList<>();
 
         for (int i = 0; i < listaResultados.size(); i++) {
             CoordenadaGeodesica resultadoEpoca = new CoordenadaGeodesica(i + 1,

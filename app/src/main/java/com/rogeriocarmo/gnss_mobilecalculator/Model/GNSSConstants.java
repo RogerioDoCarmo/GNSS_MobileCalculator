@@ -28,6 +28,8 @@ public class GNSSConstants {
     public static final int VALID_ACCUMULATED_DELTA_RANGE_STATE = 1;
     public static final int MINIMUM_NUMBER_OF_USEFUL_SATELLITES = 4;
     public static final int C_TO_N0_THRESHOLD_DB_HZ = 18;
+    public static final int RECEIVED_SVTIME_UNCERTAINTY_NANOS_THRESHOLD = 500;
+    public static final int PSEUDORANGE_UNCERTAINTY_METERS_THRESHOLD = 10;
     public static final double GM = 3.9860044185E14;
     public static final double We = 7.2921151467E-5;
 

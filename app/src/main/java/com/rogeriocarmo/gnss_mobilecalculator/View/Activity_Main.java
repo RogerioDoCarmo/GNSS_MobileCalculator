@@ -58,7 +58,7 @@ public class Activity_Main extends AppCompatActivity
         definir_fragment_inicial();
 
         controller = SingletronController.getInstance();
-        controller.processamento_completo(getApplicationContext());
+//        controller.processamento_completo(getApplicationContext());
     }
 
     private void definir_fragment_inicial() {
@@ -86,18 +86,6 @@ public class Activity_Main extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-
-//        if (getFragmentManager().getBackStackEntryCount() == 0) {
-//            this.finish();
-//        } else {
-//            getFragmentManager().popBackStack();
-//        }
-
-//        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
-//            getSupportFragmentManager().popBackStack();
-//        } else {
-//            finish();
-//        }
     }
 
     @Override
