@@ -38,6 +38,7 @@ public class Activity_Main extends AppCompatActivity
 {
 
     SingletronController controller;
+    static NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +53,45 @@ public class Activity_Main extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         definir_fragment_inicial();
 
         controller = SingletronController.getInstance();
-//        controller.processamento_completo(getApplicationContext());
+        definir_sidebar_inativa();
+    }
+
+    private void definir_sidebar_inativa(){
+        Menu menuNav = navigationView.getMenu();
+
+        MenuItem navItem2 = menuNav.findItem(R.id.save_txt);
+        navItem2.setEnabled(false);
+
+        MenuItem navItem3 = menuNav.findItem(R.id.list_epchs);
+        navItem3.setEnabled(false);
+
+        MenuItem navItem4 = menuNav.findItem(R.id.show_maps);
+        navItem4.setEnabled(false);
+
+        MenuItem navItem5 = menuNav.findItem(R.id.save_rinex);
+        navItem5.setEnabled(false);
+    }
+
+    public static void definir_sidebar_ativa(){
+        Menu menuNav = navigationView.getMenu();
+
+        MenuItem navItem2 = menuNav.findItem(R.id.save_txt);
+        navItem2.setEnabled(true);
+
+        MenuItem navItem3 = menuNav.findItem(R.id.list_epchs);
+        navItem3.setEnabled(true);
+
+        MenuItem navItem4 = menuNav.findItem(R.id.show_maps);
+        navItem4.setEnabled(true);
+
+        MenuItem navItem5 = menuNav.findItem(R.id.save_rinex);
+        navItem5.setEnabled(true);
     }
 
     private void definir_fragment_inicial() {

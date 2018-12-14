@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
+import static com.rogeriocarmo.gnss_mobilecalculator.View.Activity_Main.definir_sidebar_ativa;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,6 +42,7 @@ public class Fragment_Import extends Fragment {
     TextView txtOpenLOG;
     Button btnOpenRINEX;
     TextView txtOpenRINEX;
+    Button btnExecutar;
 
     public Fragment_Import() {
         // Required empty public constructor
@@ -57,6 +60,8 @@ public class Fragment_Import extends Fragment {
 
                         txtOpenLOG.setText(LOG_fileName);
                         txtOpenLOG.setTextColor(Color.GREEN);
+
+                        btnOpenRINEX.setEnabled(true);
                     }
                 });
         //You can change the default filename using the public variable "Default_File_Name"
@@ -76,6 +81,8 @@ public class Fragment_Import extends Fragment {
 
                         txtOpenRINEX.setText(RINEX_fileName);
                         txtOpenRINEX.setTextColor(Color.GREEN);
+
+                        btnExecutar.setEnabled(true);
                     }
                 });
         //You can change the default filename using the public variable "Default_File_Name"
@@ -102,10 +109,6 @@ public class Fragment_Import extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-
-        }
-
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -132,24 +135,36 @@ public class Fragment_Import extends Fragment {
             }
         });
 
-        Button btnExecutar = view.findViewById(R.id.btnExecutar);
+        btnExecutar = view.findViewById(R.id.btnExecutar);
+
         btnExecutar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 controller = SingletronController.getInstance();
+
+                controller.reiniciar_dados();
 
                 controller.carregar_loger(LOG_fileName, LOG_directory);
                 controller.carregar_RINEX(RINEX_fileName, RINEX_directory);
 
                 // carregar rinex
                 if (controller.isLogOpen() && controller.isRINEXOpen()){
-                    Toast.makeText(getContext(), "Iniciando processamento...", Toast.LENGTH_LONG).show(); //todo por 1 progress bar
-                    controller.processamento_completo(getContext());
+                    Toast.makeText(getContext(), "Iniciando processamento...", Toast.LENGTH_SHORT).show(); //todo por 1 progress bar
+                    controller.processamento_completo();
+                    Toast.makeText(getContext(), "Processamento concluído!!!", Toast.LENGTH_LONG).show();
+                    definir_sidebar_ativa();
                 }
+
             }
         });
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        btnOpenRINEX.setEnabled(false);
+        btnExecutar.setEnabled(false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
