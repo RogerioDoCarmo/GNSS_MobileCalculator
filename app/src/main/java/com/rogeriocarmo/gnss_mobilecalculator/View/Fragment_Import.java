@@ -34,8 +34,8 @@ public class Fragment_Import extends Fragment {
     private String LOG_directory;
     private String RINEX_fileName;
     private String RINEX_directory;
-    SimpleFileDialog FileOpenDialog_LOG;
-    SimpleFileDialog FileOpenDialog_RINEX;
+    Dialog_FileOpen FileOpenDialog_LOG;
+    Dialog_FileOpen FileOpenDialog_RINEX;
     SingletronController controller;
 
     Button btnOpenLOG;
@@ -49,8 +49,8 @@ public class Fragment_Import extends Fragment {
     }
 
     private void open_logger() {
-        FileOpenDialog_LOG =  new SimpleFileDialog(getContext(), "FileOpen",
-                new SimpleFileDialog.SimpleFileDialogListener() {
+        FileOpenDialog_LOG =  new Dialog_FileOpen(getContext(), "FileOpen",
+                new Dialog_FileOpen.SimpleFileDialogListener() {
                     @Override
                     public void onChosenDir(String chosenDir) {
                         // The code in this function will be executed when the dialog OK button is pushed
@@ -70,8 +70,8 @@ public class Fragment_Import extends Fragment {
     }
 
     private void open_RINEX() {
-        FileOpenDialog_RINEX =  new SimpleFileDialog(getContext(), "FileOpen",
-                new SimpleFileDialog.SimpleFileDialogListener() {
+        FileOpenDialog_RINEX =  new Dialog_FileOpen(getContext(), "FileOpen",
+                new Dialog_FileOpen.SimpleFileDialogListener() {
                     @Override
                     public void onChosenDir(String chosenDir) {
                         // The code in this function will be executed when the dialog OK button is pushed
