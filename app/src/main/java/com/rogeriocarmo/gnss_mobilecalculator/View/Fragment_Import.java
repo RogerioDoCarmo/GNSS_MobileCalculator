@@ -2,10 +2,13 @@ package com.rogeriocarmo.gnss_mobilecalculator.View;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +16,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper;
 import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
+
+import java.io.File;
+import java.io.IOException;
 
 import static com.rogeriocarmo.gnss_mobilecalculator.View.Activity_Main.definir_sidebar_ativa;
 
@@ -90,6 +97,41 @@ public class Fragment_Import extends Fragment {
         FileOpenDialog_RINEX.chooseFile_or_Dir();
     }
 
+    private void download_rinex_ftp() {
+        File arquivo = null;
+        String server_name = "cddis.gsfc.nasa.gov"; //ftp:// e / final retirados! TODO
+        int port_number = 21;
+        String user = "anonymous";
+        String senha = "";
+        String file_Name = "gps/data/daily/2018/304/18n/brdc3040.18n.Z";
+
+        try {
+            FileHelper.downloadAndSaveFile(server_name,port_number,user,senha,file_Name,arquivo);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null;
+    }
+
+    private void show_dialog_noInternet(){
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle("Sem conexão com a Internet")
+                .setMessage("Impossível acessar o servidor FTP")
+                .setPositiveButton("Fechar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -155,6 +197,18 @@ public class Fragment_Import extends Fragment {
                     definir_sidebar_ativa();
                 }
 
+            }
+        });
+
+        Button btnTeste = view.findViewById(R.id.btnTeste);
+        btnTeste.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isNetworkConnected()){
+                    download_rinex_ftp();
+                }else{
+                    show_dialog_noInternet();
+                }
             }
         });
 

@@ -4,17 +4,21 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class FileHelper {
     /* Checks if external storage is available for read and write */
-
     public static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state);
@@ -58,7 +62,6 @@ public class FileHelper {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Reads a text file and return its content as a String
@@ -116,4 +119,47 @@ public class FileHelper {
 
         return text.toString();
     }
+
+    public static Boolean downloadAndSaveFile(String server, int portNumber,
+                                        String user, String password, String filename, File localFile)
+            throws IOException {
+
+        FTPClient ftp = null;
+
+        String LOG_TAG = "FTP_TESTE";
+
+        try {
+            ftp = new FTPClient();
+            ftp.connect(server, portNumber);
+            ftp.enterLocalPassiveMode();
+            Log.d(LOG_TAG, "Connected. Reply: " + ftp.getReplyString());
+
+            ftp.login(user, password);
+            Log.d(LOG_TAG, "Logged in");
+            ftp.setFileType(FTP.BINARY_FILE_TYPE);
+            Log.d(LOG_TAG, "Downloading");
+            ftp.enterLocalPassiveMode();
+
+            OutputStream outputStream = null;
+            boolean success = false;
+
+            try {
+                outputStream = new BufferedOutputStream(new FileOutputStream(
+                        localFile));
+                success = ftp.retrieveFile(filename, outputStream);
+            } finally {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            }
+
+            return success;
+        } finally {
+            if (ftp != null) {
+                ftp.logout();
+                ftp.disconnect();
+            }
+        }
+    }
+
 }

@@ -108,7 +108,7 @@ public class SingletronController {
 
     public boolean carregar_loger(String fileName, String directory) {
         qntMedicoesDescartadas = 0;
-        ArrayList<String> txtLogger = FileHelper.readTXTFileArrayList(fileName,directory);
+        ArrayList<String> txtLogger = FileHelper.readTXTFileArrayList(fileName,directory); //TODO SEPARAR EM OUTRO MÉTODO
 
         String mLine;
         for (int i = 0; i < txtLogger.size(); i++) {
