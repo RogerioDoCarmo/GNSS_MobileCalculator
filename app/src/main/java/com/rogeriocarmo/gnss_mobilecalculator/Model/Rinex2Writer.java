@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-//import android.support.v4.BuildConfig;
-
 import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.getPrivateStorageDir;
 import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.isExternalStorageWritable;
 import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.writeTextFile2External;
@@ -22,7 +20,6 @@ import static com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants.EP_02_A
 
 public class Rinex2Writer {
 
-
     private ArrayList<com.rogeriocarmo.gnss_mobilecalculator.Model.EpocaObs> listaEpocas;
     private static final String FILE_PREFIX = "GNSS";
     private static final String PSEUDORANGE = "C"; // GPS C/A
@@ -30,17 +27,28 @@ public class Rinex2Writer {
     private static final String RINEX_TYPE = "O"; // Observation File
     private static final String MARKER = "GNSS Mobile Calculator";
 
-    com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSDate dataEpchAtual;
     private File newFile;
     private final Context mContext;
     private ArrayList<String> txtContent;
+
+    public String getRINEXasString(){
+        if (newFile != null){
+            StringBuilder text = new StringBuilder();
+
+            for (int i = 0; i < txtContent.size(); i++) {
+                text.append(txtContent.get(i));
+            }
+            return text.toString();
+        }
+        return null;
+    }
 
     public boolean gravarRINEX(){
         if (isExternalStorageWritable()){
             newFile = startNewLog();
             criarCabecalho();
-//            escrever_observacoes(2648);
             escrever_todas_observacoes();
+
             try {
                 writeTextFile2External(newFile,
                                         txtContent.toArray(new String[txtContent.size()]));
@@ -177,12 +185,12 @@ public class Rinex2Writer {
 
     private void escrever_todas_observacoes(){
         for (int i = 0; i < listaEpocas.size(); i++){
-            escrever_observacoes(i);
+            escrever_observacao(i);
         }
     }
 
     @SuppressLint("DefaultLocale")
-    private void escrever_observacoes(int INDEX_EPCH){ // TODO REFATORAR CONCATENAÇÃO DE STRINGS
+    private void escrever_observacao(int INDEX_EPCH){ // TODO REFATORAR CONCATENAÇÃO DE STRINGS
         StringBuilder listaSatEpch = new StringBuilder();
 
         for (int i = 0; i <listaEpocas.get(INDEX_EPCH).getLista_PRNs().size(); i++) {

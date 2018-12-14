@@ -5,33 +5,34 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/import_files"
+            android:id="@+id/menu_import_files"
             android:icon="@drawable/ic_menu_file"
-            android:title="Import" />
-        <item
-            android:id="@+id/save_txt"
-            android:icon="@drawable/ic_menu_download"
-            android:title="Salvar Resultados" />
+            android:title="Abrir Arquivos" />
 
         <item
-            android:id="@+id/list_epchs"
+            android:id="@+id/menu_list_epchs"
             android:icon="@drawable/ic_menu_list"
             android:title="Lista de Épocas" />
 
         <item
-            android:id="@+id/show_maps"
+            android:id="@+id/menu_show_results"
+            android:icon="@drawable/ic_menu_download"
+            android:title="Lista de Resultados" />
+
+        <item
+            android:id="@+id/menu_show_maps"
             android:icon="@drawable/ic_menu_location"
             android:title="Resultados no Google Maps" />
         <item
-            android:id="@+id/save_rinex"
+            android:id="@+id/menu_save_rinex"
             android:icon="@drawable/ic_menu_text"
-            android:title="Gravação de RINEX" />
+            android:title="Geração de arquivo RINEX" />
     </group>
 
     <item android:title="Mais informações">
         <menu>
             <item
-                android:id="@+id/show_about"
+                android:id="@+id/menu_show_about"
                 android:icon="@drawable/ic_menu_info"
                 android:title="Sobre" />
         </menu>

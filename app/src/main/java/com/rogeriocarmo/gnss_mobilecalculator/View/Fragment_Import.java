@@ -22,7 +22,7 @@ import static com.rogeriocarmo.gnss_mobilecalculator.View.Activity_Main.definir_
 /**
  * A simple {@link Fragment} subclass.
  * Activities that Fragment_Import this fragment must implement the
- * {@link Fragment_SaveTXT.OnFragmentInteractionListener} interface
+ * {@link Fragment_ShowResults.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link Fragment_Import#newInstance} factory method to
  * create an instance of this fragment.
@@ -96,7 +96,7 @@ public class Fragment_Import extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment Fragment_SaveTXT.
+     * @return A new instance of fragment Fragment_ShowResults.
      */
     // TODO: Rename and change types and number of parameters
     public static Fragment_Import newInstance(String param1, String param2) {

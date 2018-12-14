@@ -4,15 +4,11 @@ import android.content.Context;
 import android.util.Log;
 
 import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaCartesiana;
-import com.rogeriocarmo.gnss_mobilecalculator.R;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -916,7 +912,7 @@ public class SingletronController {
         return resultado;
     }
 
-    public String[] getListaEpocas(){
+    public String[] getListEpochsAsArray(){
         ArrayList<String> lista = new ArrayList<>();
         for (int i = 0; i < listaEpocas.size(); i++){
             lista.add(listaEpocas.get(i).toString());
@@ -926,13 +922,22 @@ public class SingletronController {
         return (Arrays.copyOf(lista.toArray(), lista.size(), String[].class));
     }
 
-    public String[] getListaResultados(){
+    public String[] getListResultsArray(){
         ArrayList<String> lista = new ArrayList<>();
         lista.add("# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);\n");
         for (int i = 0; i < listaResultados.size(); i++){
             lista.add(listaResultados.get(i).toString() + "\n");
         }
         return (Arrays.copyOf(lista.toArray(), lista.size(), String[].class));
+    }
+
+    public String getListResultsString(){
+        StringBuilder lista = new StringBuilder();
+        lista.append("# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);\n");
+        for (int i = 0; i < listaResultados.size(); i++){
+            lista.append(listaResultados.get(i).toString()).append("\n");
+        }
+        return (lista.toString());
     }
 
     public int getNumResultados() {
@@ -953,12 +958,12 @@ public class SingletronController {
 
     public boolean gravar_epocas(Context context){
         writter = new TextWritter(context); // FIXME
-        return writter.gravar_txtSD(getListaEpocas(),"ListEpchs.txt");
+        return writter.gravar_txtSD(getListEpochsAsArray(),"ListEpchs.txt");
     }
 
     public boolean gravar_resultados(Context context){
         writter = new TextWritter(context); // FIXME
-        return writter.gravar_txtSD(getListaResultados(),"ListResults.txt");
+        return writter.gravar_txtSD(getListResultsArray(),"ListResults.txt");
     }
 
     public void send_txt(){

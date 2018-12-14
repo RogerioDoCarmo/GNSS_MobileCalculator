@@ -32,7 +32,7 @@ public class RecyclerViewAdapter_Epchs extends RecyclerView.Adapter<RecyclerView
     }
 
     private List<String> load_data() {
-        return new ArrayList<>(Arrays.asList(controller.getListaEpocas()));
+        return new ArrayList<>(Arrays.asList(controller.getListEpochsAsArray()));
     }
 
     @Override

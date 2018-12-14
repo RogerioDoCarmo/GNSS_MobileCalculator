@@ -3,22 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_SaveTXT">
+    android:layout_marginTop="70dp"
+    tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_ShowResults">
 
-    <Button
-        android:id="@+id/btnEpch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="126dp"
-        android:layout_marginTop="100dp"
-        android:text="Salvar Épocas" />
+    <TextView
+        android:id="@+id/txtResults"
+        android:layout_width="350dp"
+        android:layout_height="400dp"
+        android:layout_margin="10dp"
+        android:textSize="8sp"
+        android:scrollbars="vertical" />
 
     <Button
         android:id="@+id/btnResult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="110dp"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="430dp"
         android:text="Salvar Resultados" />
 
 </FrameLayout>

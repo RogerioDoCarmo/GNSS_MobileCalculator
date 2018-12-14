@@ -8,27 +8,41 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
+import java.util.ArrayList;
+
 import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.EpocaObs;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.Rinex2Writer;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link Fragment_SaveTXT.OnFragmentInteractionListener} interface
+ * {@link Fragment_ShowRINEX.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link Fragment_SaveTXT#newInstance} factory method to
+ * Use the {@link Fragment_ShowRINEX#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Fragment_SaveTXT extends Fragment {
+public class Fragment_ShowRINEX extends Fragment {
 
+    Rinex2Writer RINEX;
+    ArrayList<EpocaObs> observacoes;
     SingletronController controller;
+    private boolean isRINEXcreated;
+
+    private void build_RINEX2(){
+        observacoes = controller.getObservacoes();
+        RINEX = new Rinex2Writer(getContext(),observacoes);
+        isRINEXcreated = RINEX.gravarRINEX();
+    }
 
     private OnFragmentInteractionListener mListener;
 
-    public Fragment_SaveTXT() {
+    public Fragment_ShowRINEX() {
         // Required empty public constructor
     }
 
@@ -38,11 +52,11 @@ public class Fragment_SaveTXT extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment Fragment_SaveTXT.
+     * @return A new instance of fragment Fragment_ShowResults.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment_SaveTXT newInstance(String param1, String param2) {
-        Fragment_SaveTXT fragment = new Fragment_SaveTXT();
+    public static Fragment_ShowRINEX newInstance(String param1, String param2) {
+        Fragment_ShowRINEX fragment = new Fragment_ShowRINEX();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -55,33 +69,23 @@ public class Fragment_SaveTXT extends Fragment {
 
         }
         controller = SingletronController.getInstance();
+        build_RINEX2();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_save_txt, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_show_rinex, container, false);
 
-        Button buttonEpch = view.findViewById(R.id.btnEpch);
-        buttonEpch.setOnClickListener(new View.OnClickListener() {
+        TextView txtRINEX = view.findViewById(R.id.txtRINEX);
+        txtRINEX.setText(RINEX.getRINEXasString());
+
+        Button button = view.findViewById(R.id.btnSalvarRINEX2);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(controller.gravar_epocas(getContext())) {
-                    Toast.makeText(getContext(), "Arquivo de épocas gravado com sucesso!", Toast.LENGTH_LONG).show();
-                    controller.send_txt();
-                }else{
-                    Toast.makeText(getContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        Button buttonResult = view.findViewById(R.id.btnResult);
-        buttonResult.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (controller.gravar_resultados(getContext())) {
-                    Toast.makeText(getContext(), "Arquivo de resultados gravado com sucesso!", Toast.LENGTH_LONG).show();
-                    controller.send_txt();
+                if (isRINEXcreated){
+                    Toast.makeText(getContext(), "Arquivo RINEX gravado com sucesso!", Toast.LENGTH_LONG).show();
+                    RINEX.send();
                 }else{
                     Toast.makeText(getContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
                 }

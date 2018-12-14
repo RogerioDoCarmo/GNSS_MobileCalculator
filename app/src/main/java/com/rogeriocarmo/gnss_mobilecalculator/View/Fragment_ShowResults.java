@@ -4,35 +4,33 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
-import java.util.ArrayList;
-
 import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
-import com.rogeriocarmo.gnss_mobilecalculator.Model.EpocaObs;
-import com.rogeriocarmo.gnss_mobilecalculator.Model.Rinex2Writer;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link Fragment_SaveRINEX.OnFragmentInteractionListener} interface
+ * {@link Fragment_ShowResults.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link Fragment_SaveRINEX#newInstance} factory method to
+ * Use the {@link Fragment_ShowResults#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Fragment_SaveRINEX extends Fragment {
+public class Fragment_ShowResults extends Fragment {
 
     SingletronController controller;
 
     private OnFragmentInteractionListener mListener;
 
-    public Fragment_SaveRINEX() {
+    public Fragment_ShowResults() {
         // Required empty public constructor
     }
 
@@ -42,11 +40,11 @@ public class Fragment_SaveRINEX extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment Fragment_SaveTXT.
+     * @return A new instance of fragment Fragment_ShowResults.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment_SaveRINEX newInstance(String param1, String param2) {
-        Fragment_SaveRINEX fragment = new Fragment_SaveRINEX();
+    public static Fragment_ShowResults newInstance(String param1, String param2) {
+        Fragment_ShowResults fragment = new Fragment_ShowResults();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -62,19 +60,21 @@ public class Fragment_SaveRINEX extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_save_rinex, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_show_results, container, false);
 
-        Button button = view.findViewById(R.id.btnSalvarRINEX2);
-        button.setOnClickListener(new View.OnClickListener() {
+        TextView txtResults = view.findViewById(R.id.txtResults);
+        txtResults.setMovementMethod(new ScrollingMovementMethod());
+        txtResults.setText(controller.getListResultsString());
+
+        Button buttonResult = view.findViewById(R.id.btnResult);
+        buttonResult.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<EpocaObs> observacoes = controller.getObservacoes();
-
-                Rinex2Writer RINEX = new Rinex2Writer(getContext(),observacoes);
-                if (RINEX.gravarRINEX()){
-                    Toast.makeText(getContext(), "Arquivo RINEX gravado com sucesso!", Toast.LENGTH_LONG).show();
-                    RINEX.send();
+                if (controller.gravar_resultados(getContext())) {
+                    Toast.makeText(getContext(), "Arquivo de resultados gravado com sucesso!", Toast.LENGTH_LONG).show();
+                    controller.send_txt();
                 }else{
                     Toast.makeText(getContext(), "Erro ao gravar o arquivo!", Toast.LENGTH_LONG).show();
                 }
