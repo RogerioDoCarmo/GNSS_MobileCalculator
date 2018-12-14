@@ -12,6 +12,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 //import android.content.DialogInterface.OnKeyListener;
+import android.content.Intent;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
+import android.os.Environment;
 import android.text.Editable;
 import android.view.Gravity;
 //import android.view.KeyEvent;
@@ -70,23 +74,48 @@ public class Dialog_FileOpen {
         m_context = context;
 //        m_sdcardDirectory = Environment.getExternalStorageDirectory().getAbsolutePath(); //FIXME
         m_sdcardDirectory = context.getExternalFilesDir(null).getAbsolutePath(); // FIXME ACRESCENTEI
-        m_SimpleFileDialogListener = SimpleFileDialogListener;
+//        m_sdcardDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
 
-        try
-        {
-            m_sdcardDirectory = new File(m_sdcardDirectory).getCanonicalPath();
-        }
-        catch (IOException ioe)
-        {
-        }
+//        try {
+//            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//            // fix
+//            path.setExecutable(true);
+//            path.setReadable(true);
+//            path.setWritable(true);
+//
+//            String pathString = path.getAbsolutePath();
+//
+////            MediaScannerConnection.scanFile(context, new String[] {pathString}, null, null);
+////            MediaScannerConnection.scanFile(context,
+////                    new String[] { path.getAbsolutePath() }, null,
+////                    new MediaScannerConnection.OnScanCompletedListener() {
+////                        public void onScanCompleted(String path, Uri uri) {
+////
+////                            android.util.Log.i("ExternalStorage", "Scanned " + path + ":");
+////                            android.util.Log.i("ExternalStorage", "-> uri=" + uri);
+////                        }
+////                    });
+//
+//            m_sdcardDirectory = pathString;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+//        try
+//        {
+//            m_sdcardDirectory = new File(m_sdcardDirectory).getCanonicalPath();
+//        } catch (IOException ioe)
+//        {
+//        }
+
+        m_SimpleFileDialogListener = SimpleFileDialogListener;
     }
 
     ///////////////////////////////////////////////////////////////////////
     // chooseFile_or_Dir() - load directory chooser dialog for initial
     // default sdcard directory
     ///////////////////////////////////////////////////////////////////////
-    public void chooseFile_or_Dir()
-    {
+    public void chooseFile_or_Dir() {
         // Initial directory is sdcard directory
         if (getSelected_File_Directory().equals(""))	chooseFile_or_Dir(m_sdcardDirectory);
         else chooseFile_or_Dir(getSelected_File_Directory());
@@ -99,17 +128,14 @@ public class Dialog_FileOpen {
     public void chooseFile_or_Dir(String dir) {
         File dirFile = new File(dir);
 
-        if (! dirFile.exists() || ! dirFile.isDirectory())
-        {
+        if (! dirFile.exists() || ! dirFile.isDirectory()) {
             dir = m_sdcardDirectory;
         }
 
         try
         {
             dir = new File(dir).getCanonicalPath();
-        }
-        catch (IOException ioe)
-        {
+        }catch (IOException ioe) {
             return;
         }
 
@@ -212,8 +238,7 @@ public class Dialog_FileOpen {
         }
         catch (Exception e)	{}
 
-        Collections.sort(dirs, new Comparator<String>()
-        {
+        Collections.sort(dirs, new Comparator<String>() {
             public int compare(String o1, String o2)
             {
                 return o1.compareTo(o2);
@@ -226,8 +251,7 @@ public class Dialog_FileOpen {
     //////                                   START DIALOG DEFINITION                                    //////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     private AlertDialog.Builder createDirectoryChooserDialog(String title, List<String> listItems,
-                                                             DialogInterface.OnClickListener onClickListener)
-    {
+                                                             DialogInterface.OnClickListener onClickListener) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(m_context);
         ////////////////////////////////////////////////
         // Create title text showing file select type //
@@ -250,7 +274,6 @@ public class Dialog_FileOpen {
         LinearLayout titleLayout1 = new LinearLayout(m_context);
         titleLayout1.setOrientation(LinearLayout.VERTICAL);
         titleLayout1.addView(m_titleView1);
-
 
         if (Select_type == FolderChoose || Select_type == FileSave)
         {
@@ -328,8 +351,7 @@ public class Dialog_FileOpen {
         return dialogBuilder;
     }
 
-    private void updateDirectory()
-    {
+    private void updateDirectory() {
         m_subdirs.clear();
         m_subdirs.addAll( getDirectories(getSelected_File_Directory()) );
         m_titleView.setText(getSelected_File_Directory());
@@ -341,16 +363,12 @@ public class Dialog_FileOpen {
         }
     }
 
-    private ArrayAdapter<String> createListAdapter(List<String> items)
-    {
-        return new ArrayAdapter<String>(m_context, android.R.layout.select_dialog_item, android.R.id.text1, items)
-        {
+    private ArrayAdapter<String> createListAdapter(List<String> items) {
+        return new ArrayAdapter<String>(m_context, android.R.layout.select_dialog_item, android.R.id.text1, items) {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent)
-            {
+            public View getView(int position, View convertView, ViewGroup parent) {
                 View v = super.getView(position, convertView, parent);
-                if (v instanceof TextView)
-                {
+                if (v instanceof TextView) {
                     // Enable list item (directory) text wrapping
                     TextView tv = (TextView) v;
                     tv.getLayoutParams().height = LayoutParams.WRAP_CONTENT;
