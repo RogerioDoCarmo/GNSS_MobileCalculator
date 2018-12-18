@@ -1,9 +1,11 @@
 package com.rogeriocarmo.gnss_mobilecalculator.Controller;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
+import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
@@ -15,6 +17,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class FileHelper {
@@ -118,48 +121,6 @@ public class FileHelper {
         }
 
         return text.toString();
-    }
-
-    public static Boolean downloadAndSaveFile(String server, int portNumber,
-                                        String user, String password, String filename, File localFile)
-            throws IOException {
-
-        FTPClient ftp = null;
-
-        String LOG_TAG = "FTP_TESTE";
-
-        try {
-            ftp = new FTPClient();
-            ftp.connect(server, portNumber);
-            ftp.enterLocalPassiveMode();
-            Log.d(LOG_TAG, "Connected. Reply: " + ftp.getReplyString());
-
-            ftp.login(user, password);
-            Log.d(LOG_TAG, "Logged in");
-            ftp.setFileType(FTP.BINARY_FILE_TYPE);
-            Log.d(LOG_TAG, "Downloading");
-            ftp.enterLocalPassiveMode();
-
-            OutputStream outputStream = null;
-            boolean success = false;
-
-            try {
-                outputStream = new BufferedOutputStream(new FileOutputStream(
-                        localFile));
-                success = ftp.retrieveFile(filename, outputStream);
-            } finally {
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            }
-
-            return success;
-        } finally {
-            if (ftp != null) {
-                ftp.logout();
-                ftp.disconnect();
-            }
-        }
     }
 
 }

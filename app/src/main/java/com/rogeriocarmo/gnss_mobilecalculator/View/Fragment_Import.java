@@ -16,13 +16,24 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.rogeriocarmo.gnss_mobilecalculator.Controller.FTPHandler;
 import com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper;
 import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
-import java.io.File;
-import java.io.IOException;
+import org.apache.commons.compress.compressors.z.ZCompressorInputStream;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
+
+import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.getPrivateStorageDir;
 import static com.rogeriocarmo.gnss_mobilecalculator.View.Activity_Main.definir_sidebar_ativa;
 
 
@@ -99,18 +110,96 @@ public class Fragment_Import extends Fragment {
 
     private void download_rinex_ftp() {
         File arquivo = null;
+        try {
+            arquivo = getPrivateStorageDir(getContext(),"EpheDownloaded");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         String server_name = "cddis.gsfc.nasa.gov"; //ftp:// e / final retirados! TODO
         int port_number = 21;
         String user = "anonymous";
         String senha = "";
         String file_Name = "gps/data/daily/2018/304/18n/brdc3040.18n.Z";
 
+        FTPHandler ftp = null;
+
         try {
-            FileHelper.downloadAndSaveFile(server_name,port_number,user,senha,file_Name,arquivo);
+            ftp = new FTPHandler(getContext(), server_name,port_number,user,senha,file_Name,arquivo);
+            ftp.execute();
+//            FileHelper.downloadAndSaveFile(server_name,port_number,user,senha,file_Name,arquivo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String name_extracted = file_Name.split("/")[6];
+        String new_name = name_extracted.substring(0,name_extracted.length() - 2);
+
+        File descompactado = null;
+        try {
+            descompactado = getPrivateStorageDir(getContext(),new_name);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        File newFile = ftp.getmNewFile();
+
+        try {
+            FileInputStream fin = new FileInputStream(newFile);
+            BufferedInputStream in = new BufferedInputStream(fin);
+
+            FileOutputStream out = new FileOutputStream(descompactado);
+            ZCompressorInputStream zIn = new ZCompressorInputStream(in);
+            final byte[] buffer = new byte[(int) newFile.length() / Byte.SIZE];
+            int n = 0;
+            while (-1 != (n = zIn.read(buffer))) {
+                out.write(buffer, 0, n);
+            }
+            out.close();
+            zIn.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        txtOpenRINEX.setText(controller.getTXTFileAsString(descompactado));
+
     }
+
+//    public  void zip( File files, File zipFile ) throws IOException {
+//        final int BUFFER_SIZE = 2048;
+//
+//        BufferedInputStream origin = null;
+//        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile)));
+//
+//        try {
+//            byte data[] = new byte[BUFFER_SIZE];
+//
+//
+//                FileInputStream fileInputStream = new FileInputStream( files );
+//
+//                origin = new BufferedInputStream(fileInputStream, BUFFER_SIZE);
+//
+//                String filePath = files.getAbsolutePath();
+//
+//                try {
+//                    ZipEntry entry = new ZipEntry( filePath.substring( filePath.lastIndexOf("/") + 1 ) );
+//
+//                    out.putNextEntry(entry);
+//
+//                    int count;
+//                    while ((count = origin.read(data, 0, BUFFER_SIZE)) != -1) {
+//                        out.write(data, 0, count);
+//                    }
+//                }
+//                finally {
+//                    origin.close();
+//                }
+//
+//        }
+//        finally {
+//            out.close();
+//        }
+//    }
 
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);

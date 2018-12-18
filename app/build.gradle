@@ -43,4 +43,5 @@ dependencies {
     //noinspection GradleDependency The version of the libs\ .jar file
     implementation group: 'com.google.guava', name: 'guava', version: '22.0-android'
     implementation group: 'commons-net', name: 'commons-net', version: '3.6'
+    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.18'
 }
