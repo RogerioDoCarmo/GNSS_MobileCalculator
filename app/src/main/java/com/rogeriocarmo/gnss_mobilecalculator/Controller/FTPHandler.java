@@ -34,7 +34,6 @@ public class FTPHandler extends AsyncTask<String, String, String> {
     private Context mContext;
     ProgressDialog progressDialog;
 
-
     public FTPHandler(Context context, String server, int portNumber, String user, String password, String fileName, File localFile){
         this.mContext = context;
         this.mServerName = server;
@@ -46,26 +45,20 @@ public class FTPHandler extends AsyncTask<String, String, String> {
     }
 
 
-    private String downloadAndSaveFile() throws IOException {
+    private boolean downloadAndSaveFile() throws IOException {
 
         FTPClient ftp = null;
-
-        String LOG_TAG = "FTP_TESTE";
 
         try {
             ftp = new FTPClient();
 
             ftp.connect(mServerName, mPortNumber);
             ftp.enterLocalPassiveMode();
-            Log.d(LOG_TAG, "Connected. Reply: " + ftp.getReplyString());
+            Log.d("FTP", "Connected. Reply: " + ftp.getReplyString());
 
             ftp.login(mUserName, mPassword);
-
             ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
-
-            Log.d(LOG_TAG, "Logged in");
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
-            Log.d(LOG_TAG, "Downloading");
             ftp.enterLocalPassiveMode();
 
             boolean success = false;
@@ -75,11 +68,11 @@ public class FTPHandler extends AsyncTask<String, String, String> {
                 success = ftp.retrieveFile(mFileName, outputStream);
             }
 
-//            return success; //FIXME
+            return success;
         } catch (Exception e) {
             e.printStackTrace();
             resp = e.getMessage();
-            return resp;
+//            return resp;
         }
         finally {
             if (ftp != null) {
@@ -87,7 +80,7 @@ public class FTPHandler extends AsyncTask<String, String, String> {
                 ftp.disconnect();
             }
         }
-        return null;
+        return false;
     }
 
     /**
@@ -107,7 +100,9 @@ public class FTPHandler extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... strings) {
         try {
-            downloadAndSaveFile();
+            if (!downloadAndSaveFile()){
+                Log.e("FTP","File not downloaded!");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

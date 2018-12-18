@@ -5,8 +5,6 @@
     android:layout_height="match_parent"
     tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_Import">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <Button
         android:id="@+id/idBTN_OpenLOG"
         android:layout_width="wrap_content"
@@ -16,20 +14,19 @@
         android:text="Abrir Log" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="232dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="125dp"
+        android:layout_marginStart="140dp"
         android:layout_marginTop="215dp"
         android:text="LOG:" />
 
     <TextView
         android:id="@+id/txtLogName"
-        android:layout_width="match_parent"
+        android:layout_width="182dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="175dp"
+        android:layout_marginStart="190dp"
         android:layout_marginTop="215dp"
         android:text="Nenhum arquivo aberto." />
-
 
     <Button
         android:id="@+id/idBTN_OpenRINEX"
@@ -40,34 +37,37 @@
         android:text="Abrir RINEX" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="232dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="125dp"
-        android:layout_marginTop="265dp"
+        android:layout_marginStart="140dp"
+        android:layout_marginTop="288dp"
         android:text="RINEX:" />
 
     <TextView
         android:id="@+id/txtRINEXName"
-        android:layout_width="match_parent"
+        android:layout_width="182dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="175dp"
-        android:layout_marginTop="265dp"
+        android:layout_marginStart="190dp"
+        android:layout_marginTop="288dp"
         android:text="Nenhum arquivo aberto." />
+
+    <Button
+        android:id="@+id/btnFTP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="300dp"
+        android:text="RINEX via FTP" />
 
     <Button
         android:id="@+id/btnExecutar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="350dp"
+        android:layout_marginTop="375dp"
         android:layout_marginStart="150dp"
         android:text="Executar" />
 
-    <Button
-        android:id="@+id/btnTeste"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="400dp"
-        android:text="Teste" />
+
 
 
 </FrameLayout>

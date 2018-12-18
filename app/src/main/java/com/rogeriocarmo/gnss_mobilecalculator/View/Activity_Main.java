@@ -1,5 +1,7 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.net.Uri;
@@ -14,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
@@ -35,6 +38,7 @@ public class Activity_Main extends AppCompatActivity
 
     SingletronController controller;
     static NavigationView navigationView;
+    static DrawerLayout drawerCopy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,7 @@ public class Activity_Main extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawerCopy = drawer;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -88,6 +93,9 @@ public class Activity_Main extends AppCompatActivity
 
         MenuItem navItem5 = menuNav.findItem(R.id.menu_save_rinex);
         navItem5.setEnabled(true);
+
+//        drawerCopy.openDrawer(GravityCompat.START); FIXME
+//        Toast.makeText(mContext, "Processamento concluído!!!", Toast.LENGTH_SHORT).show();
     }
 
     private void definir_fragment_inicial() {

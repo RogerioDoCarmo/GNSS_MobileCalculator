@@ -84,6 +84,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
 
         builder.setView(viewInflated);
 
+        int finalLimite_epch = limite_epch;
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -92,6 +93,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                     first_epch = 1;
                 } else {
                     first_epch = Integer.valueOf(input_min.getText().toString());
+                    if (first_epch > finalLimite_epch) first_epch = 1;
                 }
 
                 String last = (input_max.getText().toString());
@@ -99,6 +101,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                     last_epch = resultGeoid.size();
                 } else {
                     last_epch = Integer.valueOf(input_max.getText().toString());
+                    if (last_epch > finalLimite_epch) last_epch = finalLimite_epch;
                 }
 
                 if (resultGeoid.size() > 1) {

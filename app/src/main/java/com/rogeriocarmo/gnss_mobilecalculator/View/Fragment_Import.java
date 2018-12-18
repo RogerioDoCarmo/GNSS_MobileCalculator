@@ -1,6 +1,7 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -17,21 +18,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.rogeriocarmo.gnss_mobilecalculator.Controller.FTPHandler;
-import com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper;
 import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
 import org.apache.commons.compress.compressors.z.ZCompressorInputStream;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 import static com.rogeriocarmo.gnss_mobilecalculator.Controller.FileHelper.getPrivateStorageDir;
 import static com.rogeriocarmo.gnss_mobilecalculator.View.Activity_Main.definir_sidebar_ativa;
@@ -54,6 +50,7 @@ public class Fragment_Import extends Fragment {
     private String RINEX_directory;
     Dialog_FileOpen FileOpenDialog_LOG;
     Dialog_FileOpen FileOpenDialog_RINEX;
+
     SingletronController controller;
 
     Button btnOpenLOG;
@@ -61,6 +58,10 @@ public class Fragment_Import extends Fragment {
     Button btnOpenRINEX;
     TextView txtOpenRINEX;
     Button btnExecutar;
+    ProgressDialog progressDialog;
+
+    File downloadedFile;
+    File extractedFile;
 
     public Fragment_Import() {
         // Required empty public constructor
@@ -108,98 +109,75 @@ public class Fragment_Import extends Fragment {
         FileOpenDialog_RINEX.chooseFile_or_Dir();
     }
 
-    private void download_rinex_ftp() {
-        File arquivo = null;
+    private void download_RINEX_FTP() {
+        downloadedFile = null;
         try {
-            arquivo = getPrivateStorageDir(getContext(),"EpheDownloaded");
+            downloadedFile = getPrivateStorageDir(getContext(),"EpheFTP.18n.Z");
+            if (!downloadedFile.exists()){
+                downloadedFile.createNewFile();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        String server_name = "cddis.gsfc.nasa.gov"; //ftp:// e / final retirados! TODO
+        String server_name = "cddis.gsfc.nasa.gov"; // TODO CRIAR CONSTANTS
         int port_number = 21;
         String user = "anonymous";
         String senha = "";
-        String file_Name = "gps/data/daily/2018/304/18n/brdc3040.18n.Z";
+        String fileName_toDownload = "gps/data/daily/2018/304/18n/brdc3040.18n.Z";
 
-        FTPHandler ftp = null;
+        FTPHandler ftp;
 
         try {
-            ftp = new FTPHandler(getContext(), server_name,port_number,user,senha,file_Name,arquivo);
+            ftp = new FTPHandler(getContext(), server_name, port_number, user, senha, fileName_toDownload, downloadedFile);
             ftp.execute();
-//            FileHelper.downloadAndSaveFile(server_name,port_number,user,senha,file_Name,arquivo);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        String name_extracted = file_Name.split("/")[6];
+        String name_extracted = fileName_toDownload.split("/")[6];
         String new_name = name_extracted.substring(0,name_extracted.length() - 2);
 
-        File descompactado = null;
+        extractedFile = null;
         try {
-            descompactado = getPrivateStorageDir(getContext(),new_name);
+            extractedFile = getPrivateStorageDir(getContext(),new_name);
+            if (!extractedFile.exists()){
+                extractedFile.createNewFile();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        File newFile = ftp.getmNewFile();
+        RINEX_fileName = new_name;
+        RINEX_directory = extractedFile.getAbsoluteFile().getParent();
 
+        txtOpenRINEX.setText(new_name);
+        txtOpenRINEX.setTextColor(Color.GREEN);
+
+        btnExecutar.setEnabled(true);
+    }
+
+    private void convert_RINEX() {
         try {
-            FileInputStream fin = new FileInputStream(newFile);
+            FileInputStream fin = new FileInputStream(downloadedFile);
             BufferedInputStream in = new BufferedInputStream(fin);
 
-            FileOutputStream out = new FileOutputStream(descompactado);
+            FileOutputStream out = new FileOutputStream(extractedFile);
             ZCompressorInputStream zIn = new ZCompressorInputStream(in);
-            final byte[] buffer = new byte[(int) newFile.length() / Byte.SIZE];
+
+            final byte[] buffer = new byte[(int) downloadedFile.length() / Byte.SIZE];
+
             int n = 0;
             while (-1 != (n = zIn.read(buffer))) {
                 out.write(buffer, 0, n);
             }
+
             out.close();
             zIn.close();
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        txtOpenRINEX.setText(controller.getTXTFileAsString(descompactado));
-
     }
-
-//    public  void zip( File files, File zipFile ) throws IOException {
-//        final int BUFFER_SIZE = 2048;
-//
-//        BufferedInputStream origin = null;
-//        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile)));
-//
-//        try {
-//            byte data[] = new byte[BUFFER_SIZE];
-//
-//
-//                FileInputStream fileInputStream = new FileInputStream( files );
-//
-//                origin = new BufferedInputStream(fileInputStream, BUFFER_SIZE);
-//
-//                String filePath = files.getAbsolutePath();
-//
-//                try {
-//                    ZipEntry entry = new ZipEntry( filePath.substring( filePath.lastIndexOf("/") + 1 ) );
-//
-//                    out.putNextEntry(entry);
-//
-//                    int count;
-//                    while ((count = origin.read(data, 0, BUFFER_SIZE)) != -1) {
-//                        out.write(data, 0, count);
-//                    }
-//                }
-//                finally {
-//                    origin.close();
-//                }
-//
-//        }
-//        finally {
-//            out.close();
-//        }
-//    }
 
     private boolean isNetworkConnected() {
         ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -272,29 +250,50 @@ public class Fragment_Import extends Fragment {
             @Override
             public void onClick(View v) {
                 controller = SingletronController.getInstance();
-
                 controller.reiniciar_dados();
+
+                convert_RINEX(); //Unzipping RINEX file
 
                 controller.carregar_loger(LOG_fileName, LOG_directory);
                 controller.carregar_RINEX(RINEX_fileName, RINEX_directory);
 
-                // carregar rinex
                 if (controller.isLogOpen() && controller.isRINEXOpen()){
-                    Toast.makeText(getContext(), "Iniciando processamento...", Toast.LENGTH_SHORT).show(); //todo por 1 progress bar
                     controller.processamento_completo();
-                    Toast.makeText(getContext(), "Processamento concluído!!!", Toast.LENGTH_LONG).show();
+
+                    progressDialog = ProgressDialog.show(getContext(),
+                            "Processando arquivos...",
+                            "Calculando resultados");
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+
+                                Thread.sleep(3000); // 3 seconds
+
+                                progressDialog.dismiss();
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+
                     definir_sidebar_ativa();
+//                    Toast.makeText(getContext(), "Processamento concluído!!!", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getContext(), "Abra os arquivos de log e efemérides!", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
 
-        Button btnTeste = view.findViewById(R.id.btnTeste);
-        btnTeste.setOnClickListener(new View.OnClickListener() {
+        Button btnDownFTP = view.findViewById(R.id.btnFTP);
+        btnDownFTP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isNetworkConnected()){
-                    download_rinex_ftp();
+                    download_RINEX_FTP();
                 }else{
                     show_dialog_noInternet();
                 }
@@ -306,7 +305,6 @@ public class Fragment_Import extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        btnOpenRINEX.setEnabled(false);
         btnExecutar.setEnabled(false);
     }
 
