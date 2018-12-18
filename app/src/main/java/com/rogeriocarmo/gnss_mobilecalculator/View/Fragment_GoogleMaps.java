@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -83,6 +84,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
 
         builder.setView(viewInflated);
 
+        int finalLimite_epch = limite_epch;
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -91,6 +93,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                     first_epch = 1;
                 } else {
                     first_epch = Integer.valueOf(input_min.getText().toString());
+                    if (first_epch > finalLimite_epch) first_epch = 1;
                 }
 
                 String last = (input_max.getText().toString());
@@ -98,6 +101,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
                     last_epch = resultGeoid.size();
                 } else {
                     last_epch = Integer.valueOf(input_max.getText().toString());
+                    if (last_epch > finalLimite_epch) last_epch = finalLimite_epch;
                 }
 
                 if (resultGeoid.size() > 1) {
@@ -237,6 +241,20 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         alert.show();
     }
 
+    private void show_dialog_noInternet(){
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle("Sem conexão com a Internet")
+                .setMessage("Impossível acessar o Google Maps")
+                .setPositiveButton("Fechar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
     public Fragment_GoogleMaps() {
         // Required empty public constructor
     }
@@ -275,7 +293,12 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         if (getArguments() != null) {
             resultGeoid = getArguments().getParcelableArrayList("Coord"); //TODO obter aqui direto do controller
 
-            show_dialog_interval();
+            if (isNetworkConnected()){
+                show_dialog_interval();
+            }else{
+                show_dialog_noInternet();
+                voltar_fragment_inicial();
+            }
         }
     }
 
@@ -353,6 +376,12 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
         mMap.animateCamera(CameraUpdateFactory.zoomTo(20));
 
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null;
     }
 
     private void voltar_fragment_inicial() {

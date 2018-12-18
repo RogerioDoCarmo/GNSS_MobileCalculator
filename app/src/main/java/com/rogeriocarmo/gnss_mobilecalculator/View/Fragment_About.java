@@ -26,7 +26,7 @@ public class Fragment_About extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private WebView wv1;
-    private String url = "http://200.145.185.216/";
+    private String url = "http://200.145.185.216/"; //INCT Web Page
 
     public Fragment_About() {
         // Required empty public constructor

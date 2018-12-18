@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="60dp"
+    tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_ShowRINEX">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="365dp"
+        android:layout_height="375dp"
+        android:layout_margin="8dp"
+        android:fillViewport="true">
+
+        <TextView
+            android:id="@+id/txtRINEX"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="8sp" />
+
+    </ScrollView>
+
+    <RadioButton
+        android:id="@+id/btnRinex2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="400dp"
+        android:layout_marginStart="30dp"
+        android:checked="true"
+        android:clickable="true"
+        android:text="RINEX 2.11" />
+
+    <RadioButton
+        android:id="@+id/btnRinex3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="400dp"
+        android:layout_marginStart="145dp"
+        android:checked="false"
+        android:clickable="false"
+        android:enabled="false"
+        android:text="RINEX 3.03" />
+
+    <Button
+        android:id="@+id/btnSalvarRINEX2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="135dp"
+        android:layout_marginTop="435dp"
+        android:text="Salvar RINEX" />
+
+</FrameLayout>

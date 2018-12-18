@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="70dp"
+    tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_ShowResults">
+
+    <TextView
+        android:id="@+id/txtResults"
+        android:layout_width="350dp"
+        android:layout_height="400dp"
+        android:layout_margin="10dp"
+        android:textSize="8sp"
+        android:scrollbars="vertical" />
+
+    <Button
+        android:id="@+id/btnResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="430dp"
+        android:text="Salvar Resultados" />
+
+</FrameLayout>

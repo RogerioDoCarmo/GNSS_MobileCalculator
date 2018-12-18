@@ -13,14 +13,14 @@
         android:layout_width="175dp"
         android:layout_height="120dp"
         android:layout_marginStart="100dp"
-        android:layout_marginTop="90dp"
+        android:layout_marginTop="75dp"
         android:contentDescription="The project logo"
         android:src="@drawable/inct_logo" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="210dp"
+        android:layout_marginTop="190dp"
         android:text="@string/name_inct"
         android:textAlignment="center" />
 
@@ -30,5 +30,13 @@
         android:layout_height="285dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="260dp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="240dp"
+        android:layout_marginStart="15dp"
+        android:text="Página do Projeto:" />
 
 </FrameLayout>

@@ -1,5 +1,7 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.net.Uri;
@@ -14,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
@@ -24,16 +27,18 @@ import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaGeodesica;
 
 public class Activity_Main extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-            Fragment_Main.OnFragmentInteractionListener,
-            Fragment_Import.OnFragmentInteractionListener,
-            Fragment_SaveTXT.OnFragmentInteractionListener,
-            Fragment_SaveRINEX.OnFragmentInteractionListener,
-            Fragment_GoogleMaps.OnFragmentInteractionListener,
-            Fragment_About.OnFragmentInteractionListener,
-            Fragment_RecyclerView_Epchs.OnListFragmentInteractionListener
-        {
+        Fragment_Main.OnFragmentInteractionListener,
+        Fragment_Import.OnFragmentInteractionListener,
+        Fragment_ShowResults.OnFragmentInteractionListener,
+        Fragment_ShowRINEX.OnFragmentInteractionListener,
+        Fragment_GoogleMaps.OnFragmentInteractionListener,
+        Fragment_About.OnFragmentInteractionListener,
+        Fragment_RecyclerView_Epchs.OnListFragmentInteractionListener
+{
 
     SingletronController controller;
+    static NavigationView navigationView;
+    static DrawerLayout drawerCopy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,25 +48,54 @@ public class Activity_Main extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawerCopy = drawer;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         definir_fragment_inicial();
 
-        /*
-         *Epocas Boas
-         * ID = 313
-         * ID = 298 ==> A MELHOR!!!!
-         * ID = 212
-         * ID = 227
-         * */
         controller = SingletronController.getInstance();
-        controller.processamento_completo(getApplicationContext());
+        definir_sidebar_inativa();
+    }
+
+    private void definir_sidebar_inativa(){
+        Menu menuNav = navigationView.getMenu();
+
+        MenuItem navItem2 = menuNav.findItem(R.id.menu_show_results);
+        navItem2.setEnabled(false);
+
+        MenuItem navItem3 = menuNav.findItem(R.id.menu_list_epchs);
+        navItem3.setEnabled(false);
+
+        MenuItem navItem4 = menuNav.findItem(R.id.menu_show_maps);
+        navItem4.setEnabled(false);
+
+        MenuItem navItem5 = menuNav.findItem(R.id.menu_save_rinex);
+        navItem5.setEnabled(false);
+    }
+
+    public static void definir_sidebar_ativa(){
+        Menu menuNav = navigationView.getMenu();
+
+        MenuItem navItem2 = menuNav.findItem(R.id.menu_show_results);
+        navItem2.setEnabled(true);
+
+        MenuItem navItem3 = menuNav.findItem(R.id.menu_list_epchs);
+        navItem3.setEnabled(true);
+
+        MenuItem navItem4 = menuNav.findItem(R.id.menu_show_maps);
+        navItem4.setEnabled(true);
+
+        MenuItem navItem5 = menuNav.findItem(R.id.menu_save_rinex);
+        navItem5.setEnabled(true);
+
+//        drawerCopy.openDrawer(GravityCompat.START); FIXME
+//        Toast.makeText(mContext, "Processamento concluído!!!", Toast.LENGTH_SHORT).show();
     }
 
     private void definir_fragment_inicial() {
@@ -89,18 +123,6 @@ public class Activity_Main extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
-
-//        if (getFragmentManager().getBackStackEntryCount() == 0) {
-//            this.finish();
-//        } else {
-//            getFragmentManager().popBackStack();
-//        }
-
-//        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
-//            getSupportFragmentManager().popBackStack();
-//        } else {
-//            finish();
-//        }
     }
 
     @Override
@@ -126,6 +148,7 @@ public class Activity_Main extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -137,28 +160,28 @@ public class Activity_Main extends AppCompatActivity
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.import_files:
+            case R.id.menu_import_files:
                 fragmentClass = Fragment_Import.class;
                 break;
-            case R.id.save_txt:
-                fragmentClass = Fragment_SaveTXT.class;
+            case R.id.menu_show_results:
+                fragmentClass = Fragment_ShowResults.class;
                 break;
-            case R.id.list_epchs:
+            case R.id.menu_list_epchs:
                 fragmentClass = Fragment_RecyclerView_Epchs.class;
                 break;
-            case R.id.show_maps:
+            case R.id.menu_show_maps:
                 fragmentClass = Fragment_GoogleMaps.class;
                 ArrayList<CoordenadaGeodesica> valores = controller.getResultadosGeodeticos();
-                bundle.putParcelableArrayList("Coord", valores);
+                bundle.putParcelableArrayList("Coord", valores); //TODO Obter direto no Fragment do Maps
                 break;
-            case R.id.save_rinex:
-                fragmentClass = Fragment_SaveRINEX.class;
+            case R.id.menu_save_rinex:
+                fragmentClass = Fragment_ShowRINEX.class;
                 break;
-            case R.id.show_about:
+            case R.id.menu_show_about:
                 fragmentClass = Fragment_About.class;
                 break;
-                default:
-                    definir_fragment_inicial();
+            default:
+                definir_fragment_inicial();
         }
 
         if (fragmentClass != null) {
@@ -191,9 +214,8 @@ public class Activity_Main extends AppCompatActivity
         //you can leave it empty
     }
 
-            // public void onListFragmentInteraction(DummyContent.DummyItem item)
-            @Override
-            public void onListFragmentInteraction() {
+    @Override
+    public void onListFragmentInteraction() {
 
-            }
-        }
+    }
+}
