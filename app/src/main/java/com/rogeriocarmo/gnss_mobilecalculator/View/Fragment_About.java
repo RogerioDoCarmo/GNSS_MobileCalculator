@@ -1,6 +1,5 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,8 +24,8 @@ import com.rogeriocarmo.gnss_mobilecalculator.R;
 public class Fragment_About extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private WebView wv1;
-    private String url = "http://200.145.185.216/"; //INCT Web Page
+    private WebView mWebView;
+    private String mURL = "http://200.145.185.216/"; //INCT Web Page
 
     public Fragment_About() {
         // Required empty public constructor
@@ -56,19 +55,19 @@ public class Fragment_About extends Fragment {
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_about, container, false);
 
-        wv1 = view.findViewById(R.id.webView);
-        wv1.setWebViewClient(new MyBrowser());
-        wv1.getSettings().setLoadsImagesAutomatically(true);
-        wv1.getSettings().setJavaScriptEnabled(true);
-        wv1.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        wv1.loadUrl(url);
+        mWebView = view.findViewById(R.id.webView);
+        mWebView.setWebViewClient(new MyBrowser());
+        mWebView.getSettings().setLoadsImagesAutomatically(true);
+        mWebView.getSettings().setJavaScriptEnabled(true); //TODO Review
+        mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        mWebView.loadUrl(mURL);
+        WebView.setWebContentsDebuggingEnabled(false);
 
         return view;
     }
