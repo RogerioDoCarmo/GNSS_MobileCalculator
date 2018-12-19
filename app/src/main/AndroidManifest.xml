@@ -21,7 +21,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="AllowBackup,GoogleAppIndexingWarning"> <!-- Acrescentado para remover warnings ! -->
+        android:debuggable="false"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning,HardcodedDebugMode"> <!-- Acrescentado para remover warnings ! -->
 
         <activity android:name=".View.Activity_Main">
             <intent-filter>
