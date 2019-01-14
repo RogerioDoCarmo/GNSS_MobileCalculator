@@ -15,6 +15,11 @@
             android:title="Lista de Épocas" />
 
         <item
+            android:id="@+id/menu_analise_epch"
+            android:icon="@drawable/ic_menu_analysis"
+            android:title="Análise de Época" />
+
+        <item
             android:id="@+id/menu_show_results"
             android:icon="@drawable/ic_menu_download"
             android:title="Lista de Resultados" />
@@ -23,6 +28,7 @@
             android:id="@+id/menu_show_maps"
             android:icon="@drawable/ic_menu_location"
             android:title="Resultados no Google Maps" />
+
         <item
             android:id="@+id/menu_save_rinex"
             android:icon="@drawable/ic_menu_text"

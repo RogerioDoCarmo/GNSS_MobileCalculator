@@ -62,6 +62,7 @@ public class SingletronController {
 
     private boolean isLogOpen;
     private boolean isRINEXOpen;
+    private ArrayList<Long> listaAllRxNanos;
 
     private SingletronController() {
         listaEfemeridesOriginal = new ArrayList<>();
@@ -108,6 +109,7 @@ public class SingletronController {
             isLogOpen = true;
             isRINEXOpen = true;
             calcPseudorange();
+            separarEpocas();
             processar_todas_epocas();
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,6 +120,7 @@ public class SingletronController {
         try {
             if (isLogOpen && isRINEXOpen) {
                 calcPseudorange();
+                separarEpocas();
                 processar_todas_epocas();
             }
         } catch (Exception e) {
@@ -465,8 +468,8 @@ public class SingletronController {
         return (  (dataGNSS.getDay_week() * 24 + dataGNSS.getHour()) * 3600 + dataGNSS.getMin() * 60 + dataGNSS.getSec() );
     }
 
-    public void calcPseudorange(){
-        ArrayList<Long> listaAllRxNanos = new ArrayList<>();
+    public void calcPseudorange() {
+        listaAllRxNanos = new ArrayList<>();
 
         int INDEX_BIAS = 0;
 
@@ -528,7 +531,9 @@ public class SingletronController {
             listaMedicoesOriginal.get(i).settTxSeconds(tTxSeconds);
             listaMedicoesOriginal.get(i).settRxSeconds(tRxSeconds);
         }
+    }
 
+    private void separarEpocas() {
         for (int i = 0; i < listaAllRxNanos.size(); i++) {
             Long AllRxNanosAtual = listaAllRxNanos.get(i);
             EpocaGPS novaEpoca = new EpocaGPS(AllRxNanosAtual);
@@ -545,7 +550,7 @@ public class SingletronController {
                         double mArrivalTimeSinceGPSWeekNs = mArrivalTimeSinceGpsEpochNs - gpsWeekEpochNs;
                         int mGpsWeekNumber = gpsTime.getGpsWeekSecond().first;
 
-                        int year = gpsTime.getGpsDateTime().getYear() % 2000;
+                        int year = gpsTime.getGpsDateTime().getYear() % 2000; //TODO ARMAZENAR 2018!
                         int month = gpsTime.getGpsDateTime().getMonthOfYear();
                         int day_month = gpsTime.getGpsDateTime().getDayOfMonth();
                         int day_week = gpsTime.getGpsDateTime().getDayOfWeek();
@@ -567,9 +572,7 @@ public class SingletronController {
                 }
             }
 
-            if (novaEpoca.getNumSatelites() >= 5){
-                listaEpocas.add(novaEpoca);
-            }
+            listaEpocas.add(novaEpoca);
         }
     }
 
@@ -577,7 +580,7 @@ public class SingletronController {
      * Calcula as <b>coordenadas X,Y,Z (WGS-84)</b> para cada satélite.
      * <p>Calcula o <b>erro do relógio</b> para cada satélite em segundos.
      */
-    private void calcCoordenadas(){
+    private void calcCoordSat(){
         GNSSDate dataObservacao = epocaAtual.getDateUTC();
 
         for (int i = 0; i < qntSatEpchAtual; i++ ){// FIXME
@@ -761,21 +764,25 @@ public class SingletronController {
         listaCoordAtual = new ArrayList<>();
         listaPRNsAtual = new ArrayList<>();
         epocaAtual = escolherEpoca(INDEX_ANALISE);
-        calcCoordenadas();
-        listaResultados.add(calcularMMQ()); // para a época atual
+        calcCoordSat();
+        listaResultados.add(calcularMMQ());
     }
 
     public void processar_todas_epocas(){
 //        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);");
         for (int i = 0; i < listaEpocas.size(); i++) {
-            processar_epoca(i);
+            if (listaEpocas.get(i).getNumSatelites() >= 4){
+                processar_epoca(i);
+            }
         }
     }
 
     public void processar_n_epocas(int lastEpch){
 //        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);");
         for (int i = 0; i < lastEpch; i++) {
-            processar_epoca(i);
+            if (listaEpocas.get(i).getNumSatelites() >= 4){
+                processar_epoca(i);
+            }
         }
     }
 
@@ -1456,6 +1463,11 @@ public class SingletronController {
 
         reader.close();
         return sb.toString();
+    }
+
+    public AnaliseEpoca analisarEpoca(int INDEX_EPCH) {
+        AnaliseEpoca analise = new AnaliseEpoca(listaEpocas.get(INDEX_EPCH));
+        return analise;
     }
 
 }

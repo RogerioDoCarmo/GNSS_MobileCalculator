@@ -30,7 +30,8 @@ public class Activity_Main extends AppCompatActivity
         Fragment_ShowRINEX.OnFragmentInteractionListener,
         Fragment_GoogleMaps.OnFragmentInteractionListener,
         Fragment_About.OnFragmentInteractionListener,
-        Fragment_RecyclerView_Epchs.OnListFragmentInteractionListener
+        Fragment_RecyclerView_Epchs.OnListFragmentInteractionListener,
+        Fragment_Analysis_Epch.OnFragmentInteractionListener
 {
 
     SingletronController controller;
@@ -69,11 +70,14 @@ public class Activity_Main extends AppCompatActivity
         MenuItem navItem3 = menuNav.findItem(R.id.menu_list_epchs);
         navItem3.setEnabled(false);
 
-        MenuItem navItem4 = menuNav.findItem(R.id.menu_show_maps);
+        MenuItem navItem4 = menuNav.findItem(R.id.menu_analise_epch);
         navItem4.setEnabled(false);
 
-        MenuItem navItem5 = menuNav.findItem(R.id.menu_save_rinex);
+        MenuItem navItem5 = menuNav.findItem(R.id.menu_show_maps);
         navItem5.setEnabled(false);
+
+        MenuItem navItem6 = menuNav.findItem(R.id.menu_save_rinex);
+        navItem6.setEnabled(false);
     }
 
     public static void definir_sidebar_ativa(){
@@ -90,6 +94,9 @@ public class Activity_Main extends AppCompatActivity
 
         MenuItem navItem5 = menuNav.findItem(R.id.menu_save_rinex);
         navItem5.setEnabled(true);
+
+        MenuItem navItem6 = menuNav.findItem(R.id.menu_analise_epch);
+        navItem6.setEnabled(true);
 
 //        drawerCopy.openDrawer(GravityCompat.START); FIXME
 //        Toast.makeText(mContext, "Processamento concluído!!!", Toast.LENGTH_SHORT).show();
@@ -145,7 +152,6 @@ public class Activity_Main extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -165,6 +171,9 @@ public class Activity_Main extends AppCompatActivity
                 break;
             case R.id.menu_list_epchs:
                 fragmentClass = Fragment_RecyclerView_Epchs.class;
+                break;
+            case R.id.menu_analise_epch:
+                fragmentClass = Fragment_Analysis_Epch.class;
                 break;
             case R.id.menu_show_maps:
                 fragmentClass = Fragment_GoogleMaps.class;

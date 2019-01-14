@@ -238,4 +238,22 @@ public class EpocaGPS{
         return lista;
     }
 
+    public ArrayList<Double> getListCn0DbHz() {
+        ArrayList<Double> result = new ArrayList<>();
+
+        for (int i = 0; i < listaMedicoes.size(); i++) {
+            result.add(listaMedicoes.get(i).getCn0DbHz());
+        }
+        return result;
+    }
+
+    public ArrayList<Integer> getListMultipathIndicator() {
+        ArrayList<Integer> result = new ArrayList<>();
+
+        for (int i = 0; i < listaMedicoes.size(); i++) {
+            result.add(listaMedicoes.get(i).getMultipathIndicator());
+        }
+        return result;
+    }
+
 }
