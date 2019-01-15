@@ -1465,6 +1465,11 @@ public class SingletronController {
         return sb.toString();
     }
 
+    public String analisarEpocaTXT(int INDEX_EPCH) {
+        AnaliseEpoca analise = new AnaliseEpoca(listaEpocas.get(INDEX_EPCH));
+        return analise.toString();
+    }
+
     public AnaliseEpoca analisarEpoca(int INDEX_EPCH) {
         AnaliseEpoca analise = new AnaliseEpoca(listaEpocas.get(INDEX_EPCH));
         return analise;

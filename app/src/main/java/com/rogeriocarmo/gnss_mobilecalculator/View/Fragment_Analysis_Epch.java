@@ -1,14 +1,30 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.rogeriocarmo.gnss_mobilecalculator.Controller.AnaliseEpoca;
+import com.rogeriocarmo.gnss_mobilecalculator.Controller.SingletronController;
 import com.rogeriocarmo.gnss_mobilecalculator.R;
+
+import org.achartengine.ChartFactory;
+import org.achartengine.chart.BarChart;
+import org.achartengine.model.CategorySeries;
+import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.renderer.SimpleSeriesRenderer;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,16 +35,11 @@ import com.rogeriocarmo.gnss_mobilecalculator.R;
  * create an instance of this fragment.
  */
 public class Fragment_Analysis_Epch extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    SingletronController controller;
+    AnaliseEpoca analise;
 
     public Fragment_Analysis_Epch() {
         // Required empty public constructor
@@ -38,35 +49,110 @@ public class Fragment_Analysis_Epch extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment Fragment_Analysis_Epch.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment_Analysis_Epch newInstance(String param1, String param2) {
+    public static Fragment_Analysis_Epch newInstance() {
         Fragment_Analysis_Epch fragment = new Fragment_Analysis_Epch();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_analysis_epch, container, false);
+        View view = inflater.inflate(R.layout.fragment_analysis_epch, container, false);
+
+        controller = SingletronController.getInstance();
+
+        analise = controller.analisarEpoca(300);
+
+        String result = analise.toString();
+
+        TextView txtResult = view.findViewById(R.id.txtAnalise);
+
+        Button btnGraph = view.findViewById(R.id.btnGraph);
+        btnGraph.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                XYMultipleSeriesRenderer renderer = getTruitonBarRenderer();
+                myChartSettings(renderer);
+                Intent intent = ChartFactory.getBarChartIntent(getContext(), getTruitonBarDataset(), renderer, BarChart.Type.DEFAULT);
+                startActivity(intent);
+            }
+        });
+
+        txtResult.setText(result);
+
+        return view;
     }
+
+    private XYMultipleSeriesDataset getTruitonBarDataset() {
+        XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+        final int nr = 4;
+        int SERIES_NR = analise.getListCn0DbHz().size();//??
+        ArrayList<String> legendTitles = new ArrayList<String>();
+
+//        legendTitles.add("Sales");
+//        legendTitles.add("Expenses");
+//        legendTitles.add("Expenses");
+//        legendTitles.add("Expenses");
+//        legendTitles.add("Expenses");
+//        legendTitles.add("Expenses");
+//
+        for (int i = 0; i < analise.getListCn0DbHz().size(); i++){
+            legendTitles.add(String.valueOf(analise.getListCn0DbHz().get(i)));
+        }
+
+        for (int i = 0; i < SERIES_NR; i++) {
+            CategorySeries series = new CategorySeries(legendTitles.get(i));
+            for (int k = 0; k < analise.getListCn0DbHz().size(); k++) {
+                series.add(analise.getListCn0DbHz().get(k));
+            }
+            dataset.addSeries(series.toXYSeries());
+        }
+        return dataset;
+    }
+
+    public XYMultipleSeriesRenderer getTruitonBarRenderer() {
+        XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
+        renderer.setAxisTitleTextSize(16);
+        renderer.setChartTitleTextSize(20);
+        renderer.setLabelsTextSize(15);
+        renderer.setLegendTextSize(15);
+        renderer.setMargins(new int[] { 30, 40, 15, 0 });
+        SimpleSeriesRenderer r = new SimpleSeriesRenderer();
+        r.setColor(Color.BLUE);
+        renderer.addSeriesRenderer(r);
+        r = new SimpleSeriesRenderer();
+        r.setColor(Color.RED);
+        renderer.addSeriesRenderer(r);
+        return renderer;
+    }
+
+    private void myChartSettings(XYMultipleSeriesRenderer renderer) {
+        renderer.setChartTitle("Truiton's Performance by AChartEngine BarChart");
+        renderer.setXAxisMin(0.5);
+        renderer.setXAxisMax(10.5);
+        renderer.setYAxisMin(0);
+        renderer.setYAxisMax(210);
+        renderer.addXTextLabel(1, "2010");
+        renderer.addXTextLabel(2, "2011");
+        renderer.addXTextLabel(3, "2012");
+        renderer.addXTextLabel(4, "2013");
+        renderer.setYLabelsAlign(Paint.Align.RIGHT);
+        renderer.setBarSpacing(0.5);
+        renderer.setXTitle("Years");
+        renderer.setYTitle("Performance");
+        renderer.setShowGrid(true);
+        renderer.setGridColor(Color.GRAY);
+        renderer.setXLabels(0); // sets the number of integer labels to appear
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

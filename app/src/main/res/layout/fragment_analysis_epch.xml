@@ -6,9 +6,17 @@
     tools:context=".View.Fragment_Analysis_Epch">
 
     <TextView
+        android:id="@+id/txtAnalise"
         android:layout_width="325dp"
         android:layout_height="210dp"
         android:layout_marginTop="200dp"
         android:text="@string/hello_blank_fragment" />
+
+    <Button
+        android:id="@+id/btnGraph"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="350dp"
+        android:text="Grafico" />
 
 </FrameLayout>

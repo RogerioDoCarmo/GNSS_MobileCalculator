@@ -2,7 +2,9 @@ package com.rogeriocarmo.gnss_mobilecalculator.Controller;
 
 import com.rogeriocarmo.gnss_mobilecalculator.Model.EpocaGPS;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AnaliseEpoca {
 
@@ -13,6 +15,9 @@ public class AnaliseEpoca {
     private Double maxCn0DbHz;
     private int indexMaxCn0DbHz;
     private Double meanCn0DbHz;
+
+    private ArrayList<Double> listCn0DbHz;
+
     //TODO FAZER DESVIO PADRÃO
 
     public AnaliseEpoca(EpocaGPS epocaAnalise) {
@@ -22,6 +27,7 @@ public class AnaliseEpoca {
 
     private void calcMinMaxMean() {
         ArrayList<Double> listaCn0DbHz = epoca.getListCn0DbHz();
+        listCn0DbHz = new ArrayList<>();
 
         Double min = Double.MAX_VALUE;
         Double max = Double.MIN_VALUE;
@@ -29,6 +35,9 @@ public class AnaliseEpoca {
         int sizeList = listaCn0DbHz.size();
 
         for (int i = 0; i < sizeList; i++) {
+
+            listCn0DbHz.add(listaCn0DbHz.get(i));
+
             if (listaCn0DbHz.get(i) > max){
                 max = listaCn0DbHz.get(i);
                 indexMaxCn0DbHz = i;
@@ -67,6 +76,28 @@ public class AnaliseEpoca {
 
     public int getSatMaxCn0DbHz() {
         return epoca.getListaPRNs().get(indexMaxCn0DbHz);
+    }
+
+    public ArrayList<Double> getListCn0DbHz() {
+        return listCn0DbHz;
+    }
+
+    @Override
+    public String toString(){
+        return
+                "ID: " + epoca.getId() + "\n" +
+                "Year: " + epoca.getDateUTC().getYear() + " Month: " + epoca.getDateUTC().getMonth() + " Day: " + epoca.getDateUTC().getDay_Month() + " \n" +
+                "Hour: " + epoca.getDateUTC().getHour() + " Minutes: " + epoca.getDateUTC().getMin() + " Seconds: " + epoca.getDateUTC().getSec() + " \n" +
+                "Number of satellites: " + epoca.getNumSatelites() + " \n" +
+                "List of Satellites: " + Arrays.toString(epoca.getListaPRNs().toArray()) + "\n" +
+                "List of Cn0DbHz per Satellite: " + Arrays.toString(listCn0DbHz.toArray()) + "\n\n" +
+                "Minimum Cn0DbHz: " + minCn0DbHz + "\n" +
+                "Satellite of Minimum Cn0DbHz: " + epoca.getListaPRNs().get(indexMinCn0DbHz) + "\n" +
+                "Maximum Cn0DbHz: " + maxCn0DbHz + "\n" +
+                "Satellite of Maximum Cn0DbHz: " + epoca.getListaPRNs().get(indexMaxCn0DbHz) + "\n" +
+                "Arithmetic mean of Cn0DbHz: " + new DecimalFormat("###.###").format(meanCn0DbHz)
+        ;
+
     }
 
 }
