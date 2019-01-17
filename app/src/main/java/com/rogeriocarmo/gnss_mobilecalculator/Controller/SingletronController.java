@@ -966,8 +966,8 @@ public class SingletronController {
         return (lista.toString());
     }
 
-    public int getNumResultados() {
-        return  listaResultados.size();
+    public int getNumEpocas() {
+        return  listaEpocas.size();
     }
 
     public int getQntMedicoesDescartadas() {

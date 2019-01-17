@@ -7,16 +7,40 @@
 
     <TextView
         android:id="@+id/txtAnalise"
-        android:layout_width="325dp"
-        android:layout_height="210dp"
-        android:layout_marginTop="200dp"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_width="365dp"
+        android:layout_height="220dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:scrollbars="vertical" />
 
     <Button
         android:id="@+id/btnGraph"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="350dp"
-        android:text="Grafico" />
+        android:layout_marginTop="370dp"
+        android:layout_marginStart="140dp"
+        android:text="Gráfico" />
+
+    <EditText
+        android:id="@+id/txtID"
+        android:layout_width="157dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="ID da época"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="10dp"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/btnSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="175dp"
+        android:layout_marginTop="100dp"
+        android:text="Analisar" />
 
 </FrameLayout>

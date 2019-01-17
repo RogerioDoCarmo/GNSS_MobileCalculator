@@ -1,5 +1,6 @@
 package com.rogeriocarmo.gnss_mobilecalculator.View;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -7,6 +8,7 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +42,7 @@ public class Fragment_Analysis_Epch extends Fragment {
 
     SingletronController controller;
     AnaliseEpoca analise;
+    int epocaAnalise;
 
     public Fragment_Analysis_Epch() {
         // Required empty public constructor
@@ -69,46 +72,53 @@ public class Fragment_Analysis_Epch extends Fragment {
 
         controller = SingletronController.getInstance();
 
-        analise = controller.analisarEpoca(300);
+        TextView txtID = view.findViewById(R.id.txtID);
 
-        String result = analise.toString();
-
-        TextView txtResult = view.findViewById(R.id.txtAnalise);
 
         Button btnGraph = view.findViewById(R.id.btnGraph);
+        btnGraph.setEnabled(false);
+
+        TextView txtResult = view.findViewById(R.id.txtAnalise);
+        txtResult.setMovementMethod(new ScrollingMovementMethod());
+
+        Button btnSearch = view.findViewById(R.id.btnSearch);
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String texto = txtID.getText().toString();
+
+                if (!texto.isEmpty()) { //TODO CHECAR INTERVALO
+                    epocaAnalise = Integer.valueOf(texto) - 1;
+                    if (epocaAnalise == -1) epocaAnalise = 0;
+                    if (epocaAnalise > controller.getNumEpocas()) epocaAnalise = controller.getNumEpocas() - 1;
+                    analise = controller.analisarEpoca(epocaAnalise);
+                    String result = analise.toString();
+                    txtResult.setText(result);
+                    btnGraph.setEnabled(true);
+                }
+            }
+        });
+
         btnGraph.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                XYMultipleSeriesRenderer renderer = getTruitonBarRenderer();
+                XYMultipleSeriesRenderer renderer = getBarRenderer();
                 myChartSettings(renderer);
-                Intent intent = ChartFactory.getBarChartIntent(getContext(), getTruitonBarDataset(), renderer, BarChart.Type.DEFAULT);
+                Intent intent = ChartFactory.getBarChartIntent(getContext(), getBarDataset(), renderer, BarChart.Type.DEFAULT,"Análise de Época");
                 startActivity(intent);
             }
         });
 
-        txtResult.setText(result);
-
         return view;
     }
 
-    private XYMultipleSeriesDataset getTruitonBarDataset() {
+    private XYMultipleSeriesDataset getBarDataset() {
         XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-        final int nr = 4;
-        int SERIES_NR = analise.getListCn0DbHz().size();//??
+
         ArrayList<String> legendTitles = new ArrayList<String>();
+        legendTitles.add("Cn0DbHz");
 
-//        legendTitles.add("Sales");
-//        legendTitles.add("Expenses");
-//        legendTitles.add("Expenses");
-//        legendTitles.add("Expenses");
-//        legendTitles.add("Expenses");
-//        legendTitles.add("Expenses");
-//
-        for (int i = 0; i < analise.getListCn0DbHz().size(); i++){
-            legendTitles.add(String.valueOf(analise.getListCn0DbHz().get(i)));
-        }
-
-        for (int i = 0; i < SERIES_NR; i++) {
+        for (int i = 0; i < legendTitles.size(); i++) {
             CategorySeries series = new CategorySeries(legendTitles.get(i));
             for (int k = 0; k < analise.getListCn0DbHz().size(); k++) {
                 series.add(analise.getListCn0DbHz().get(k));
@@ -118,7 +128,7 @@ public class Fragment_Analysis_Epch extends Fragment {
         return dataset;
     }
 
-    public XYMultipleSeriesRenderer getTruitonBarRenderer() {
+    public XYMultipleSeriesRenderer getBarRenderer() {
         XYMultipleSeriesRenderer renderer = new XYMultipleSeriesRenderer();
         renderer.setAxisTitleTextSize(16);
         renderer.setChartTitleTextSize(20);
@@ -128,26 +138,30 @@ public class Fragment_Analysis_Epch extends Fragment {
         SimpleSeriesRenderer r = new SimpleSeriesRenderer();
         r.setColor(Color.BLUE);
         renderer.addSeriesRenderer(r);
-        r = new SimpleSeriesRenderer();
-        r.setColor(Color.RED);
-        renderer.addSeriesRenderer(r);
+
         return renderer;
     }
 
+    @SuppressLint("DefaultLocale")
     private void myChartSettings(XYMultipleSeriesRenderer renderer) {
-        renderer.setChartTitle("Truiton's Performance by AChartEngine BarChart");
+        renderer.setChartTitle("Densidade Carrier-to-noise em dB-Hz");
+
+        renderer.setXTitle("Satélites");
+        renderer.setYTitle("Cn0DbHz");
+
         renderer.setXAxisMin(0.5);
         renderer.setXAxisMax(10.5);
         renderer.setYAxisMin(0);
-        renderer.setYAxisMax(210);
-        renderer.addXTextLabel(1, "2010");
-        renderer.addXTextLabel(2, "2011");
-        renderer.addXTextLabel(3, "2012");
-        renderer.addXTextLabel(4, "2013");
+        renderer.setYAxisMax(40);
+
+        for (int i = 0; i < analise.getListCn0DbHz().size(); i++){
+            renderer.addXTextLabel(i + 1, "G" + String.format("%02d", analise.getListPRNs().get(i)));
+        }
+
+        renderer.setDisplayChartValues(true);
+
         renderer.setYLabelsAlign(Paint.Align.RIGHT);
         renderer.setBarSpacing(0.5);
-        renderer.setXTitle("Years");
-        renderer.setYTitle("Performance");
         renderer.setShowGrid(true);
         renderer.setGridColor(Color.GRAY);
         renderer.setXLabels(0); // sets the number of integer labels to appear

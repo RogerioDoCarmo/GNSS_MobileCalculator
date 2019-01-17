@@ -17,6 +17,7 @@ public class AnaliseEpoca {
     private Double meanCn0DbHz;
 
     private ArrayList<Double> listCn0DbHz;
+    private ArrayList<Integer> listPRNs;
 
     //TODO FAZER DESVIO PADRÃO
 
@@ -28,6 +29,7 @@ public class AnaliseEpoca {
     private void calcMinMaxMean() {
         ArrayList<Double> listaCn0DbHz = epoca.getListCn0DbHz();
         listCn0DbHz = new ArrayList<>();
+        listPRNs    = new ArrayList<>();
 
         Double min = Double.MAX_VALUE;
         Double max = Double.MIN_VALUE;
@@ -47,6 +49,8 @@ public class AnaliseEpoca {
                 min = listaCn0DbHz.get(i);
                 indexMinCn0DbHz = i;
             }
+
+            listPRNs.add(epoca.getListaPRNs().get(i)); //TODO REVISAR EFICIENCIA
 
             mean += listaCn0DbHz.get(i);
         }
@@ -80,6 +84,10 @@ public class AnaliseEpoca {
 
     public ArrayList<Double> getListCn0DbHz() {
         return listCn0DbHz;
+    }
+
+    public ArrayList<Integer> getListPRNs() {
+        return listPRNs;
     }
 
     @Override
