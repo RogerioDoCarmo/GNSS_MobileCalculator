@@ -80,6 +80,8 @@ public class Fragment_Analysis_Epch extends Fragment {
 
         TextView txtResult = view.findViewById(R.id.txtAnalise);
         txtResult.setMovementMethod(new ScrollingMovementMethod());
+        String resultAll = controller.getListAnalysisAsString();
+        txtResult.setText(resultAll);
 
         Button btnSearch = view.findViewById(R.id.btnSearch);
         btnSearch.setOnClickListener(new View.OnClickListener() {
@@ -94,7 +96,9 @@ public class Fragment_Analysis_Epch extends Fragment {
                     analise = controller.analisarEpoca(epocaAnalise);
                     String result = analise.toString();
                     txtResult.setText(result);
+                    txtResult.setTextSize(12);
                     btnGraph.setEnabled(true);
+                    controller.gravar_analises(getContext());
                 }
             }
         });

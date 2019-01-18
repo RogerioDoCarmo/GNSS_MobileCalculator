@@ -1,6 +1,7 @@
 package com.rogeriocarmo.gnss_mobilecalculator.Controller;
 
 import com.rogeriocarmo.gnss_mobilecalculator.Model.EpocaGPS;
+import com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -90,6 +91,10 @@ public class AnaliseEpoca {
         return listPRNs;
     }
 
+//    public double getErrorClockMeters(){
+//        return epoca.get * GNSSConstants.LIGHTSPEED;
+//    }
+
     @Override
     public String toString(){
         return
@@ -106,6 +111,17 @@ public class AnaliseEpoca {
                 "Arithmetic mean of Cn0DbHz: " + new DecimalFormat("###.###").format(meanCn0DbHz)
         ;
 
+    }
+
+    public String getAsStringLine() {
+        return
+                epoca.getDateUTC().toString() + "; " +
+                epoca.getId() + "; " +
+                epoca.getNumSatelites() + "; " +
+                minCn0DbHz + "; " +
+                maxCn0DbHz + "; " +
+                new DecimalFormat("###.###").format(meanCn0DbHz) + ";"
+        ;
     }
 
 }

@@ -53,6 +53,7 @@ public class SingletronController {
     public static ArrayList<EpocaGPS> listaEpocas = new ArrayList<>();
 
     public static ArrayList<ResultEpch> listaResultados = new ArrayList<>();
+    public static ArrayList<AnaliseEpoca> listaAnalises = new ArrayList<>();
 
     public static EpocaGPS epocaAtual;
     public static TextWritter writter;
@@ -717,17 +718,28 @@ public class SingletronController {
         /**
          * DEFINIÇÃO MANUAL DA DATA DO RINEX:
          */
+        //DADOS DO LOG 1
+//        int YEAR = 18; // FIXME RINEX
+//        int MONTH = 10; // FIXME RINEX
+//        int DAY_MONTH = 31; // FIXME RINEX
+//        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+//        int HOUR_DAY = 20; // FIXME RINEX
+//        int MIN_HOUR = 0; // FIXME RINEX
+//        double SEC = 0.0; // FIXME RINEX
+
         int YEAR = 18; // FIXME RINEX
-        int MONTH = 10; // FIXME RINEX
-        int DAY_MONTH = 31; // FIXME RINEX
+        int MONTH = 12; // FIXME RINEX
+        int DAY_MONTH = 17; // FIXME RINEX
         //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
-        int HOUR_DAY = 20; // FIXME RINEX
+        int HOUR_DAY = 16; // FIXME RINEX
         int MIN_HOUR = 0; // FIXME RINEX
         double SEC = 0.0; // FIXME RINEX
 
         GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
+
+        epocaEmAnalise.excluirSatelitePRN(21);
 
         qntSatEpchAtual = epocaEmAnalise.getNumSatelites();
 
@@ -770,7 +782,7 @@ public class SingletronController {
 
     public void processar_todas_epocas(){
 //        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);");
-        for (int i = 0; i < listaEpocas.size(); i++) {
+        for (int i = 0; i < 832; i++) { //FIXME
             if (listaEpocas.get(i).getNumSatelites() >= 4){
                 processar_epoca(i);
             }
@@ -948,6 +960,26 @@ public class SingletronController {
         return (Arrays.copyOf(lista.toArray(), lista.size(), String[].class));
     }
 
+    public String[] getListAnalysisAsArray(){
+        ArrayList<String> lista = new ArrayList<>();
+        if (listaAnalises.isEmpty()) analisarTodasEpocas();
+        lista.add("# Epoch (GPS time); N_epoch; Number of satellites; Minimum Cn0(DbHz); Maximum Cn0(DbHz); Mean Cn0(DbHz);\n");
+        for (int i = 0; i < listaAnalises.size(); i++){
+            lista.add(listaAnalises.get(i).getAsStringLine() + "\n");
+        }
+        return (Arrays.copyOf(lista.toArray(), lista.size(), String[].class));
+    }
+
+    public String getListAnalysisAsString(){
+        StringBuilder lista = new StringBuilder();
+        if (listaAnalises.isEmpty()) analisarTodasEpocas();
+        lista.append("# Epoch (GPS time); N_epoch; Number of satellites; Minimum Cn0(DbHz); Maximum Cn0(DbHz); Mean Cn0(DbHz);\n");
+        for (int i = 0; i < listaAnalises.size(); i++){
+            lista.append(listaAnalises.get(i).getAsStringLine() + "\n");
+        }
+        return (lista.toString());
+    }
+
     public String[] getListResultsArray(){
         ArrayList<String> lista = new ArrayList<>();
         lista.add("# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);\n");
@@ -990,6 +1022,11 @@ public class SingletronController {
     public boolean gravar_resultados(Context context){
         writter = new TextWritter(context); // FIXME
         return writter.gravar_txtSD(getListResultsArray(),"ListResults.txt");
+    }
+
+    public boolean gravar_analises(Context context){
+        writter = new TextWritter(context);
+        return writter.gravar_txtSD(getListAnalysisAsArray(), "ListAnalysis.txt");
     }
 
     public void send_txt(){
@@ -1463,6 +1500,12 @@ public class SingletronController {
 
         reader.close();
         return sb.toString();
+    }
+
+    public void analisarTodasEpocas(){
+        for (int i = 0; i < listaEpocas.size(); i++) {
+            listaAnalises.add(new AnaliseEpoca(listaEpocas.get(i)));
+        }
     }
 
     public String analisarEpocaTXT(int INDEX_EPCH) {

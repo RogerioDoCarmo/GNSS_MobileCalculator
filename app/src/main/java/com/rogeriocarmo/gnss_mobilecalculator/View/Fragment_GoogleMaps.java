@@ -560,7 +560,7 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
             Location.distanceBetween(coord.latitude,coord.longitude,
                     coordEP02.latitude,coordEP02.longitude, result);
 
-            if (result[0] <= distancia) {
+            if (result[0] >= distancia) {
                 mMap.addMarker(new MarkerOptions().
                         position(coord).
                         icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)).
