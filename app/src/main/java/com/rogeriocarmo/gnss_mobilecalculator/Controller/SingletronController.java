@@ -581,7 +581,7 @@ public class SingletronController {
      * Calcula as <b>coordenadas X,Y,Z (WGS-84)</b> para cada satélite.
      * <p>Calcula o <b>erro do relógio</b> para cada satélite em segundos.
      */
-    private void calcCoordSat(){
+    private void calcCoordSat() {
         GNSSDate dataObservacao = epocaAtual.getDateUTC();
 
         for (int i = 0; i < qntSatEpchAtual; i++ ){// FIXME
@@ -718,22 +718,32 @@ public class SingletronController {
         /**
          * DEFINIÇÃO MANUAL DA DATA DO RINEX:
          */
-        //DADOS DO LOG 1
+//        DADOS DO LOG 31-10-2018
+        int YEAR = 18; // FIXME RINEX
+        int MONTH = 10; // FIXME RINEX
+        int DAY_MONTH = 31; // FIXME RINEX
+        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+        int HOUR_DAY = 20; // FIXME RINEX
+        int MIN_HOUR = 0; // FIXME RINEX
+        double SEC = 0.0; // FIXME RINEX
+
+//        // DADOS DO LOG 17-12-2018 (LOG2)
 //        int YEAR = 18; // FIXME RINEX
-//        int MONTH = 10; // FIXME RINEX
-//        int DAY_MONTH = 31; // FIXME RINEX
+//        int MONTH = 12; // FIXME RINEX
+//        int DAY_MONTH = 17; // FIXME RINEX
+//        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+//        int HOUR_DAY = 16; // FIXME RINEX
+//        int MIN_HOUR = 0; // FIXME RINEX
+//        double SEC = 0.0; // FIXME RINEX
+
+//         DADOS DO LOG 03-09-2018
+//        int YEAR = 18; // FIXME RINEX
+//        int MONTH = 9; // FIXME RINEX
+//        int DAY_MONTH = 3; // FIXME RINEX
 //        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
 //        int HOUR_DAY = 20; // FIXME RINEX
 //        int MIN_HOUR = 0; // FIXME RINEX
 //        double SEC = 0.0; // FIXME RINEX
-
-        int YEAR = 18; // FIXME RINEX
-        int MONTH = 12; // FIXME RINEX
-        int DAY_MONTH = 17; // FIXME RINEX
-        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
-        int HOUR_DAY = 16; // FIXME RINEX
-        int MIN_HOUR = 0; // FIXME RINEX
-        double SEC = 0.0; // FIXME RINEX
 
         GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
@@ -782,7 +792,7 @@ public class SingletronController {
 
     public void processar_todas_epocas(){
 //        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);");
-        for (int i = 0; i < 832; i++) { //FIXME
+        for (int i = 0; i < 832; i++) { //FIXME listaEpocas.size() 832
             if (listaEpocas.get(i).getNumSatelites() >= 4){
                 processar_epoca(i);
             }
@@ -1168,7 +1178,7 @@ public class SingletronController {
 
     public String readLogger_RawAssets(Context context) throws  IOException{
         //EP02 2018-10-31
-        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.logdia31mes10b))); // FIXME DEIXAR DINAMICO
+        BufferedReader reader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.logdia31mes10a))); // FIXME DEIXAR DINAMICO
         StringBuilder sb = new StringBuilder();
 
         //PULANDO O CABEÇALHO
