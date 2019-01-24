@@ -719,13 +719,13 @@ public class SingletronController {
          * DEFINIÇÃO MANUAL DA DATA DO RINEX:
          */
 //        DADOS DO LOG 31-10-2018
-        int YEAR = 18; // FIXME RINEX
-        int MONTH = 10; // FIXME RINEX
-        int DAY_MONTH = 31; // FIXME RINEX
-        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
-        int HOUR_DAY = 20; // FIXME RINEX
-        int MIN_HOUR = 0; // FIXME RINEX
-        double SEC = 0.0; // FIXME RINEX
+//        int YEAR = 18; // FIXME RINEX
+//        int MONTH = 10; // FIXME RINEX
+//        int DAY_MONTH = 31; // FIXME RINEX
+//        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+//        int HOUR_DAY = 20; // FIXME RINEX
+//        int MIN_HOUR = 0; // FIXME RINEX
+//        double SEC = 0.0; // FIXME RINEX
 
 //        // DADOS DO LOG 17-12-2018 (LOG2)
 //        int YEAR = 18; // FIXME RINEX
@@ -745,11 +745,22 @@ public class SingletronController {
 //        int MIN_HOUR = 0; // FIXME RINEX
 //        double SEC = 0.0; // FIXME RINEX
 
+//        DADOS DO LOG 4 24/01/2019
+        int YEAR = 19; // FIXME RINEX
+        int MONTH = 1; // FIXME RINEX
+        int DAY_MONTH = 24; // FIXME RINEX
+        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+        int HOUR_DAY = 16; // FIXME RINEX
+        int MIN_HOUR = 0; // FIXME RINEX
+        double SEC = 0.0; // FIXME RINEX
+
+
         GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
 
-        epocaEmAnalise.excluirSatelitePRN(21);
+        if (epocaEmAnalise.getNumSatelites() >= 5)
+            epocaEmAnalise.excluirSatelitePRN(21); // FIXME !!!!!!!!!
 
         qntSatEpchAtual = epocaEmAnalise.getNumSatelites();
 
@@ -786,13 +797,21 @@ public class SingletronController {
         listaCoordAtual = new ArrayList<>();
         listaPRNsAtual = new ArrayList<>();
         epocaAtual = escolherEpoca(INDEX_ANALISE);
+
+        int sizeMeasurements = listaMedicoesAtual.size();
+
+        //todo teste
+        if ( (listaEfemeridesAtual.size() != sizeMeasurements) && (listaPRNsAtual.size() != sizeMeasurements) ){
+            return;
+        }
+
         calcCoordSat();
         listaResultados.add(calcularMMQ());
     }
 
     public void processar_todas_epocas(){
 //        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);");
-        for (int i = 0; i < 832; i++) { //FIXME listaEpocas.size() 832
+        for (int i = 0; i < listaEpocas.size(); i++) { //FIXME listaEpocas.size() 832
             if (listaEpocas.get(i).getNumSatelites() >= 4){
                 processar_epoca(i);
             }
