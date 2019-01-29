@@ -1,13 +1,21 @@
 package com.rogeriocarmo.gnss_mobilecalculator.Controller;
 
+import com.google.common.primitives.Doubles;
 import com.rogeriocarmo.gnss_mobilecalculator.Model.EpocaGPS;
 import com.rogeriocarmo.gnss_mobilecalculator.Model.GNSSConstants;
+
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class AnaliseEpoca {
+
+    public EpocaGPS getEpoca() {
+        return epoca;
+    }
 
     private EpocaGPS epoca;
 
@@ -16,6 +24,8 @@ public class AnaliseEpoca {
     private Double maxCn0DbHz;
     private int indexMaxCn0DbHz;
     private Double meanCn0DbHz;
+
+    private Double stdCn0DbHz;
 
     private ArrayList<Double> listCn0DbHz;
     private ArrayList<Integer> listPRNs;
@@ -94,6 +104,28 @@ public class AnaliseEpoca {
 //    public double getErrorClockMeters(){
 //        return epoca.get * GNSSConstants.LIGHTSPEED;
 //    }
+
+    public double getCn0DbHzByPRN(int PRN){
+        if (listPRNs.contains(PRN)){
+            int pos = -1;
+            for (int i = 0; i < listCn0DbHz.size(); i++) {
+                if (listPRNs.get(i).equals(PRN)){
+                    pos = i;
+                    break;
+                }
+            }
+            return  listCn0DbHz.get(pos);
+        }
+        return  Double.NaN;
+    }
+
+    private Double getSTDCn0DbHz(){
+        StandardDeviation sd = new StandardDeviation(false);
+
+        double[] valores = Doubles.toArray(listCn0DbHz);
+
+        return  sd.evaluate(valores);
+    }
 
     @Override
     public String toString(){

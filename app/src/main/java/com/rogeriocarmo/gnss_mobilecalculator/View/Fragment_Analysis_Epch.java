@@ -83,6 +83,8 @@ public class Fragment_Analysis_Epch extends Fragment {
         String resultAll = controller.getListAnalysisAsString();
         txtResult.setText(resultAll);
 
+        controller.analisar_S4(); // FIXME
+
         Button btnSearch = view.findViewById(R.id.btnSearch);
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override

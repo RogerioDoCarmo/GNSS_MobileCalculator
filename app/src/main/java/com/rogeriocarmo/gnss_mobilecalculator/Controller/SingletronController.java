@@ -3,11 +3,14 @@ package com.rogeriocarmo.gnss_mobilecalculator.Controller;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.common.primitives.Doubles;
 import com.rogeriocarmo.gnss_mobilecalculator.Model.CoordenadaCartesiana;
 
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -728,13 +731,13 @@ public class SingletronController {
 //        double SEC = 0.0; // FIXME RINEX
 
 //        // DADOS DO LOG 17-12-2018 (LOG2)
-//        int YEAR = 18; // FIXME RINEX
-//        int MONTH = 12; // FIXME RINEX
-//        int DAY_MONTH = 17; // FIXME RINEX
-//        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
-//        int HOUR_DAY = 16; // FIXME RINEX
-//        int MIN_HOUR = 0; // FIXME RINEX
-//        double SEC = 0.0; // FIXME RINEX
+        int YEAR = 18; // FIXME RINEX
+        int MONTH = 12; // FIXME RINEX
+        int DAY_MONTH = 17; // FIXME RINEX
+        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+        int HOUR_DAY = 16; // FIXME RINEX
+        int MIN_HOUR = 0; // FIXME RINEX
+        double SEC = 0.0; // FIXME RINEX
 
 //         DADOS DO LOG 03-09-2018
 //        int YEAR = 18; // FIXME RINEX
@@ -746,21 +749,21 @@ public class SingletronController {
 //        double SEC = 0.0; // FIXME RINEX
 
 //        DADOS DO LOG 4 24/01/2019
-        int YEAR = 19; // FIXME RINEX
-        int MONTH = 1; // FIXME RINEX
-        int DAY_MONTH = 24; // FIXME RINEX
-        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
-        int HOUR_DAY = 16; // FIXME RINEX
-        int MIN_HOUR = 0; // FIXME RINEX
-        double SEC = 0.0; // FIXME RINEX
+//        int YEAR = 19; // FIXME RINEX
+//        int MONTH = 1; // FIXME RINEX
+//        int DAY_MONTH = 24; // FIXME RINEX
+//        //int DAY_WEEK = GNSSConstants.DAY_SEX; // FIXME RINEX
+//        int HOUR_DAY = 16; // FIXME RINEX
+//        int MIN_HOUR = 0; // FIXME RINEX
+//        double SEC = 0.0; // FIXME RINEX
 
 
         GNSSDate dataRINEX = new GNSSDate(YEAR,MONTH,DAY_MONTH,HOUR_DAY,MIN_HOUR,SEC);
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
 
-        if (epocaEmAnalise.getNumSatelites() >= 5)
-            epocaEmAnalise.excluirSatelitePRN(21); // FIXME !!!!!!!!!
+//        if (epocaEmAnalise.getNumSatelites() >= 5)
+//            epocaEmAnalise.excluirSatelitePRN(21); // FIXME !!!!!!!!!
 
         qntSatEpchAtual = epocaEmAnalise.getNumSatelites();
 
@@ -1546,5 +1549,45 @@ public class SingletronController {
         AnaliseEpoca analise = new AnaliseEpoca(listaEpocas.get(INDEX_EPCH));
         return analise;
     }
+
+    public double analisar_S4(){
+        if (listaAnalises != null && listaAnalises.isEmpty()) {
+            analisarTodasEpocas();
+        }
+
+        ArrayList<Double> listaSat = new ArrayList<>();
+
+        for (int i = 0; i < listaAnalises.size(); i++) {
+            if (listaAnalises.get(i).getEpoca().getDateUTC().getYear() == 18 &&
+                    listaAnalises.get(i).getEpoca().getDateUTC().getMonth() == 12 &&
+                        listaAnalises.get(i).getEpoca().getDateUTC().getDay_Month() == 17 &&
+                    listaAnalises.get(i).getEpoca().getDateUTC().getHour() == 17 &&
+                    listaAnalises.get(i).getEpoca().getDateUTC().getMin() == 19)
+            {
+                Double valor = listaAnalises.get(i).getCn0DbHzByPRN(25);
+                if (!valor.isNaN()){
+                    listaSat.add(valor);
+                }
+            }
+        }
+
+        double[] listaSatMin = Doubles.toArray(listaSat);
+
+        DescriptiveStatistics desc = new DescriptiveStatistics(listaSatMin);
+
+        Double MEAN = desc.getMean();
+        Double STD = desc.getVariance();
+
+        Double Ssnr = ( ( (STD * STD) - (MEAN * MEAN) ) / (MEAN * MEAN) );
+
+        Log.i("S4_INICIO",Ssnr.toString());
+
+        Ssnr = Math.sqrt(Ssnr);
+
+        Log.i("S4_RAIZ",Ssnr.toString());
+
+        return Ssnr;
+    }
+
 
 }
