@@ -762,8 +762,8 @@ public class SingletronController {
 
         EpocaGPS epocaEmAnalise = listaEpocas.get(INDEX_ANALISE);
 
-//        if (epocaEmAnalise.getNumSatelites() >= 5)
-//            epocaEmAnalise.excluirSatelitePRN(21); // FIXME !!!!!!!!!
+        if (epocaEmAnalise.getNumSatelites() >= 5)
+            epocaEmAnalise.excluirSatelitePRN(21); // FIXME !!!!!!!!!
 
         qntSatEpchAtual = epocaEmAnalise.getNumSatelites();
 
@@ -814,7 +814,7 @@ public class SingletronController {
 
     public void processar_todas_epocas(){
 //        Log.i("RESULTADO_HEADER","# Epoca (GPS time); N_epoca; X(m); Y(m); Z(m); Dtr(s); SigmaX(m); SigmaY(m); SigmaZ(m); SigmaDtr(s); Qtde_Sat; Dtr(m);");
-        for (int i = 0; i < listaEpocas.size(); i++) { //FIXME listaEpocas.size() 832
+        for (int i = 0; i < 769; i++) { //FIXME listaEpocas.size() 832
             if (listaEpocas.get(i).getNumSatelites() >= 4){
                 processar_epoca(i);
             }
