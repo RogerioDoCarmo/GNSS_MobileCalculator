@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".View.Fragment_Analysis_Epch">
+
+    <TextView
+        android:id="@+id/txtAnalise"
+        android:layout_width="365dp"
+        android:layout_height="288dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:scrollbars="vertical"
+        android:textSize="9sp" />
+
+    <Button
+        android:id="@+id/btnGraph"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="450dp"
+        android:layout_marginStart="140dp"
+        android:text="Gráfico" />
+
+    <EditText
+        android:id="@+id/txtID"
+        android:layout_width="157dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="ID da época"
+        android:layout_marginTop="100dp"
+        android:layout_marginStart="10dp"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/btnSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="175dp"
+        android:layout_marginTop="100dp"
+        android:text="Analisar" />
+
+</FrameLayout>
