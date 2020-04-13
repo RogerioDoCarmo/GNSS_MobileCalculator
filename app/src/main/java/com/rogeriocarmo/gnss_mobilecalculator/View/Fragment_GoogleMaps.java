@@ -294,10 +294,10 @@ public class Fragment_GoogleMaps extends Fragment implements OnMapReadyCallback 
             resultGeoid = getArguments().getParcelableArrayList("Coord"); //TODO obter aqui direto do controller
 
             if (isNetworkConnected()){
-                show_dialog_interval();
+                //show_dialog_interval();
             }else{
                 show_dialog_noInternet();
-                voltar_fragment_inicial();
+                //voltar_fragment_inicial();
             }
         }
     }

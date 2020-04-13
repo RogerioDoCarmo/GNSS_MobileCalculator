@@ -27,7 +27,7 @@
         android:debuggable="false"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,HardcodedDebugMode"> <!-- Acrescentado para remover warnings ! -->
 
-        <activity android:name=".View.Activity_Main">
+        <activity android:name=".NewApp.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

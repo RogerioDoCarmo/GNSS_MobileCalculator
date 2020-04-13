@@ -37,6 +37,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="240dp"
         android:layout_marginStart="15dp"
-        android:text="Página do Projeto:" />
+        android:text="Project website:" />
 
 </FrameLayout>

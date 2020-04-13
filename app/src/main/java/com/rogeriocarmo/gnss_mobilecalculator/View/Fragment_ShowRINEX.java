@@ -68,8 +68,8 @@ public class Fragment_ShowRINEX extends Fragment {
         if (getArguments() != null) {
 
         }
-        controller = SingletronController.getInstance();
-        build_RINEX2();
+        //controller = SingletronController.getInstance();
+        //build_RINEX2();
     }
 
     @Override
@@ -77,7 +77,8 @@ public class Fragment_ShowRINEX extends Fragment {
         View view = inflater.inflate(R.layout.fragment_show_rinex, container, false);
 
         TextView txtRINEX = view.findViewById(R.id.txtRINEX);
-        txtRINEX.setText(RINEX.getRINEXasString());
+//        txtRINEX.setText(RINEX.getRINEXasString());
+        txtRINEX.setText("ARQUIVO RINEX!");
 
         Button button = view.findViewById(R.id.btnSalvarRINEX2);
         button.setOnClickListener(new View.OnClickListener() {
