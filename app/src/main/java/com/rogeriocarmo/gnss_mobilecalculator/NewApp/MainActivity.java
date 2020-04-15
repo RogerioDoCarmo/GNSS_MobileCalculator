@@ -71,19 +71,10 @@ public class MainActivity extends AppCompatActivity
     private void definir_sidebar_inativa(){
         Menu menuNav = navigationView.getMenu();
 
-        MenuItem navItem1 = menuNav.findItem(R.id.menu_import_files);
-        navItem1.setEnabled(false);
-
-        MenuItem navItem2 = menuNav.findItem(R.id.menu_show_results);
+        MenuItem navItem2 = menuNav.findItem(R.id.menu_show_collect);
         navItem2.setEnabled(true);
 
-        MenuItem navItem3 = menuNav.findItem(R.id.menu_list_epchs);
-        navItem3.setEnabled(false);
-
-        MenuItem navItem4 = menuNav.findItem(R.id.menu_analise_epch);
-        navItem4.setEnabled(false);
-
-        MenuItem navItem5 = menuNav.findItem(R.id.menu_show_maps);
+        MenuItem navItem5 = menuNav.findItem(R.id.menu_show_realtime_maps);
         navItem5.setEnabled(true);
 
         MenuItem navItem6 = menuNav.findItem(R.id.menu_save_rinex);
@@ -93,20 +84,14 @@ public class MainActivity extends AppCompatActivity
     public static void definir_sidebar_ativa(){
         Menu menuNav = navigationView.getMenu();
 
-        MenuItem navItem2 = menuNav.findItem(R.id.menu_show_results);
+        MenuItem navItem2 = menuNav.findItem(R.id.menu_show_collect);
         navItem2.setEnabled(true);
 
-        MenuItem navItem3 = menuNav.findItem(R.id.menu_list_epchs);
-        navItem3.setEnabled(true);
-
-        MenuItem navItem4 = menuNav.findItem(R.id.menu_show_maps);
+        MenuItem navItem4 = menuNav.findItem(R.id.menu_show_realtime_maps);
         navItem4.setEnabled(true);
 
         MenuItem navItem5 = menuNav.findItem(R.id.menu_save_rinex);
         navItem5.setEnabled(true);
-
-        MenuItem navItem6 = menuNav.findItem(R.id.menu_analise_epch);
-        navItem6.setEnabled(true);
 
 //        drawerCopy.openDrawer(GravityCompat.START); FIXME
 //        Toast.makeText(mContext, "Processamento concluído!!!", Toast.LENGTH_SHORT).show();
@@ -173,19 +158,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.menu_import_files:
-                fragmentClass = Fragment_Import.class;
-                break;
-            case R.id.menu_show_results:
+            case R.id.menu_show_collect:
                 fragmentClass = Fragment_ShowResults.class;
                 break;
-            case R.id.menu_list_epchs:
-                fragmentClass = Fragment_RecyclerView_Epchs.class;
-                break;
-            case R.id.menu_analise_epch:
-                fragmentClass = Fragment_Analysis_Epch.class;
-                break;
-            case R.id.menu_show_maps:
+            case R.id.menu_show_realtime_maps:
                 fragmentClass = Fragment_GoogleMaps.class;
                 ArrayList<CoordenadaGeodesica> valores = controller.getResultadosGeodeticos();
                 bundle.putParcelableArrayList("Coord", valores); //TODO Obter direto no Fragment do Maps

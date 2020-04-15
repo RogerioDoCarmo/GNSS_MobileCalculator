@@ -4,11 +4,13 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 import com.rogeriocarmo.gnss_mobilecalculator.R;
 
@@ -25,7 +27,7 @@ public class Fragment_About extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private WebView mWebView;
-    private String mURL = "http://200.145.185.216/"; //INCT Web Page
+    private String mURL = "http://inct-gnss-navaer.fct.unesp.br/en/"; //INCT Web Page
 
     public Fragment_About() {
         // Required empty public constructor
@@ -64,10 +66,13 @@ public class Fragment_About extends Fragment {
         mWebView = view.findViewById(R.id.webView);
         mWebView.setWebViewClient(new MyBrowser());
         mWebView.getSettings().setLoadsImagesAutomatically(true);
-        mWebView.getSettings().setJavaScriptEnabled(true); //TODO Review
+        mWebView.getSettings().setJavaScriptEnabled(false);
         mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         mWebView.loadUrl(mURL);
         WebView.setWebContentsDebuggingEnabled(false);
+
+        TextView txtWebpageLink = view.findViewById(R.id.textOpenLink);
+        txtWebpageLink.setMovementMethod(LinkMovementMethod.getInstance());
 
         return view;
     }

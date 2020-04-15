@@ -5,33 +5,18 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/menu_import_files"
-            android:icon="@drawable/ic_menu_file"
-            android:title="ZZZZ" />
-
-        <item
-            android:id="@+id/menu_list_epchs"
-            android:icon="@drawable/ic_menu_list"
-            android:title="ZZZZ" />
-
-        <item
-            android:id="@+id/menu_analise_epch"
-            android:icon="@drawable/ic_menu_analysis"
-            android:title="ZZZZ" />
-
-        <item
-            android:id="@+id/menu_show_results"
+            android:id="@+id/menu_show_collect"
             android:icon="@drawable/ic_menu_download"
             android:title="Collect RAW GNSS data" />
 
         <item
-            android:id="@+id/menu_show_maps"
+            android:id="@+id/menu_show_realtime_maps"
             android:icon="@drawable/ic_menu_location"
             android:title="Real time positioning" />
 
         <item
             android:id="@+id/menu_save_rinex"
-            android:icon="@drawable/ic_menu_text"
+            android:icon="@drawable/ic_menu_text_file"
             android:title="RINEX files generation" />
     </group>
 

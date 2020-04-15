@@ -7,28 +7,62 @@
     android:paddingTop="@dimen/maps_fragment_vertical_spacing"
     tools:context="com.rogeriocarmo.gnss_mobilecalculator.View.Fragment_GoogleMaps">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapa"
+    <FrameLayout
+        android:id="@+id/FRAGMENT_MAPS_UP"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="49dp" />
+        android:layout_height="300dp">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_filter"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="155dp"
-        android:layout_marginEnd="05dp"
-        android:layout_gravity="end|bottom"
-        android:src="@android:drawable/ic_menu_preferences" />
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapa"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="49dp" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="155dp"
-        android:layout_marginStart="05dp"
-        android:layout_gravity="start|bottom"
-        android:src="@android:drawable/ic_menu_add" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_filter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="155dp"
+            android:layout_marginEnd="05dp"
+            android:layout_gravity="end|bottom"
+            android:src="@android:drawable/ic_menu_preferences" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_add"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="155dp"
+            android:layout_marginStart="05dp"
+            android:layout_gravity="start|bottom"
+            android:src="@android:drawable/ic_menu_add" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/FRAGMENT_MAPS_DOWN"
+        android:layout_width="match_parent"
+        android:layout_height="700dp">
+
+
+        <TextView
+            android:id="@+id/txtPROCESSING"
+            android:layout_width="350dp"
+            android:layout_height="285dp"
+            android:layout_marginTop="320dp"
+            android:layout_marginHorizontal="30dp"
+            android:scrollbars="vertical"
+            android:text="RESULTADOS!"
+            android:textAlignment="gravity"
+            android:textSize="8sp" />
+
+        <Button
+            android:id="@+id/btnOK"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="175dp"
+            android:layout_marginTop="620dp"
+            android:text="OK" />
+
+    </FrameLayout>
 
 </FrameLayout>
