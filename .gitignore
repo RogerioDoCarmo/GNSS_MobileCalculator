@@ -59,3 +59,4 @@ freeline_project_description.json
 # Inclusoes adicionais
 .idea/caches/build_file_checksums.ser
 *.stackdump
+google_maps_api.xml
