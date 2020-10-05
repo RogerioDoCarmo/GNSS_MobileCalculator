@@ -6,7 +6,8 @@
  Diversos aplicativos consomem dados GNSS dentre eles estão:
 1. [GPSTest](https://play.google.com/store/apps/details?id=com.chartcross.gpstest&hl=en)
 2. [Geo++ RINEX Logger](https://play.google.com/store/apps/details?id=de.geopp.rinexlogger)
-3. [PPP WizLite](https://play.google.com/store/apps/details?id=jocs.fr.gnss_ppp&rdid=jocs.fr.gnss_ppp)
+3. [rinex On](https://play.google.com/store/apps/details?id=com.eu.nsl.rinexON)
+4. [PPP WizLite](https://play.google.com/store/apps/details?id=jocs.fr.gnss_ppp&rdid=jocs.fr.gnss_ppp)
 
 ## Referências Bibliográficas
 Informações adicionais sobre medições GNSS em dispositivos Android podem ser encontradas nos seguintes endereços:
